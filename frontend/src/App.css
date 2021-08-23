@@ -1,0 +1,58 @@
+.App {
+  height: 100vh;
+  width: 100vh;
+}
+body{
+  margin: 0;
+  padding: 0;
+}
+
+
+.contentSection{
+  min-height: 1000px;
+}
+.sidebarSection{
+/*max-height: 100vh ;*/
+top: 01;
+bottom: 0;
+left: 0;
+/*z-index: 1000;*/
+padding: 20px;
+/*overflow-x: hidden;
+overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+background-color: #f5f5f5;
+
+}
+.sidebarItem{
+  display: block;
+}
+.sidebarRight{
+  position: -webkit-sticky;
+	position: sticky;
+	top: 0;
+  padding: 0 15px;
+}
+.footerSection{
+ padding-top: 3rem;
+ min-height: 300px;
+}
+.badge{
+  background-color: rgb(211, 235, 235);
+  cursor: pointer;
+  margin: 5px;
+  height:auto;
+}
+.CARD_IMGe{
+  width: 300px;
+  height: 300px;
+}
+.Cattle_Img_Container{
+  width: 200px;
+  height: 200px;
+}
+.Image{
+  min-width: 500px;
+  max-height: 50vh;
+}
+
+
