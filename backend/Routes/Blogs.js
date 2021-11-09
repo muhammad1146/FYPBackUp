@@ -1,52 +1,46 @@
 const express = require( 'express');
 const BlogController = require( '../Controllers/Blogs');
+const expertVerify = require('./expertVerify');
+const verifyToken = require('./verifyToken');
 const router = express.Router();
 
-//Blog 
+router.get("/tags",verifyToken, BlogController.getAllBlogTags); // get all Tags from Tag Box
 
-router.post("/",BlogController.addBlog); // add new blog
+router.post('/tags',verifyToken,expertVerify,BlogController.addBlogTag); // add new tag to tags box
 
-router.get("/",BlogController.getBlogs); // get all blogs
-
-router.get('/:bid',BlogController.getBlog); // get single Blog
-
-router.put("/:bid",BlogController.editBlog); // edit a blog
-
-router.delete("/:bid",BlogController.deleteBlog); // delete a blog
-
+router.get("/myblogs",verifyToken,expertVerify ,BlogController.getExpertBlogs); // get all blogs 
  
+router.get("/myblogs/:bid",verifyToken, expertVerify,BlogController.getExpertBlog); // get all blogs 
+//Blog  
+router.post("/",verifyToken,expertVerify,BlogController.addBlog); // add new blog
+
+router.get("/",verifyToken,BlogController.getBlogs); // get all blogs 
+// router.get("/specific/:tags",verifyToken,BlogController.getSpecificTagBlogs); // get all blogs 
+router.get('/:bid',verifyToken,BlogController.getBlog); // get single Blog for non-owners
+
+router.put("/:bid",verifyToken,BlogController.editBlog); // edit a blog for owners
+
+router.delete("/:bid",verifyToken,BlogController.deleteBlog); // delete a blog
 //Blog Comments
+router.get("/:bid/blogcomments",verifyToken,BlogController.getBlogComments); // get Blog Comments
 
-router.get("/:id/blogcomments",BlogController.GetBlogComments); // get Blog Comments
+router.post('/:bid/blogcomments',verifyToken,BlogController.addBlogComment); // add Blog Comments
 
-router.post('/blogcomments',BlogController.addBlogComment); // add Blog Comments
+router.put("/:bid/blogcomments/:bcid",verifyToken,BlogController.editBlogComment); // edit Blog comments
 
-router.put("/:id/blogcomments/:bcid",BlogController.editBlogComments); // edit Blog comments
-
-router.delete("/:id/blogcomments/:bcid",BlogController.deleteBlog); // delete blog comments
-
-
+router.delete("/:id/blogcomments/:bcid",verifyToken,BlogController.deleteBlogComment); // delete blog comments
 //Blog Reacts
+router.get("/:bid/reacts",verifyToken,BlogController.getBlogReacts); // get All Blog Reacts
 
-router.get("/:id",BlogController.getBlogReacts); // get All Blog Reacts
+router.post('/:bid/reacts',verifyToken,BlogController.addBlogReact); // add Blog React
 
-router.post('/id',BlogController.addBlogReact); // add Blog React
-
-router.put('/id',BlogController.editBlogReact); // change/edit Blog React
-
+router.put('/:bid/reacts/:rid',verifyToken,BlogController.editBlogReact); // change/edit Blog React
 //Blog Tags 
-
-router.get("/tags",BlogController.getAllBlogTags); // get all Tags from Tag Box
-
-router.post('/tags',BlogController.addTag); // add new tag to tags box
-
 //Blog Reports
+router.post('/:bid/blogreports',verifyToken,BlogController.addBlogReport); // add report Blog
 
-router.post('/blogreports',BlogController.addBlogReport); // add report Blog
+router.delete('/:bid/blogreports/:brid',verifyToken,BlogController.deleteBlogReport); // delete a blog report
 
-router.delete('/blogreports/:brid',BlogController.deleteBlogReport); // delete a blog report
+router.get('/:bid/blogreports', verifyToken,BlogController.getBlogReports); // get all blog reports of current user
 
-router.get('/blogreports', BlogController.getBlogReport); // get all blog reports of current user
-
-
-module.exports = router;
+module.exports = router; 

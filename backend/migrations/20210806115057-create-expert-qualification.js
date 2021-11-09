@@ -1,30 +1,32 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('expertQualifications', {
+    await queryInterface.createTable('expertqualification', {
       id: {
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true,
+        primaryKey: true, 
         type: Sequelize.INTEGER
       },
       qualification: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20),
+        allowNull:false
       },
-      startDate: {
-        type: Sequelize.STRING
-      },
-      endDate: {
-        type: Sequelize.STRING
+      duration: {
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       percentage: {
-        type: Sequelize.STRING
+        type: Sequelize.FLOAT,
+        allowNull:false
       },
       institution: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull:false
       },
       expertId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -37,6 +39,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('expertQualifications');
+    await queryInterface.dropTable('expertqualification');
   }
 };

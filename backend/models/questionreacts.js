@@ -4,25 +4,42 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class QuestionReacts extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
+    /*
+    Only "Farmers" can React on Question.
      */
-    static associate({Questions,Farmers,Experts}) {
-      // define association here
+    static associate({Questions,Farmers}) {
+      // define association here 
       this.belongsTo(Questions,{foreignKey:'questionId'});
       this.belongsTo(Farmers,{foreignKey:'commiterId'});
-      this.belongsTo(Experts,{foreignKey:'commiterId'});
     }
   };
   QuestionReacts.init({
-    questionId: DataTypes.INTEGER,
-    commitType: DataTypes.STRING,
-    commiterType: DataTypes.STRING,
-    commiterId: DataTypes.INTEGER
+    questionId:  //FK
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    commitType: 
+    {
+      type:DataTypes.STRING(4),
+      allowNull:false,
+      validate:
+      {
+        isIn:
+        {
+          args:[["UP","DOWN"]],
+          msg:"Must be UP or DOWN."
+        }
+      }
+    },
+    commiterId:
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }
   }, {
     sequelize,
+    tableName:'questionreacts',
     modelName: 'QuestionReacts',
   });
   return QuestionReacts;

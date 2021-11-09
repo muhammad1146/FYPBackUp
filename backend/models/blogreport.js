@@ -3,31 +3,53 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class blogReport extends Model {
+  class BlogReport extends Model {
     /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
+     ONLY EXPERTS CAN REPORT ANY BLOG
      */
-    static associate({Questions,Farmers,Experts}) {
+    static associate({Questions,Farmers,Experts,Blogs}) {
       // define association here
       this.belongsTo(Questions,{foreignKey:'questionId'});
       this.belongsTo(Farmers,{foreignKey:'reporterId'});
       this.belongsTo(Experts,{foreignKey:'reporterId'});
-
-
-
+      this.belongsTo(Blogs,{foreignKey:'blogId'});
     }
+    
   };  
-  blogReport.init({
-    questionId: DataTypes.INTEGER,
-    reporterId: DataTypes.INTEGER,
-    reportDescription: DataTypes.STRING,
-    reportStatus: DataTypes.STRING,
-    date: DataTypes.STRING
+  BlogReport.init({
+    blogId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reporterId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reportDescription: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    reportStatus: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false,
+      defaultValue:"US",
+      validate:
+      {
+        isIn:
+        {
+        args:[["S", "US"]],
+        msg:"reportStatus must be seen or unseen"
+        }
+      }
+    },
   }, {
     sequelize,
-    modelName: 'blogReport',
+    tableName:'blogreport',
+    modelName: 'BlogReport',
   });
-  return blogReport;
+  return BlogReport;
 };

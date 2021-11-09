@@ -1,31 +1,69 @@
 'use strict';
+const { nanoid } = require('nanoid');
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class farms extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class Farms extends Model {
+  
     static associate({Farmers}) {
       // define association here
-      this.hasMany(Farmers,{foreignKey:'farmerId'});
+      this.belongsTo(Farmers,{foreignKey:'farmerId'});
+    }
+    toJSON() {
+      return {...this.get(),id:undefined}
     }
   };
-  farms.init({
-    farmName: DataTypes.STRING,
-    farmSize: DataTypes.STRING,
-    numberOfCattle: DataTypes.INTEGER,
-    startDate: DataTypes.STRING,
-    farmLocation: DataTypes.STRING,
-    farmType: DataTypes.STRING,
-    images: DataTypes.STRING,
-    farmerId: DataTypes.INTEGER
+  Farms.init({
+    uuid:{
+      type:DataTypes.STRING,
+      defaultValue:nanoid(10),
+      unique: true
+      },
+    farmName: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    farmSize: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    numberOfCattle:
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    startDate:
+    {
+      type:DataTypes.DATE,
+      allowNull:false
+    },
+    farmLocation: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    farmingType: 
+    {
+      type:DataTypes.STRING,
+      defaultValue: "Cattle",
+      allowNull:false
+    },
+    image: 
+    {
+      type:DataTypes.STRING,
+    },
+    farmerId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }
   }, {
     sequelize,
-    modelName: 'farms',
+    tableName:'farms',
+    modelName: 'Farms',
   });
-  return farms;
+  return Farms;
 };

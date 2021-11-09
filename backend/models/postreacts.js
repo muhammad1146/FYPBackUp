@@ -5,10 +5,8 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class PostReacts extends Model {
     /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    Only Farmers can react on Post.
+    */
     static associate({Posts, Farmers}) {
       // define association here
       this.belongsTo(Posts,{foreignKey:'postId'});
@@ -16,12 +14,32 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   PostReacts.init({
-    commitType: DataTypes.STRING,
-    date: DataTypes.DATE,
-    farmerId: DataTypes.INTEGER,
-    postId: DataTypes.INTEGER
+    commitType: 
+    {
+      type:DataTypes.STRING(2),
+      allowNull:false,
+      validate:
+      {
+        isIn:
+        {
+          args:[["L","DL"]],
+          msg:"Must be L (like) or DL (dislike)."
+        }
+      }
+    },
+    farmerId:  //FK
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    postId: //FK
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }
   }, {
     sequelize,
+    tableName:'postreacts',
     modelName: 'PostReacts',
   });
   return PostReacts;

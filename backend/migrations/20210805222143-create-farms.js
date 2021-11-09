@@ -1,4 +1,5 @@
 'use strict';
+const {nanoid} = require('nanoid');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('farms', {
@@ -8,32 +9,45 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
-      },
-      size: {
-        type: Sequelize.STRING
+      uuid:{
+        type:Sequelize.STRING,
+        defaultValue:nanoid(10),
+        unique: true
+        },
+      farmName: 
+      {
+        type:Sequelize.STRING(20),
+        allowNull:false
+      }, 
+      farmSize: {
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       numberOfCattle: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       startDate: {
-        type: Sequelize.STRING
+        type: Sequelize.DATE,
+        allowNull:false
       },
-      location: {
-        type: Sequelize.STRING
+      farmLocation: {
+        type: Sequelize.STRING,
+        allowNull:false
+
       },
       farmingType: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20),
+      allowNull:false
       },
-      images: {
-        type: Sequelize.STRING
+      image: {
+        type: Sequelize.STRING,
       },
-      likes: {
-        type: Sequelize.INTEGER
-      },
+      
       farmerId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false 
+
       },
       createdAt: {
         allowNull: false,

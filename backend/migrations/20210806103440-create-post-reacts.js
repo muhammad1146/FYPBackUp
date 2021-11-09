@@ -1,17 +1,17 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('PostReacts', {
+    await queryInterface.createTable('postreacts', {
       id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
+        primaryKey: true
       },
-      commitType: {
+      commitType: { 
         type: Sequelize.STRING
       },
-      commiterId: {
+      farmerId: {
         type: Sequelize.INTEGER
       },
       postId: {
@@ -28,6 +28,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('PostReacts');
+    await queryInterface.dropTable('postreacts');
   }
 };

@@ -1,28 +1,53 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { nanoid } = require('nanoid');
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class expertExperience extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class ExpertExperience extends Model {
+    
     static associate({Experts}) {
       // define association here
       this.belongsTo(Experts,{foreignKey:'expertId'});
     }
+    toJSON() {
+      return {...this.get(),id:undefined}
+    }
   };
-  expertExperience.init({
-    institute: DataTypes.STRING,
-    startDate: DataTypes.STRING,
-    endDate: DataTypes.STRING,
-    position: DataTypes.STRING,
-    expertId: DataTypes.INTEGER
+  ExpertExperience.init({
+    uuid:{
+      type:DataTypes.STRING,
+      defaultValue:nanoid(8),
+      unique:true,
+      allowNull:false
+    },
+    institute: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    startDate: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    endDate: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    }, 
+    position: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    expertId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }, //FK
   }, {
     sequelize,
-    modelName: 'expertExperience',
+    tableName: 'expertexperience',
+    modelName: 'ExpertExperience',
   });
-  return expertExperience;
+  return ExpertExperience;
 };

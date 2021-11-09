@@ -1,0 +1,14 @@
+<header />
+<image />
+<Container>
+<Nav> 
+<item> Discussion </item>
+<item> Ecommerce </item>
+<item> Blogs </item>
+</Nav>
+<FunctionalityContainer>
+
+here lies my main Container, when we click "Discussion" button, the Discussion feature will be uploaded here.
+and so on.
+</Container>
+<Footer />

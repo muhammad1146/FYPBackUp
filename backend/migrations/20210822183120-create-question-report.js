@@ -1,28 +1,43 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('questionReports', {
-      id: {
+    await queryInterface.createTable('questionreport', {
+      id: 
+      {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      questionId: {
-        type: Sequelize.INTEGER
-      },
+      questionId: 
+      {
+        type: Sequelize.INTEGER,
+        allowNull:false
+
+      }, 
       reporterId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       reportDescription: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+      allowNull:false
+
       },
       reportStatus: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(6),
+      allowNull:false,
+      validate:
+      {
+        isIn: 
+        {
+          args:[["seen","unseen"]],
+          msg:"Must be seen or unseen."
+        }
+      }
+
       },
-      date: {
-        type: Sequelize.STRING
-      },
+     
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -34,6 +49,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('questionReports');
+    await queryInterface.dropTable('questionreport');
   }
 };

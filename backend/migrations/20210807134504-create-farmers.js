@@ -1,24 +1,42 @@
 'use strict';
+
+const { nanoid } = require("nanoid");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Farmers', {
+    await queryInterface.createTable('farmers', {
       id: {
-        allowNull: false,
+        allowNull: false, 
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      uuid:{
+        type:Sequelize.STRING,
+        defaultValue:nanoid(10),
+        unique:true
+      },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(100),
+        allowNull:false
       },
       userName: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull:false,
+        unique:true
+      }, 
+      password: {
+        type: Sequelize.STRING,
+        allowNull:false,
+        
       },
       phoneNumber: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(12),
+        
       },
       farmingType: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(20),
+        allowNull:false
       },
       address: {
         type: Sequelize.STRING
@@ -30,7 +48,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       rankId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -43,6 +62,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Farmers');
+    await queryInterface.dropTable('farmers');
   }
 };

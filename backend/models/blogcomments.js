@@ -1,28 +1,51 @@
 'use strict';
+const { nanoid } = require('nanoid');
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class BlogComments extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    /*
+    Both Farmers and Experts can comment on Blog*/
     static associate({Blogs,Farmers,Experts}) {
       // define association here
       this.belongsTo(Blogs,{foreignKey:'blogId'});
-      this.belongsTo(Farmers, { foreignKey: 'commenterId', as:'farmerComment'});
-      this.belongsTo(Experts, { foreignKey: 'commenterId', as:'expertComment'});
+      this.belongsTo(Farmers, { foreignKey: 'commenterId',constraints:false});
+      this.belongsTo(Experts, { foreignKey: 'commenterId',constraints:false});
+    }
+    toJSON(){
+      return {...this.get(), id:undefined}
     }
   };
   BlogComments.init({
-    blogId: DataTypes.INTEGER,
-    body: DataTypes.STRING, 
-    commenterType: DataTypes.STRING, 
-    commenterId: DataTypes.INTEGER
+    uuid:{
+      type:DataTypes.STRING,
+      defaultValue:nanoid(8),
+      unique: true
+      },
+    blogId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    body: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    }, 
+    commenterType: 
+    {
+      type:DataTypes.STRING(10),
+      allowNull:false
+    }, 
+    commenterId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }
   }, {
     sequelize,
+    tableName:'blogcomments',
     modelName: 'BlogComments',
   });
   return BlogComments;

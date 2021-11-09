@@ -1,24 +1,37 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('AnswerReacts', {
+    await queryInterface.createTable('answerreacts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      
       commitType: {
-        type: Sequelize.STRING
+        type:Sequelize.STRING,
+        allowNull:false,
+       validate:
+       { 
+          isIn: 
+          {
+            args: [['like', 'dislike']],
+            msg: "Answer React must be like or dislike"
+          }
+        }
       },
       commiterType: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull:false
       },
       commiterId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       answerId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +44,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('AnswerReacts');
+    await queryInterface.dropTable('answerreacts');
   }
 };

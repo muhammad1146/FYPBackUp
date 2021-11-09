@@ -3,26 +3,43 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class expertQualification extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class ExpertQualification extends Model {
     static associate({Experts}) {
       // define association here
       this.belongsTo(Experts,{foreignKey:'expertId'}); 
     }
+    
   };
-  expertQualification.init({
-    qualification: DataTypes.STRING,
-    duration: DataTypes.STRING,
-    percentage: DataTypes.STRING,
-    institution: DataTypes.STRING,
-    expertId: DataTypes.INTEGER
+  ExpertQualification.init({
+    qualification: 
+    {
+      type:DataTypes.STRING, 
+      allowNull:false
+    },
+    duration: 
+    {
+      type:DataTypes.INTEGER,  //Months
+      allowNull:false
+    },
+    percentage: 
+    {
+      type:DataTypes.FLOAT, 
+      allowNull:false
+    },
+    institution: 
+    {
+      type:DataTypes.STRING(50), 
+      allowNull:false
+    },
+    expertId: 
+    {
+      type:DataTypes.INTEGER, 
+      allowNull:false
+    },
   }, {
     sequelize,
-    modelName: 'expertQualification',
+    tableName: 'expertqualification',
+    modelName: 'ExpertQualification',
   });
-  return expertQualification;
+  return ExpertQualification;
 };

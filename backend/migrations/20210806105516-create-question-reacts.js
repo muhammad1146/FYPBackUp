@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('QuestionReacts', {
+    await queryInterface.createTable('questionreacts', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,16 +9,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       questionId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
-      commitType: {
-        type: Sequelize.STRING
-      },
-      commiterType: {
-        type: Sequelize.STRING
+      commitType: { 
+        type: Sequelize.STRING(4),
+        allowNull:false
       },
       commiterId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('QuestionReacts');
+    await queryInterface.dropTable('questionreacts');
   }
 };

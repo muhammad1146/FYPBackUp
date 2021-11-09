@@ -1,21 +1,31 @@
 'use strict';
+
+const { nanoid } = require("nanoid");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('PostComments', {
+    await queryInterface.createTable('postcomments', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: true, 
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      comment: {
+      uuid:{
+        type:Sequelize.STRING,
+        defaultValue:nanoid(8),
+        unique: true
+        },
+      commentBody: {
         type: Sequelize.STRING
       },
       commenterId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       postId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +38,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('PostComments');
+    await queryInterface.dropTable('postcomments');
   }
 };

@@ -4,26 +4,63 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class ExpertReports extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate({Farmers,Experts}) {
       this.belongsTo(Experts,{foreignKey:'expertId'});
-      this.belongsTo(Farmers,{foreignKey:'farmerId'});
-
+      this.belongsTo(Experts,{foreignKey:'reporterId',constraints:false});
+      this.belongsTo(Farmers,{foreignKey:'reporterId',constraints:false});
       // define association here
     }
-  };
+    };
   ExpertReports.init({
-    expertId: DataTypes.INTEGER,
-    farmerId: DataTypes.INTEGER, 
-    reportDescription: DataTypes.STRING,
-    reportStatus: DataTypes.STRING,
-    date: DataTypes.STRING
+    expertId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reporterId: //FK
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }, 
+    reporterType: 
+    {
+      type:DataTypes.STRING(2),
+      allowNull:false,
+      validate: 
+      {
+        isIn : 
+        {
+          args:[["F","E"]],
+          msg:"reporterType can be only F or E."
+        }
+      }},
+    reportType: 
+    {
+      type:DataTypes.STRING(20),
+      allowNull:false,
+    },
+    reportDescription: 
+    {
+      type:DataTypes.STRING
+    },
+    reportStatus: 
+    {
+      type:DataTypes.STRING(2),
+      allowNull:false,
+      defaultValue:"US",
+      validate:
+      {
+        isIn:
+        {
+          args: [["S","US"]],
+          msg: "reportStatus must be S or US."
+        }
+      }
+    },
+    
   }, {
     sequelize,
+    tableName:'expertreports',
     modelName: 'ExpertReports',
   });
   return ExpertReports;

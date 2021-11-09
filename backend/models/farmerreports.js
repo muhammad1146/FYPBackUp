@@ -2,26 +2,59 @@
 const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class FarmerReports extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    /*
+    Both can Report Farmers here.     
+    */
     static associate({Farmers,Experts}) {
       // define association here
-      this.belongsTo(Farmers,{foreignKey:'farmerId'})
-      this.belongsTo(Experts,{foreignKey:'reporterId'})
+      this.belongsTo(Farmers,{foreignKey:'farmerId'});
+      this.belongsTo(Experts,{foreignKey:'reporterId',constraints:false});
+      this.belongsTo(Farmers,{foreignKey:'reporterId',constraints:false});
 
     }
+    
   };
   FarmerReports.init({
-    farmerId: DataTypes.INTEGER,
-    reporterId: DataTypes.INTEGER,
-    reportDescription: DataTypes.STRING,
-    reportStatus: DataTypes.STRING,
-    date: DataTypes.STRING
+    farmerId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reporterType:
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    reporterId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reportType: 
+    {
+      type:DataTypes.STRING(2),
+      allowNull:false,
+      validate:
+      {
+        isIn:
+        {
+          args:[["F","E"]],
+          msg:"Must be F or E."
+        }
+      }
+    },
+    reportDescription: 
+    {
+      type:DataTypes.STRING
+    },
+    reportStatus: 
+    {
+      type:DataTypes.STRING
+    },
+    
   }, {
     sequelize,
+    tableName:'farmerreports',
     modelName: 'FarmerReports',
   });
   return FarmerReports;

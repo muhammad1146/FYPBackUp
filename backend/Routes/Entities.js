@@ -1,69 +1,82 @@
 const express = require ( 'express');
-const AdminController = require ( '../Controllers/Admin');
+const EntitiesController = require ( '../Controllers/Entities');
+const verifyToken = require('./verifyToken');
+const adminVerify = require('./adminVerify');
 const router = express.Router();
+// These endpoints are for admin  
+//Farmer
+router.put("/farmers/:id",verifyToken,adminVerify,EntitiesController.changeFarmerStatus); // block/unblock Farmer's Account
+ 
+//Farmer Reports
+router.get('/farmers/reports',verifyToken,adminVerify,EntitiesController.getReportedFarmers); //get All Reported Farmers
 
-// These endpoints are for admin 
-// Farmers
-router.post("/farmers",AdminController.addFarmer) // add farmer
+router.get('/farmers/:id/reports',verifyToken,adminVerify,EntitiesController.getFarmerReports); //get Farmer's Reports
 
-router.put("/farmers/:id",AdminController.updateUserInfo) // edit a farmer
+router.get('/farmers/:id/reports/:frid',verifyToken,adminVerify,EntitiesController.getFarmerReport); //get Farmer's Report
 
-router.get("/farmers",AdminController.getUsers) // get farmers
+router.put('/farmers/:id/reports/:frid',verifyToken,adminVerify,EntitiesController.respondToFarmerReport);//Respond on Farmer's Report
 
-router.get('/farmers/:id',AdminController.getFarmer) // get farmer
+// Experts 
+router.put("/experts/:eid",verifyToken,adminVerify, EntitiesController.changeExpertStatus); // block/unblock expert
 
-router.delete("/farmers/:id",AdminController.deleteUser) // delete farmer
+//Experts Reports
 
-// Experts
-router.get("/experts/reports",AdminController.getReportedExperts) // get reported Experts 
+router.get("/experts/reports",verifyToken,adminVerify,EntitiesController.getReportedExperts) // get reported Experts
 
-router.get('/experts/:eid',AdminController.getExpert) // get Experts 
+router.get('/experts/:eid/reports',verifyToken,adminVerify,EntitiesController.getExpertReports); //get Expert Reports
 
-router.post('/experts',AdminController.addExpert) // add Expert
+router.get('/farmers/:eid/reports/:erid',verifyToken,adminVerify,EntitiesController.getExpertReport); //get Expert Report
 
-router.put("/experts/:id",AdminController.editExpert) // edit Expert 
-
-router.delete("/experts/:id",AdminController.deleteExpert) // delete Expert
-
+router.put('/farmers/:eid/reports/:erid',verifyToken,adminVerify,EntitiesController.respondToExpertReport);//Respond/edit on Expert Report
+ 
 // Questions
-router.get('/questions/reports', AdminController.getQuestionReports) // get reported questions 
+router.delete ('/questions/:qid',verifyToken,adminVerify,EntitiesController.deleteQuestion); // delete question
 
-router.get('/questions/:qid' , AdminController.getReportedQuestion) // get single reporte Q
+//Question Reports
+router.get('/questions/reports',verifyToken,adminVerify,EntitiesController.getReportedQuestions) // get all reported questions 
 
-router.delete ('/questions/:qid',AdminController.deleteQuestion); // delete question
+router.get('/questions/:qid/reports',verifyToken,adminVerify,EntitiesController.getQuestionReports); // Get all reports of a single Question 
 
-router.put('/questions/:qid',AdminController.handleReportedQuestion); // respond on reported
+router.get('/questions/:qid/reports/:qrid',verifyToken,adminVerify,EntitiesController.getQuestionReport); // Get Question Report
 
+router.put('/questions/:qid/reports/:qrid',verifyToken,adminVerify,EntitiesController.respondToQuestionReport); //Respond on Report of a question
 
 // Answer
-router.put('/questions/:qid/answers/:aid',AdminController.handleReportedAnswer); //edit answer
+router.delete('/questions/:qid/answers/:aid',verifyToken,adminVerify,EntitiesController.deleteAnswer) // delete answer
 
-router.get('/questions/:qid/answers/reports',AdminController.getAnswerReports); //edit answer
+//Answer Reports
 
-router.delete('/questions/:qid/answers/:aid',AdminController.deleteAnswer) // delete answer
+router.put('/questions/:qid/answers/:aid/reports/:arid',verifyToken,adminVerify,EntitiesController.respondToAnswerReport); //Respond/edit each answer report
+
+router.get('/questions/:qid/answers/reports',verifyToken,adminVerify,EntitiesController.getReportedAnswers); //get all reported answers
+
+router.get('/question/:qid/answers/:aid/reports',verifyToken,adminVerify,EntitiesController.getAnswerReports); //get All Reports to amswer
+
+router.get('/question/:qid/answers/:aid/reports/:arid',verifyToken,adminVerify,EntitiesController.getAnswerReport); //get one Report to answer
 
 // Posts
+router.delete("/ecommerce/:pid",verifyToken,adminVerify,EntitiesController.deletePost); // delete an ecommerce post
 
-router.get('/ecommerce/reports',AdminController.getPostReports) // getting all reported posts
+// Post Reports
 
-router.get('/ecommerce/:pid', AdminController.getPost) // get a reported post
+router.get('/ecommerce/reports',verifyToken,adminVerify,EntitiesController.getReportedPosts) // getting all reported ecommerce posts
 
-router.put('/ecommerce/:pid', AdminController.handleReportedPost); // respond on reported post
+router.get('/ecommerce/:pid/reports',verifyToken,adminVerify,EntitiesController.getPostReports); //get all reports on an ecommerce Post
 
-router.delete('/ecommerce/:pid',AdminController.deletePost); // delete specific post
+router.get('/ecommerce/:pid/reports/:prid',verifyToken,adminVerify,EntitiesController.getPostReport); //Get Report of Any Post
 
-
+router.put('/ecommerce/:pid/reports/:prid',verifyToken,adminVerify,EntitiesController.respondToPostReport); //Respond/edit on Post Report
 
 // blog
-router.get('/blogs/reports',AdminController.getBlogReports); // getting all reported blog
+router.delete('/blogs/:bid',verifyToken,adminVerify, EntitiesController.deleteBlog);  // delete specific blog
 
-router.get('/blogs/:bid',AdminController.getBlog); // get a reported blog
+//Blog Reports
+router.get('/blogs/reports',verifyToken,adminVerify, EntitiesController.getReportedBlogs); // getting all reported blog
 
-router.put('/blogs/:bid',AdminController.handleBlogReports) // respond on reported blogs
+router.get('/blogs/:bid/reports',verifyToken,adminVerify, EntitiesController.getBlogReports); // get All Blog Reports
 
-router.delete('/blogs/:bid',AdminController.deleteBlog)  // delete specific blog
+router.get('/blogs/:bid/reports/:brid',verifyToken,adminVerify,EntitiesController.getBlogReport); //Get Blog Report
 
-
-
-
+router.put('/blogs/:bid/reports/:brid',verifyToken,adminVerify,EntitiesController.respondToBlogReport); //Respond/edit Blog Report
+ 
 module.exports = router;

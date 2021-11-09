@@ -1,27 +1,58 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class ecommerceReport extends Model {
+  class EcommerceReport extends Model {
     /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+    Only "Farmers" can Report any "EcommercePost". */
+    static associate({Farmers,Posts}) {
+      this.belongsTo(Farmers,{foreignKey:'reporterId'});
+      this.belongsTo(Posts,{foreignKey:'postId'});
+    } 
   };
-  ecommerceReport.init({
-    postId: DataTypes.INTEGER,
-    reporterId: DataTypes.INTEGER,
-    reportDescription: DataTypes.STRING,
-    reportStatus: DataTypes.STRING,
-    date: DataTypes.STRING
+  EcommerceReport.init({
+    postId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reporterId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reportDescription: 
+    {
+      type:DataTypes.STRING
+    },
+    reportStatus: 
+    {
+      type:DataTypes.STRING(2) ,
+      allowNull:false, 
+      validate:
+      { isIn:
+        {
+          args:[["S","US"]],
+          msg:"Must be S or US."
+      }
+      }
+    },
+    
+    reportType:
+    {
+      type:DataTypes.STRING(4),
+      allowNull:false,
+      validate:
+      {
+        isIn:
+        {
+          args:[["spam","fake"]]
+        }
+      }
+    }
   }, {
     sequelize,
-    modelName: 'ecommerceReport',
+    tableName: 'ecommercereport',
+    modelName: 'EcommerceReport',
   });
-  return ecommerceReport;
+  return EcommerceReport;
 };

@@ -1,49 +1,132 @@
 'use strict';
+const { nanoid } = require('nanoid');
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Farmers extends Model {
-    static associate({BlogComments,RankFarmers,Questions,
-      QuestionComments,QuestionReacts,Farms,farmerFollows,
-      QuestionVotes,farmerBookmarks,Posts,PostReacts,
-      PostComments,answerReport,blogReport.questionReport}) {
+    static associate({BlogComments,FarmersRank,Questions,EcommerceReport,
+      QuestionComments,QuestionReacts,Farms,FarmerFollows,
+      QuestionVotes,FarmerBookmarks,Posts,PostReacts,
+      PostComments,AnswerReport,BlogReport,FarmersExperience,AnimalPostOrders,
+      AnswerReacts,BlogReacts,ExpertReports,FarmerReports}) {
       // define association here
-      this.belongsTo(RankFarmers,{foreignKey:'rankId', as:'rank'});
-      this.hasMany(BlogComments,{foreignKey:'commenterId', as:'farmerComment'})
+      this.belongsTo(FarmersRank,{foreignKey:'rankId'});
+      this.hasMany(BlogComments, 
+        {
+          foreignKey:'commenterId',
+          constraints:false,
+          scope:
+          {
+            commenterType:"Farmers"
+          }
+        });
+      this.hasMany(BlogReacts,
+        {
+          foreignKey:'commiterId',
+          constraints:false,
+          scope:
+          {
+          commiterType:"Farmers"
+          } 
+        });
       this.hasMany(Questions,{foreignKey:'farmerId'});
-      this.hasMany(QuestionComments,{foreignKey:'commenterId'});
-      this.hasMany(QuestionReacts,{foreignKey:'commiterId'});
-      this.hasMany(QuestionVotes,{foreignKey:'voterId'});
+      this.hasMany(QuestionComments,
+        {
+          foreignKey:'commenterId',
+          constraints: false,
+          scope: 
+          {
+            commenterType: 'Farmers'
+        }});
+      this.hasMany(QuestionReacts,{foreignKey:'commiterId'}); 
+     
       this.hasMany(Farms,{foreignKey:'farmerId'});
-      this.hasMany(farmerFollows,{foreignKey:'farmerId'});
-      this.hasMany(farmerBookmarks,{foreignKey:'farmerId'});
+      this.hasMany(FarmerFollows,{foreignKey:'farmerId'});
+      this.hasMany(FarmerBookmarks,{foreignKey:'farmerId'});
       this.hasMany(Posts,{foreignKey:'farmerId'});
       this.hasMany(PostComments,{foreignKey:'commenterId'});
       this.hasMany(PostReacts,{foreignKey:'commiterId'});
-      this.hasMany(experienceFarmers,{foreignKey:'farmerId'});
+      this.hasMany(FarmersExperience,{foreignKey:'farmerId'});
       this.hasMany(AnimalPostOrders,{foreignKey:'farmerId'});
-      this.hasMany(answerReport,{foreignKey:'reporterId'});
-      this.hasMany(blogReport,{foreignKey:'reporterId'});
-      this.hasMany(questionReport,{foreignKey:'reporterId'});
-
-
-
-      
+      this.hasMany(AnswerReport,
+        {
+          foreignKey:'reporterId',
+          constraints: false,
+          scope: 
+          {
+            reporterType: 'Farmers'
+          }
+        });
+      this.hasMany(BlogReport,{foreignKey:'reporterId'});
+      this.hasMany(EcommerceReport,{foreignKey:'reporterId'});
+      this.hasMany(AnswerReacts,
+        {
+          foreignKey:'commiterId',
+          constraints:false,
+          scope:
+          {
+            commiterType: "Farmers"
+          }
+        });
+        this.hasMany(ExpertReports,
+          {
+            foreignKey:'reporterId',
+            constraints:false,
+            scope:
+            {
+              reporterType: "Farmers"
+            }
+          });
+          this.hasMany(FarmerReports,
+            {
+              foreignKey:'reporterId',
+              constraints:false,
+              scope:
+              {
+                reporterType: "Farmers"
+              }
+            }); 
+    }
+    toJSON() {
+      return {...this.get(),id:undefined}
     }
   };
   Farmers.init({
-    name: DataTypes.STRING,
-    userName: DataTypes.STRING,
-    phoneNumber: DataTypes.STRING,
-    Date: DataTypes.DATE,
-    farmingType: DataTypes.STRING,
+    uuid:{
+      type:DataTypes.STRING,
+      defaultValue:nanoid(10),
+      unique:true
+    },
+    name: 
+    {
+      type:DataTypes.STRING(100),
+      allowNull:false
+    },
+    userName: 
+    {
+      type:DataTypes.STRING,
+      allowNull:false,
+      unique: true
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull:false,
+      
+    },
+    phoneNumber: DataTypes.STRING(12),
+    farmingType: DataTypes.STRING(20),
     address: DataTypes.STRING,
     profileImage: DataTypes.STRING,
     description: DataTypes.STRING,
-    rankId: DataTypes.INTEGER
+    rankId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }
   }, {
     sequelize,
+    tableName:'farmers',
     modelName: 'Farmers',
   });
   return Farmers;

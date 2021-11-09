@@ -13,13 +13,27 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(Blogs,{foreignKey:'blogId'})
     }
+   
   };
   BlogImages.init({
-    blogId: DataTypes.INTEGER,
-    image: DataTypes.STRING,
-    positionInBlog: DataTypes.STRING
+    blogId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    image:
+    {
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+    positionInBlog: 
+    {
+    type:DataTypes.INTEGER,
+    allowNull:false
+  }
   }, {
     sequelize,
+    tableName:'blogimages',
     modelName: 'BlogImages',
   });
   return BlogImages;

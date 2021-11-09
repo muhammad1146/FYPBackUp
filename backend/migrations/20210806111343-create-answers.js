@@ -1,25 +1,37 @@
 'use strict';
+
+const { nanoid } = require("nanoid");
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Answers', {
+    await queryInterface.createTable('answers', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      uuid:{
+        type:Sequelize.STRING,
+        defaultValue:nanoid(8),
+        allowNull:false,
+        unique:true
+      },
       body: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT,
+        allowNull:false
       },
       questionId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       expertId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE 
       },
       updatedAt: {
         allowNull: false,
@@ -28,6 +40,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Answers');
+    await queryInterface.dropTable('answers');
   }
 };

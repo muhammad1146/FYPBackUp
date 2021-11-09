@@ -1,17 +1,25 @@
 'use strict';
+const {nanoid} = require('nanoid');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('expertExperiences', {
-      id: {
+    await queryInterface.createTable('expertexperience', {
+      id: { 
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      institute: {
-        type: Sequelize.STRING
+      uuid:{
+        type:Sequelize.STRING,
+        defaultValue:nanoid(8),
+        unique:true,
+        allowNull:false
       },
-      start: {
+      institute: {
+        type: Sequelize.STRING,
+        allowNull:false
+      },
+      startDate: {
         type: Sequelize.STRING
       },
       endDate: {
@@ -21,7 +29,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       expertId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull:false
       },
       createdAt: {
         allowNull: false,
@@ -34,6 +43,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('expertExperiences');
+    await queryInterface.dropTable('expertexperience');
   }
 };

@@ -2,22 +2,26 @@
 const {Model} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class BlogTags extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */ 
-    static associate({AllBlogTags,Blogs}) {
+    static associate ({BlogTagBox,Blogs}) {
       // define association here
-      this.belongsTo(Blogs, { foreignKey: 'blogId', as:'blog'});
-      this.belongsTo(AllBlogTags, { foreignKey: 'TagId', as:'tag'});
-    }
+      this.belongsTo(BlogTagBox,{foreignKey:'tagId'});
+       this.belongsTo(Blogs,{foreignKey:'blogId'});  
+    }  
   };
-  BlogTags.init({
-    blogId: DataTypes.INTEGER,
-    TagId: DataTypes.INTEGER
+  BlogTags.init({                  
+    blogId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }, //FK
+    tagId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    }, //FK
   }, {
     sequelize,
+    tableName:'blogtags',
     modelName: 'BlogTags',
   });
   return BlogTags;

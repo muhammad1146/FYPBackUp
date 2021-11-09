@@ -1,193 +1,409 @@
-const {Farmers,Experts,experienceFarmers,Farms,RankExperts,expertExperience,
-    expertQualification} = require('../models');
-
-exports.getFarmers = async (req,res,next) => {
-    try {
-        const users = await Farmers.findAll({include:RankFarmers});
-        return res.json(users);
-        
-    } catch (error) {
-        return res.status(500).json(error);
-    }
-};
-exports.getFarmer = async (req,res) => {
-const id = req.params.id;
-try {
-    const user = await Farmers.findOne({include:[RankFarmers,experienceFarmers,Farms]}, {where:{id}});
-    return res.json(user);
-} catch (error) {
-    return res.status(500).json(error);
-
-} 
-}
-exports.updateFarmerFarm = async (req,res) => {
-    const farmId = req.params.fid;
-    const {farmName,farmSize,numberOfCattle,farmLocation,farmType,images} = req.body;
-    try {
-        const farm = await Farms.update({farmName,farmSize,numberOfCattle,farmLocation,farmType,images},{where:{id:farmId}});
-        return res.json(farm);
-    } catch (error) {
-        return res.status(500).json(farm);
-    }
-
-}
-
-
-exports.updateFarmerInfo = async (req,res,next) => {
+const Joi = require('joi');
+const {Farmers,Experts,FarmerReports,ExpertReports,EcommerceReport,QuestionReport,
+    AnswerReports,BlogReport,QuestionComments,QuestionReacts,QuestionImages,Questions,
+    Answers,AnswerImages,AnswerReacts,Posts,PostComments,PostImages,PostReacts,AnimalPostOrders,
+Blogs,BlogComments,BlogImages,BlogReacts,BlogTags,QuestionTags} = require('../models');
+// Farmers
+exports.changeFarmerStatus = async(req,res) => {
     const id = req.params.id;
-    const {name,address,phoneNumber,description} = req.body;
-   
-   
+    const schema = Joi.object( {
+        ActiveStatus:Joi.string().required()
+    });
     try {
-        const updatedUser = await Farmers.update({name,address,phoneNumber,description},{where:{id}});
-        return res.json(updatedUser);
+        const value = await schema.validateAsync(req.body);
+        
+    } catch (error) {
+        res.status(400).send(error.details[0].message);
+        return;
+    }
+   
+        const {ActiveStatus } =req.body;
+        try {
+            const farmer = await Farmers.update({ActiveStatus},{where:{id}});
+            return res.json(farmer);
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    }; 
+//Farmer Reports
+exports.getReportedFarmers = async(req,res) => {
+    const reportStatus = "unseen";
+     try {
+         const AllfarmerReports = await FarmerReports.findAll({where:{reportStatus}});
+         return res.json(AllfarmerReports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+
+exports.getFarmerReports = async(req,res) => {
+   const farmerId = req.params.id;
+    try {
+        const reports = await FarmerReports.findAll({where:{farmerId}});
+        return res.json(reports);
     } catch (error) {
         return res.status(500).json(error);
     }
-};
-exports.addFarmer = (req,res,next) => {
-  //  res.send("Post Request for users");
-    const {name,phoneNumber,address,username,farmingType,rankId,
-        description,profileImage} = req.body.farmer;
-   // farm data
-        const {farmName,farmSize,startDate,endDate,farmType,animals,farmLocation,numberOfFarms} = req.body;
-  //  const {farmingTypeExperience,position,eStartDate,eEndDate} = req.body.farmerExperience;
-    const farmer = await Farmers.create({
-        name,phoneNumber,address,username,farmingType,rankId,description,profileImage
-      }, { transaction: t });
-    const farms = [],userExperienceBox = [];
-    for (let j=0; j<numberOfExperiences; j++){
-        const exper = {
-            farmType:req.body.farmerExperience.farmingTypeExperience[j],
-            position:req.body.farmerExperience.position[j],
-            startDate:req.body.farmerExperience.startDate[j],
-            endDate:req.body.farmerExperience.endDate[j],
-            farmerId: farmer.id
-        }
-        userExperienceBox.push(exper);
-    }
-    for(let j = 0; j <numberOfFarms; j++){
-        const farm = {
-            farmName,
-            startDate,endDate,farmType,animals,farmSize,farmLocation,farmerId:farmer.id
-        };
-        farms.push(farm);
-    };
-    const result = await sequelize.transaction(async (t) => {
-        const userFarms = await Farms.bulkCreate(Farms, {returning:true},{transaction:t});
-        // const captains = await Captain.bulkCreate([
-        //     { name: 'Jack Sparrow' },
-        //     { name: 'Davy Jones' }
-        //   ]);
-        const userExperience = await experienceFarmers.bulkCreate(userExperienceBox,{returning:true},{transaction:t});
-        return res.json(userFarms,userExperience);
-        
-    });
-    result.farmer= farmer;
-    res.json(result);
-
+    
 };
 
-exports.deleteFarmer = async(req,res,next) => {
-  const id = req.params.id;
-  try {
-      const user = await Farmers.destroy({where:{id}});
-      return res.json(user);
-  } catch (error) {
-      return res.status(500).json(error);
-  }
+exports.getFarmerReport = async(req,res) => {
+    const id = req.params.frid;
+     try {
+         const report = await FarmerReports.findOne({where:{id}});
+         return res.json(report);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
 
-};
+exports.respondToFarmerReport = async(req,res) => {
+    const id = req.params.frid;
+    const reportStatus = "seen";
+     try {
+         const response = await FarmerReports.update({reportStatus},{where:{id}});
+         return res.json(response);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
 
 //experts
-exports.getExperts = async(req,res,next) => {
-   
-    try {
-        const experts = await Experts.findAll({include:[RankExperts,expertExperience,expertQualification]});
-        return res.json(experts);
-    } catch (error) {
-       return res.status(500).json(error); 
-    }
-};
-
-exports.getExpert = async (req,res) => {
+exports.changeExpertStatus = async(req,res) => {
     const id = req.params.eid;
+    const schema = Joi.object({
+        ActiveStatus:Joi.string().required()
+    });
     try {
-        const experts = await Experts.findOne({include:[RankExperts,expertExperience,expertQualification]},{where: {id}});
-        return res.json(experts);
+        const value = await schema.validateAsync(req.body);
+        
     } catch (error) {
-       return res.status(500).json(error); 
+        res.status(400).send(error.details[0].message);
+        return;
+        
     }
-}
-// at signup
-exports.addExpert =async (req,res) => {
-    const {name,userName,phoneNumber,address,date,profileImage,description,rankId,experties} = req.body;
-    const {qualification,duration,percentage,institution} = req.body;
-    const {institute,startDate,endDate,position} = req.body;
+    const {ActiveStatus} = req.body;
+    try {
+        const farmer = await Experts.update({ActiveStatus},{where:{id}});
+        return res.json(farmer);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
     
+    }; 
+// Expert Reports
+exports.getReportedExperts = async(req,res) => {
+    const reportStatus = "unseen";
+     try {
+         const AllExpertReports = await ExpertReports.findAll({where:{reportStatus}});
+         return res.json(AllExpertReports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+
+ exports.getExpertReports = async(req,res) => {
+    const expertId = req.params.eid;
+     try {
+         const reports = await ExpertReports.findAll({where:{expertId}});
+         return res.json(reports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+ 
+exports.getExpertReport = async(req,res) => {
+     const id = req.params.erid;
+      try {
+          const report = await FarmerReports.findOne({where:{id}});
+          return res.json(report);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
+ 
+exports.respondToExpertReport = async(req,res) => {
+     const id = req.params.erid;
+     const reportStatus = "seen";
+      try {
+          const response = await ExpertReports.update({reportStatus},{where:{id}});
+          return res.json(response);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
+ 
+// Questions
+exports.deleteQuestion = (req,res) =>{
+    const id = req.params.qid;
     try {
-    const expert = await Experts.create({name,userName,phoneNumber,address,date,profileImage,
-        description,rankId,experties});
-        let expertId = expert.id;
-        const expertEdu = await expertQualification.create({qualification,duration,percentage,institution,expertId} );
-        const expertExp = await expertExperience.create({institute,startDate,endDate,position,expertId});
-        return res.json(expert,expertEdu,expertExp);   
+        const answers = Answers.destroy({where:{question:id}});
+        const reacts = QuestionReacts.destroy({where:{questionId:id}});
+        const comments = QuestionComments.destroy({where:{questionId:id}});
+        const tags = QuestionTags.destroy({where:{questionId}});
+        const images = QuestionImages.destroy({where:{questionId:id}});
+        const reports = QuestionReport.destroy({where:{questionId:id}});
+        const question = Questions.destroy({where:{id}});
+        return res.json({question,answers,reacts,comments,images,tags,reports}); 
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}; 
+
+exports.getReportedQuestions = async(req,res) => {
+    const reportStatus = "unseen";
+     try {
+         const AllReports = await QuestionReport.findAll({where:{reportStatus}});
+         return res.json(AllReports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+
+exports.getQuestionReports = async(req,res) => 
+{
+const questionId = req.params.qid;
+    try 
+    {
+        const reports = await QuestionReport.findAll({where:{questionId}});
+        return res.json(reports);
+    } catch (error) 
+    {
+        return res.status(500).json(error);
+    }
+    
+};
+ 
+exports.getQuestionReport = async(req,res) => {
+     const id = req.params.qrid;
+      try {
+          const report = await QuestionReport.findOne({where:{id}});
+          return res.json(report);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
+ 
+exports.respondToQuestionReport = async(req,res) => {
+     const id = req.params.qrid;
+     const reportStatus = "seen";
+      try {
+          const response = await QuestionReport.update({reportStatus},{where:{id}});
+          return res.json(response);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
+//Answers
+exports.deleteAnswer = async (req,res) =>{
+    const id = req.params.aid;
+    try {
+        const reports = await AnswerReports.destroy({where:{answerId:id}});
+        const reacts =await AnswerReacts.destroy({where:{answerId:id}});
+        const images =await AnswerImages.destroy({where:{answerId:id}});
+        const answer = await Answers.destroy({where:{id}});
+        return res.json({answer,reports,reacts,images}); 
     } catch (error) {
         return res.status(500).json(error);
     }
 };
+//Answer Reports
 
+exports.getReportedAnswers = async(req,res) => {
+    const reportStatus = "unseen";
+     try {
+         const AllReports = await AnswerReports.findAll({where:{reportStatus}});
+         return res.json(AllReports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
 
-exports.updateExpertInfo = async (req,res) => {
-    const id = req.params.eid;
-    const {name,phoneNumber,address,date,profileImage,description,experties} = req.body;
-    try {
-        const updatedExpert = await Experts.update({name,phoneNumber,address,profileImage,description,experties},{where:{id}});
-        return res.json(updatedExpert);
-    } catch (error) {
+exports.getAnswerReports = async(req,res) => 
+{
+const answerId = req.params.aid;
+    try 
+    {
+        const reports = await AnswerReports.findAll({where:{answerId}});
+        return res.json(reports);
+    } catch (error) 
+    {
         return res.status(500).json(error);
     }
+    
 };
-
-// exports.updateExpertEducation = async (req,res) => {
-
-//     const id = req.params.eeid;
-//     const {qualification,percentage,}
-
-
-// }
-// adding Qualification later
-exports.addExpertQualification = async (req,res) => {
-    const id = req.params.eid;
-    const {qualification,startDate,endDate,percentage,institution} = req.body;
-    try {
-        const education = await expertQualification.create({qualification,startDate,endDate,percentage,institution,expertId:id});
-        return res.json(education);
-    } catch (error) {
+ 
+exports.getAnswerReport = async(req,res) => 
+{
+    const id = req.params.arid;
+    try 
+    {
+        const report = await AnswerReports.findOne({where:{id}});
+        return res.json(report);
+    } catch (error) 
+    {
         return res.status(500).json(error);
     }
+    
+};
+ 
+exports.respondToAnswerReport = async(req,res) => {
+     const id = req.params.arid;
+     const reportStatus = "seen";
+      try {
+          const response = await AnswerReports.update({reportStatus},{where:{id}});
+          return res.json(response);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
 
-}
-// adding experience later
-exports.addExpertExperience = async (req,res) => {
-    const id = req.params.eid;
-    const {institute,startDate,endDate,position} = req.body;
-    try {
-        const experience = await expertExperience.create({institute,startDate,endDate,position,expertId:id});
-        return res.json(experience);
-    } catch (error) {
-        return res.status(500).json(error);
-    }
 
-}
+//Ecommerce 
 
-exports.deleteExpert = async (req,res) => {
-
-const {expertId} = req.body;
+exports.deletePost = async (req,res,next)=>{
+// For Deleting Post 
+const id = req.params.pid
 try {
-    const expert = await Experts.destroy({where:{id:expertId}});
-    return res.json(expert);
+const comments = await PostComments.destroy({where:{postId:id}});
+const images = await PostImages.destroy({where:{postId:id}});
+const reacts = await PostReacts.destroy({where:{postId:id}});
+const orders = await AnimalPostOrders.destroy({where:{postId:id}});
+const post = await Posts.destroy({where:{id}});
+return res.json(post,comments,images,reacts,orders);
 } catch (error) {
     return res.status(500).json(error);
-}
+} 
 };
+
+//Ecommerce Posts
+
+exports.getReportedPosts = async(req,res) => {
+const reportStatus = "unseen";
+    try {
+        const AllReports = await EcommerceReport.findAll({where:{reportStatus}});
+        return res.json(AllReports);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+    
+};
+
+exports.getPostReports = async(req,res) => 
+{
+const postId = req.params.pid;
+    try 
+    {
+        const reports = await EcommerceReport.findAll({where:{postId}});
+        return res.json(reports);
+    } catch (error) 
+    {
+        return res.status(500).json(error);
+    }
+    
+};
+ 
+exports.getPostReport = async(req,res) => 
+{
+    const id = req.params.prid;
+    try 
+    {
+        const report = await EcommerceReport.findOne({where:{id}});
+        return res.json(report);
+    } catch (error) 
+    {
+        return res.status(500).json(error);
+    }
+    
+};
+ 
+exports.respondToPostReport = async(req,res) => 
+{
+    const id = req.params.prid;
+    const reportStatus = "seen";
+    try 
+    {
+        const response = await EcommerceReport.update({reportStatus},{where:{id}});
+        return res.json(response);
+    } catch (error) 
+    {
+        return res.status(500).json(error);
+    }
+    
+}; 
+
+//Blogs
+
+exports.deleteBlog = async(req,res,next) =>{
+    const blogId = req.params.bid;
+    try {
+        const tags = await BlogTags.destroy({where:{blogId}});
+        const images =await BlogImages.destroy({where:{blogId}});
+        const reacts =await BlogReacts.destroy({where:{blogId}});
+        const comments =await BlogComments.destroy({where:{blogId}});
+        const reports =await BlogReport.destroy({where:{blogId}});
+        const blog =await Blogs.destroy({where:{id}});
+        return res.json(blog,tags,images,reacts,comments,reports); 
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};
+
+exports.getReportedBlogs = async(req,res) => {
+    const reportStatus = "unseen";
+     try {
+         const AllReports = await BlogReport.findAll({where:{reportStatus}});
+         return res.json(AllReports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+
+ exports.getBlogReports = async(req,res) => {
+    const blogd = req.params.bid;
+     try {
+         const reports = await BlogReport.findAll({where:{blogId}});
+         return res.json(reports);
+     } catch (error) {
+         return res.status(500).json(error);
+     }
+     
+ };
+ 
+exports.getBlogReport = async(req,res) => {
+     const id = req.params.brid;
+      try {
+          const report = await BlogReport.findOne({where:{id}});
+          return res.json(report);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  };
+ 
+exports.respondToBlogReport = async(req,res) => {
+     const id = req.params.prid;
+     const reportStatus = "seen";
+      try {
+          const response = await BlogReport.update({reportStatus},{where:{id}});
+          return res.json(response);
+      } catch (error) {
+          return res.status(500).json(error);
+      }
+      
+  }; 
+
+

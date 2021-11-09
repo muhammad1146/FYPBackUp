@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('answerReports', {
+    await queryInterface.createTable('answerreport', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,29 +11,56 @@ module.exports = {
       answerId: {
         type: Sequelize.INTEGER
       },
-      reporterId: {
+      reporterId: { 
         type: Sequelize.INTEGER
       },
-      reportDescription: {
+      reporterType: 
+      {
+       type:Sequelize.STRING,
+        allowNull:false,
+        validate:
+        { 
+          isIn: 
+          {
+            args: [['Farmers', 'Experts']],
+            msg: "Must be Farmers or Experts"
+          }
+        }},
+      reportDescription: 
+      {
         type: Sequelize.STRING
       },
-      reportStatus: {
-        type: Sequelize.STRING
+      reportStatus: 
+      {
+        type: Sequelize.STRING,
+        defaultValue:"US"
       },
-      date: {
-        type: Sequelize.STRING
+      reportType: 
+      {
+        type:Sequelize.STRING,
+        allowNull:false,
+        validate:
+        { 
+          isIn: 
+          {
+            args: [['Wrong Information', 'Not Clear',"Misleading"]],
+            msg: "Review Answer Report Types"
+          }
+        } 
       },
-      createdAt: {
+      createdAt: 
+      {
         allowNull: false,
         type: Sequelize.DATE
       },
-      updatedAt: {
+      updatedAt: 
+      {
         allowNull: false,
         type: Sequelize.DATE
       }
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('answerReports');
+    await queryInterface.dropTable('answerreport');
   }
 };
