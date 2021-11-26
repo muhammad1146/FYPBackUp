@@ -12,11 +12,10 @@ app.use(express.json());
 app.use('/api/blogs',BlogRoutes);
 app.use('/api/questions',Discussion);
 app.use('/api/ecommerce',Ecommerce);
-app.use('/api/admin',AdminRoutes);
+app.use('/api/admin',AdminRoutes); 
 app.use('/api/farmers',FarmerRoutes);
 app.use('/api/experts',ExpertRoutes);
 
-  
 app.get('/', (req, res) => {
 res.send(" CattleTalk Api is active and running...")
 })

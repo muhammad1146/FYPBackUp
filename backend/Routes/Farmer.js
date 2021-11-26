@@ -13,7 +13,7 @@ router.get('/ranks',FarmerController.getRanks); //get All Farmer Ranks
 router.post('/ranks',verifyToken,adminVerify,FarmerController.addRank); //get All Farmer Ranks
 
 router.post("/login",FarmerController.farmerLogin) //  farmer login
-//Farms
+//Farms 
 router.get('/farms',verifyToken,FarmerController.getFarms); // get all farms of a farmer
 
 router.post('/farms',verifyToken,FarmerController.addFarm); //add a farm

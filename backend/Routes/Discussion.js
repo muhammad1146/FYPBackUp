@@ -16,7 +16,10 @@ router.delete('/:qid',verifyToken,DiscussionController.deleteQuestion); // delet
 
 router.post('/:qid',verifyToken,DiscussionController.addQuestionReact); // adding a question react
 
+//Question Comments 
+router.post('/:qid/comments',verifyToken,DiscussionController.addQuestionComment); // adding a question react
 
+router.delete('/:qid/comments/:commentid',verifyToken,DiscussionController.deleteQuestionComment); // adding a question react
 
 //Question Reports
 

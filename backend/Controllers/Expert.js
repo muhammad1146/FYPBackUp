@@ -11,10 +11,8 @@ exports.addExpert =async (req,res) => {
           userName: Joi.string().required(),
           phoneNumber: Joi.string().required(),
           password: Joi.string().required(),
-          isAdmin: Joi.boolean().required(),
-          profileImage: Joi.string(),
-          description:Joi.string(),
-          experties:Joi.string().required()
+          address: Joi.string().required(),
+          experties:Joi.array().required()
       });
       try {
           const value = await schema.validateAsync(req.body);
@@ -22,21 +20,30 @@ exports.addExpert =async (req,res) => {
         return res.status(400).send(error.details[0].message);
           
       }
-      const {userName,name,password,isAdmin,profileImage,description,phoneNumber,experties} = req.body;
+      let {userName,name,password,phoneNumber,experties,address} = req.body;
+      
+      experties=experties.toString();
      const rankId = 1;
       const test = await Experts.findOne({where:{userName:userName}});
-     if(test) return res.status(400).send('UserName already exist!!');
+      const test1 = await Experts.findOne({where:{userName:userName}});
+     if(test || test1) return res.status(400).send('UserName already exist!!');
       const salt = await bcrypt.genSalt(10);
       const hashPassword = await bcrypt.hash(password,salt);
       try 
       {
-      const expert =await Experts.create({name,userName,isAdmin,password:hashPassword,profileImage,description,phoneNumber,experties,rankId});
+      const expert =await Experts.create({name,userName,password:hashPassword,phoneNumber,address,experties,rankId});
       return res.json(expert);
       } catch (error) 
       {
           return res.status(500).json(error);
       }
   };
+
+//   exports.updateImage = async (req,res) => {
+//       const schema = Joi.object({
+
+//       })
+//   }
 
   exports.addExpertExperience = async (req,res) => {
     const schema = Joi.object({
@@ -224,9 +231,9 @@ exports.getExperts = async(req,res,next) => {
 };
 
 exports.getExpert = async (req,res) => {
-    const id = req.params.eid;
+    const username = req.params.username;
     try {
-        const experts = await Experts.findOne({attributes:{exclude:['password']}},{include:[ExpertsRank,ExpertExperience,ExpertQualification]},{where: {id}});
+        const experts = await Experts.findOne({attributes:{exclude:['password']}},{include:[ExpertsRank,ExpertExperience,ExpertQualification]},{where: {username}});
         return res.json(experts);
     } catch (error) {
        return res.status(500).json(error); 
@@ -353,23 +360,24 @@ exports.expertLogin = async (req,res) => {
     const schema = Joi.object( {
         userName: Joi.string().required(),
         password:Joi.string().required(),
-        type: Joi.string().required().valid('E','A','F')
+        
     });
     try {
         const value = await schema.validateAsync(req.body);
     } catch (error) {
        return res.status(400).send(error.details[0].message);
     }
-    const {userName,password,type} = req.body;
-
+    console.log('expert login reached');
+    const {userName,password} = req.body;
+ 
      try {
         const expert = await Experts.findOne({where:{userName}});
         if(!expert) return res.status(400).send('Username not found!');
         const validPass = await bcrypt.compare(password,expert.password);
-        if(!validPass) return res.status(400).send('Password is not correct!');
+        if(!validPass) return res.status(401).json({error:'Password/username is not correct!'});
         const expertType = (expert.isAdmin) ? "A" : "E";
-        if(!(expertType===type)) return res.status(401).send("user type is not valid for these credentials");
-        const token = jwt.sign({uuid:expert.uuid,type:expertType},"secret");
+        // if(!(expertType===type)) return res.status(401).send("user type is not valid for these credentials");
+        const token = jwt.sign({uuid:expert.uuid,userType:expertType},"secret");
         return res.header('auth-token',token).send(token);
         } catch (err) {
          return res.status(500).json(err);

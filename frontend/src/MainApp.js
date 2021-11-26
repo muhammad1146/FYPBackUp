@@ -1,39 +1,84 @@
-import React,{useEffect, useState} from 'react'
-import FarmerDiscussion from './Farmers/Screens/DiscussionMain';
-import Ecommerce from './Farmers/Screens/EcommerceMain';
-import FarmerBlog from './Farmers/Screens/BlogMain';
-import ExpertDiscussion from './Expert/Screens/DiscussionMain';
-import ExpertBlog from './Experts/Screens/BlogMain';
-import {Container,Row,Col} from 'react-bootstrap'
-const MainApp = () => {
-  
-    return(   
-        <Container fluid >
-  <Row>
-    <Col  lg='2' className='ps-absolute sidebarSection'>
-      <Sidebar/>                            
-    </Col>
-    <Col lg="10" className="bg-light ">
-      <main>
-        <Switch>
-        <Route  path='/' component={FarmerDiscussion} exact/>
-        <Route  path='/ecommerce' component={Ecommerce}  />
-        <Route  path='/discussion' component={FarmerDiscussion}   />
-        <Route  path='/blogs' component={FarmerBlog} />
-        {/* <Route  path='/animals/:id' component={AnimalDetail} exact /> */}
-        {/* <Route  path='/home' component={HomeScreen}  /> */}
-        {/* <Route  path='/profile' component={Profile} exact /> */}
-        {/* <Route  path='/users' component={Users} exact /> */}
-        {/* <Route  path='/tags' component={TagsScreen }    /> */}
-        {/* <Route  path='/unanswered' component={UnansweredScreen}   /> */}
-        {/* <Route  path='/users/:id' component={UserDetail}   /> */}
-        </Switch>
-      </main>
-    </Col>    
-  </Row>
-</Container>
+import React,{useContext, useEffect, useState} from 'react'
 
-)
+import {Container,Row,Col,Nav,Button,} from 'react-bootstrap'
+import {LinkContainer} from 'react-router-bootstrap'
+import { Link } from 'react-router-dom';
+import { UserContext } from './Contexts/UserContext';
+import { useHistory } from 'react-router-dom';
+import MainContainer from './MainContainer';
+const MainApp = () => {
+  const {user,setUser} = useContext(UserContext);
+  console.log(user)
+  let history = useHistory();
+                          const MainHeader = ({type}) => {
+                            let history = useHistory();
+                          if(type==='E'){
+                            return(
+                              <>
+                            <Nav justify variant="tabs" defaultActiveKey="/discussion" className='w-100'>
+                              <Nav.Item as={Button} className='text-white w-100'>
+                                <Nav.Link as={Link} to="/discussion"  className='border-dark'>Discussion</Nav.Link>
+                              </Nav.Item>
+                              <Nav.Item className='text-white w-100'>
+                                <Nav.Link as={Link} to="/blogs" className='border-dark'>Blogs</Nav.Link>
+                              </Nav.Item>
+                            </Nav>
+                              </>
+                          )
+                          }
+                          else if(type==='F')
+                          {
+                            return(
+                              <div className=''>
+
+                              <Nav justify variant="tabs" defaultActiveKey="/discussion" className='w-100'>
+                              <Row className='w-100'>
+                              <Col  lg={4} >
+                              <Nav.Item as={Button} className='w-100'>
+                                <Nav.Link as={Link} to="/discussion" className='border-dark primary w-100 text-white'>Discussion</Nav.Link>
+                              </Nav.Item>
+                              </Col>
+                              <Col lg={4} >
+                              <Nav.Item className='w-100' as={Button}>
+                                <Nav.Link as={Link} to="/blogs" className='border-dark w-100 text-white'>Blogs</Nav.Link>
+                              </Nav.Item>
+                              </Col>
+                              <Col lg={4} >
+                              <Nav.Item className='w-100' as={Button} >
+                                <Nav.Link as={Link} to="/ecommerce" className='border-dark w-100 text-white'>Ecommerce</Nav.Link>
+                              </Nav.Item>
+                              </Col>
+                              </Row>
+                            </Nav>
+                              </div>
+                            )
+                          }
+                          else if(type==='A'){
+
+                          }
+                          else {
+                            console.log('Header redirecting to /login')
+                            history.push('/login');
+                          }
+                          }       
+        if(user.uuid){  // logged in
+        let type= user.type;
+            return(   
+              <Container className='bg-dark' fluid>
+              <MainHeader type={type} />
+              <MainContainer />
+              </Container>
+            ) 
+      }
+        else{ //not logged in
+        
+        
+        history.push('/login');
+        return (
+          <>
+          </>
+        )
+      }
 }
 
 

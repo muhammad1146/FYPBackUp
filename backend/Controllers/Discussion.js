@@ -1,8 +1,11 @@
 const Joi = require('joi');
 const {Questions,QuestionImage,QuestionTags,QuestionReacts,QuestionTagBox,
-    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports} = require('../models/questions'); 
+    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers} = require('../models/questions'); 
 exports.getQuestions = async (req,res) => {
+    let category = req.query.cat;
+if(category){
 
+    }
     try { 
         const questions = await Questions.findAll({include:[Farmers,QuestionReacts]});
         return res.json(questions);
@@ -20,7 +23,6 @@ exports.getQuestion = async (req,res) => {
     } catch (error) {
         return res.status(500).json(error);
     }
-
 };
 
 exports.addQuestion = async (req,res) =>{
@@ -105,17 +107,50 @@ exports.editQuestion =async (req,res) =>{
 
 }
 exports.deleteQuestion = async (req,res) =>{
-    const questionId = req.params.qid;
-    try {
-        const answers = await Answers.destroy({where:{questionId}});
-        const reacts = await QuestionReacts.destroy({where:{questionId}});
-        const comment = await QuestionComments.destroy({where:{questionId}});
-        const report = await QuestionReport.destroy({where:{questionId}});
-        const question = await Questions.destroy({where:{id:questionId}});
-        return res.json({question,answers,reacts,comment,report}); 
-    } catch (error) {
-        return res.status(500).json(error);
+    const questionuuid = req.params.qid;
+    let questionId;
+    let questionFarmerId, uuid=req.user.uuid,userType=req.user.type, farmerId;
+    if(userType==='F') 
+    {
+        try {
+            const question = Questions.findOne({where:{uuid:questionuuid}});
+            questionFarmerId = question.farmerId;
+            questionId = question.id;
+            const farmer = Farmers.findOne({where:{uuid}});
+            farmerId = farmer.id;
+        } catch (error) {
+            return res.status(501).send("Internal Server Error!");
+        }
+        if(farmerId===questionFarmerId)
+        {
+            try {
+                const answers = await Answers.destroy({where:{questionId}});
+                const reacts = await QuestionReacts.destroy({where:{questionId}});
+                const comment = await QuestionComments.destroy({where:{questionId}});
+                const report = await QuestionReport.destroy({where:{questionId}});
+                const question = await Questions.destroy({where:{id:questionId}});
+                return res.json({question,answers,reacts,comment,report}); 
+            }
+            catch (error) {
+                return res.status(500).json(error);
+            }
+        }
+        else{
+            return res.status(401).send("Forbidden access!");
+        }
     }
+    else if(userType==='A'){
+        try {
+            const answers = await Answers.destroy({where:{questionId}});
+            const reacts = await QuestionReacts.destroy({where:{questionId}});
+            const comment = await QuestionComments.destroy({where:{questionId}});
+            const report = await QuestionReport.destroy({where:{questionId}});
+            const question = await Questions.destroy({where:{id:questionId}});
+            return res.json({question,answers,reacts,comment,report}); }
+        catch (error) {
+            return res.status(500).json(error);
+        }
+}
 }
 
 exports.addQuestionReact = async (req,res) => {
@@ -142,6 +177,65 @@ exports.addQuestionReact = async (req,res) => {
     }
 
 };
+
+exports.addQuestionComment = async (req,res) => {
+    const schema = Joi.obect( {
+        body:Joi.string().required(),
+        questionId:Joi.string().required(),
+        commenterType :Joi.string().required(),
+        commenterId :Joi.string().required()
+    });
+    try {
+        const value = await schema.validateAsync(req.body);
+        
+    } catch (error) {
+        
+        res.status(400).send(error.details[0].message);
+        return;
+    }
+    const {body,questionId,commenterType,commenterId} = req.body;
+    try {
+        const qComment = await QuestionComments.create({body,questionId,commenterId,commenterType});
+        return res.json(qComment);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+
+};
+
+exports.deleteQuestionComment = async (req,res) => {
+    const id = req.params.commentid;
+    const uuid = req.user.uuid;
+    const userType = res.user.type
+    let requesterId;
+    let commentorType,commentorId;
+        if(userType==='F') {
+            const farmer = Farmers.findOne({where:{uuid}});
+            requesterId = farmer.id;
+        }
+        else {
+            const expert = Experts.findOne({where:{uuid}});
+            requesterId = expert.id;
+        }
+    try {
+        const questionComment = QuestionComments.findOne({where:{id}});
+        commentorType = questionComment.commenterType;
+        commentorId = questionComment.commenterId;
+    } catch (error) {
+        return res.status(401).send('Invalid Request');
+    }
+try {
+        if(commentorId===requesterId){
+            const qComment = await QuestionComments.destroy({where:{id}});
+            return res.json(qComment);
+        }else {
+            return res.status(401).send("Forbidden Access!");}
+    }         
+        catch (error) {
+            return res.status(500).json(error);
+        }
+};
+
 //QuestionReport
 exports.reportQuestion = async (req,res) => {
     const schema = Joi.obect( {
@@ -253,13 +347,33 @@ exports.editAnswer = async (req,res) =>
 exports.deleteAnswer = async (req,res) =>
 {
     const id = req.params.aid;
+    const uuid = req.user.uuid;
+    let answerExpertId;
+    let expertId;
+
+    if(req.user.type !== 'A') {
+
+        try {
+            const expert = Experts.findOne({where:{uuid}});
+            const answer = Answers.findOne({where:{id}});
+            expertId = expert.id;
+            answerExpertId = answer.expertId;
+        } catch (error) {
+            return res.status(500).send('Internal Server Error!');
+        }
+    }
     try 
     {
-        const reports = await AnswerReports.destroy({where:{answerId:id}});
-        const reacts = await AnswerReacts.destroy({where:{answerId:id}});
-        const images = await AnswerImages.destroy({where:{answerId:id}});
-        const answer = await Answers.destroy({where:{id}});
-        return res.json({answer,reports,reacts,images}); 
+        if(expertId===answerExpertId || req.user.type==='A'){
+            const reports = await AnswerReports.destroy({where:{answerId:id}});
+            const reacts = await AnswerReacts.destroy({where:{answerId:id}});
+            const images = await AnswerImages.destroy({where:{answerId:id}});
+            const answer = await Answers.destroy({where:{id}});
+            return res.json({answer,reports,reacts,images}); 
+        }
+        else{
+            return res.status(401).send('Forbidden Access!');
+        }
     } catch (error) 
     {
         return res.status(500).json(error);

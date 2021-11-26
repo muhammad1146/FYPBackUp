@@ -1,7 +1,5 @@
 // This Screen is without the right side bar 
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
-import { Card } from 'react-bootstrap';
 import '../../App.css'
 const Farmers = () => {
     const [farmers,setFarmers] = useState([]);

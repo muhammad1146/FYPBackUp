@@ -302,7 +302,7 @@ exports.farmerLogin = async (req,res) =>
     const schema = Joi.object(
         {
             userName: Joi.string().required(),
-            password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()           
+            password: Joi.string().min(4).max(10).required()
         }
     );
     try {
@@ -316,7 +316,7 @@ exports.farmerLogin = async (req,res) =>
         const farmer = await Farmers.findOne({where:{userName}});   
         if(!farmer) return res.status(400).send('Farmer not found');
         const validPass = await bcrypt.compare(password,farmer.password);
-        console.log(validPass);
+        
         if(!validPass) return res.status(400).send('Invalid Password');
         const token = jwt.sign({uuid:farmer.uuid,userType:'F'},"secret");
         res.header('auth-token',token).send(token);

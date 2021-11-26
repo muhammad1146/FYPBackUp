@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import '../../App.css'
 import {Row,Col, Container, Card} from 'react-bootstrap'
+import Question from '../QuestionComponent'
 import axios from 'axios'
 const Questions = () => {
     const [questions,setQuestions] = useState([]);
@@ -32,37 +33,37 @@ const QuestionCard = (props) => {
         //Farmer userName
         //question Tags
         //question Reacts
-    <>
-        <Card>
-            <Card.Body>
-                <Card.Title>Question title</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
-                <Card.Text>
-                Some quick example text to build on the card title and make up the bulk of
-                the card's content.
-                </Card.Text>
-                <Card.Link href="#">Card Link</Card.Link>
-                <Card.Link href="#">Another Link</Card.Link>
-                {/* Include Question Reacts too*/}
-            </Card.Body>
-        </Card>
-    </>
+<>
+<Card>
+<Card.Body>
+    <Card.Title>Question title</Card.Title>
+    <Card.Subtitle className="mb-2 text-muted">Card Subtitle</Card.Subtitle>
+    <Card.Text>
+      Some quick example text to build on the card title and make up the bulk of
+      the card's content.
+    </Card.Text>
+    <Card.Link href="#">Card Link</Card.Link>
+    <Card.Link href="#">Another Link</Card.Link>
+  </Card.Body>
+</Card>
+</>
     )
 }
     return (
         <div className='contentSection'>
             <h1> Questions</h1>
+        <Container fluid>
             <Row>
-                <Col lg={12}> 
+                <Col lg='9'> 
                 {   questions.map((question) =>
                 {
                     return(
-                    <QuestionCard  question/>)
-                    }
-                    )
+                    <QuestionCard  question/>
+                    );})
                 }
                 </Col>
-            </Row> 
+            </Row>
+        </Container>
         </div>
     )
 }

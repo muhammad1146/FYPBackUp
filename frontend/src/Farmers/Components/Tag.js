@@ -1,18 +1,24 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {Badge} from 'react-bootstrap'
 import {LinkContainer} from 'react-router-bootstrap'
 import Card from 'react-bootstrap/Card'
+import axios from 'axios'
+import { UserContext } from '../../Contexts/UserContext'
 
 const Tag = () => {
-    return (
-        <>
+    const [tags, setTags] = useState([]);
+    const [user,setUser] = useContext(UserContext);
+    useEffect(() => {
+        const result = axios.get('',{headers:{'auth-token':`Bearer ${user.token}`}});
+        setTags(result);
+    },[])
+    const TagStructure = (props) => {
+        return (
             <Card className='mb-2'>
                 <Card.Title>
                     <LinkContainer to='/' > 
-                    {/* <a href="#" className="btn btn-secondary stretched-link w-100">Tag</a> */}
-                   <Badge  className='p-2 w-auto rounded'>Tag</Badge>
+                   <Badge  className='p-2 w-auto rounded'>tag</Badge>
                     </LinkContainer>
-
                 </Card.Title>
                 <Card.Body className='p-1 text-center'>
                   <Card.Text >
@@ -27,6 +33,13 @@ const Tag = () => {
                     updated 3 mins ago
                 </Card.Footer>
             </Card>
+        )
+    }
+    return (
+        <>
+         {tags.map(tag =>{
+             return( <TagStructure tag={tag} /> )
+         })}   
          
              
              
@@ -34,6 +47,8 @@ const Tag = () => {
          
         </>
     )
+
+
 }
 
 export default Tag

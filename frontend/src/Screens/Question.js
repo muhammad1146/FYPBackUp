@@ -1,10 +1,10 @@
-import React, { useContext, useState,useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import '../../App.css'
-import {Row,Card,Form,Image, Container, Button} from 'react-bootstrap'
+import {Row,Col, Container, Button} from 'react-bootstrap'
 import { UserContext } from '../../Contexts/UserContext'
-import axios from 'axios'
-import Answers from '../Components/Answers'
+import Answers from './Answers'
 const Question = () => {
+    //take question id from url
     const [user,setUser] = useContext(UserContext);
     const [question,setQuestion] = useState({});
     const [answers, setAnswers] = useState([]);
@@ -36,6 +36,7 @@ const Question = () => {
         const [body, setBody] = useState('');
         const [questionId, setQuestionId] = useState('');
         const [commentorType, setCommentorType] = useState('');
+        const [commentorId,setCommentorId] = useState('');
         const handleCommentSubmit = () =>{
 
         }

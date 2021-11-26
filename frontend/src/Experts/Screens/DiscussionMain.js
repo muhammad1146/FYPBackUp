@@ -1,30 +1,39 @@
 import React,{useEffect} from 'react';
-import { Container } from 'react-bootstrap';
+import { Container,Row,Col } from 'react-bootstrap';
 import { Route, BrowserRouter as Router, Switch,withRouter} from 'react-router-dom'
-import Sidebar from '../Components/BlogSidebar'
+import Sidebar from '../Components/DiscussionSidebar'
+import Questions from '../../Farmers/Screens/Questions';
+import Question from '../../Farmers/Screens/Question';
+import Farmers from '../../Farmers/Screens/Farmers';
+import FarmerProfile from '../../Farmers/Components/FarmerProfile';
+import Experts from './Experts'
+import Expert from './Expert';
 const DiscussionMain = () => 
 {
-    const BlogContainer = () =>
+    const DiscussionContainer = () =>
     {
-        return (
-        <Container>
+
+        return ( 
+            <>
+        {console.log('rendered from expert module')}
+            <Container>
+            <h3>Experts Container </h3>
             <Switch> 
-                <Route path='/' component={()=>(<div className='contentSection'>
-                        <Row>
-                        <InflateData />
-                        </Row>
-                </div>)} exact />
-                <Route path='/blogs' component={}   />
-                <Route path='/blogs/top' component={}  />
-                <Route path='/blogs/tags' component={}  />
-                <Route path='/tags' component={}  />
-                <Route path='/blogs/:qid' component={}   />
-                <Route path='/farmers' component={}  />
-                <Route path='/farmers/:fid' component={}  />
-                <Route path='/experts' component={}  />
-                <Route path='/experts/:eid' component={}  />
+                <Route path='/' component={ Questions } exact />
+                <Route exact path='/questions' component={Questions }   /> {/*Done */}
+                {/* <Route path='/questions/unanswered' component={<Questions />}  /> */}
+                <Route exact path='/questions/my' component={ Questions  }  />
+                {/* <Route path='/questions/tags/' component={ }  /> */}
+                {/* <Route path='/tags' component={<Tag />}  /> */}
+                <Route path='/questions/:qid' component={ Question }  />
+                <Route path='/farmers' component={ Farmers }  />
+                <Route path='/farmers/:fid' component={ FarmerProfile }  />
+                <Route path='/experts' component={ Experts }  />
+                <Route path='/experts/:eid' component={ Expert }  />
             </Switch>
         </Container>
+        
+        </>
         )
     }
 //1) Sidebar
@@ -33,10 +42,14 @@ const DiscussionMain = () =>
 // iii)
 //2) Container
     return (
-        <>
+        <Row>
+        <Col xs={2} lg={2}>
             <Sidebar />
-            <BlogContainer />   
-        </>
+        </Col>
+        <Col lg={10}>
+            <DiscussionContainer />   
+        </Col>
+        </Row>
     );
 }
 

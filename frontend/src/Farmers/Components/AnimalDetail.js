@@ -6,7 +6,7 @@ import {LinkContainer} from 'react-router-bootstrap';
 import axios from 'axios'
 import CommentSection from '../components/CommentSectionAD'
 import { AiFillPhone,AiOutlineUser } from "react-icons/ai";
-const AnimalDetail = ({match}) => {
+const   AnimalDetail = ({match}) => {
     const [Animal,setAnimal] = useState({})
     const Id = parseInt(match.params.id)
    // const Animal= Cattle.find((animal) => animal.id===Id);

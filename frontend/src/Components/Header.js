@@ -3,31 +3,28 @@ import {LinkContainer} from 'react-router-bootstrap'
 import { Navbar, Nav, Container,Form,Button,FormControl,Row,Col, NavDropdown  } from 'react-bootstrap';
 import { FaSignInAlt,FaShoppingCart  } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router';
 import { GiTalk } from "react-icons/gi";
 import { NavLink } from 'react-router-dom';
-import UserContext from './Contexts/UserContext'
+import {UserContext} from '../Contexts/UserContext'
 const Header = () => {
-const [user,setUser] = useContext(UserContext);
-const history = useHistory();
-const Logout = (e) => {
+const {user,setUser} = useContext(UserContext);
 
-    setUser(prev => ({
-        ...prev,
-        uuid:undefined,
-        type:undefined,
-        token:undefined
-    }));
-  
-        history.push("/login");
-    
-}
 
-if(user.type==='F' || user.type==='A' || user.type==='E')  //user is logged in 
-{
-
-    return (
-        <header>
+const LoggedInHeader = () =>{
+        let history = useHistory()
+        const Logout = (e) => {
+            setUser(prev => ({
+                ...prev,
+                uuid:undefined,
+                type:undefined,
+                token:undefined
+            }));
+               history.push('/login');
+            
+        }
+        return (
+            <header>
     <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Container>
             <LinkContainer to='/'>
@@ -58,23 +55,27 @@ if(user.type==='F' || user.type==='A' || user.type==='E')  //user is logged in
                             
                         </Nav.Link>
                     </LinkContainer> */}
-                    <LinkContainer onClick={Logout}> 
-                        <Nav.Link >
+                    
+                        
+                        <Nav.Item onClick={Logout}>
+                        <Button className='mx-2'>
                         <FaSignInAlt size='1.2rem' className='pr-1'/>
                             Logout
-                        </Nav.Link>
-                    </LinkContainer>
+                            </Button>
+                        </Nav.Item>
+                        
                 </Nav>
             
             </Navbar.Collapse>
         </Container>
     </Navbar>
  </header>
-    )
-}
-else{
-    return (
-        <header>
+        )
+    }
+
+    const LoggedOutHeader = () => {
+        return(
+            <header>
     <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Container>
             <LinkContainer to='/'>
@@ -100,8 +101,16 @@ else{
             </Navbar.Collapse>
         </Container>
     </Navbar>
+    
  </header>
+        )
+    }
+    
+     return (
+         <>
+        {user.token ? ( <LoggedInHeader /> ) : (<LoggedOutHeader /> )}
+    </>
     )
 }
-}
+
 export default Header

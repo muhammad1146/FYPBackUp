@@ -40,13 +40,13 @@ const BlogSidebar = () => {
           
             <Accordion defaultActiveKey="0">
               <Card>
-                      <Accordion.Item as={Nav.Item} variant="link" eventKey="0">
                 <Card.Header>
+                      <Accordion.Toggle as={Nav.Item} variant="link" eventKey="0">
                         <Link to='/questions'>
                         <FaQuestionCircle size='1.1rem'/> Questions
                       </Link>
+                    </Accordion.Toggle>
                 </Card.Header>
-                    </Accordion.Item>
 
                 <Accordion.Collapse eventKey="0">
                   <Card.Body>

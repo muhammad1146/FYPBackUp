@@ -30,7 +30,10 @@ router.post('/login',ExpertController.expertLogin) // Expert login
 
 router.get('/',verifyToken,ExpertController.getExperts) // get All Experts 
 
-router.get('/:eid',verifyToken,ExpertController.getExpert) // get Expert
+router.get('/:username',verifyToken,ExpertController.getExpert) // get Expert
+
+// router.get('/:username',verifyToken,ExpertController.getExpert) // get Expert
+
 
 router.put("/:eid",verifyToken,ExpertController.editExpert) // edit Expert
 

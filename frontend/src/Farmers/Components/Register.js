@@ -102,13 +102,9 @@ const [userType, setUserType] = useState('');
         </Form.Row>
 
         <Button type="submit">Submit form</Button>
-        <p>
-            {userType}
-        </p>
+        
     </Form>
-        <p>
-            {userType}
-        </p>
+        
 </>
     )
     

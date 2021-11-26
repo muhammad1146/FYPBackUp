@@ -1,7 +1,7 @@
-import React,{useState,useEffect} from 'react';
-import { Container, Table,Image } from 'react-bootstrap';
+import React,{useState,useEffect} from 'react'
 import ExpertExperience from './ExpertExperience';
 import ExpertQualification from './ExpertQualification';
+import { Table,Image,Container } from 'react-bootstrap';
 import axios from 'axios';
 const ExpertProfile = (props) => {
     const userName = props.match.params.userName;

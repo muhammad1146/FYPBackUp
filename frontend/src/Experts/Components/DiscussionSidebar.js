@@ -1,22 +1,20 @@
-import React from 'react'
-
+import React,{useEffect,useState} from 'react'
 import {Link} from 'react-router-dom'
-import '../../App.css'
 import { AiFillHome } from "react-icons/ai";
 import { FaUsers,FaQuestionCircle,FaTags } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { RiQuestionAnswerFill } from "react-icons/ri";
-import {Nav,Card,Accordion} from 'react-bootstrap'
+import {Nav,Card,Accordion} from 'react-bootstrap';
 
-const BlogSidebar = () => {
+const DiscussionsSidebar = () => {
  
     return (
       <>
-        <Nav className='sidebarRight'>
+        <Nav className='sidebarRight py-4 m-1 w-100 border'>
             <Nav.Item className='sidebarItem' >
               <Nav.Link>
-              <Link to="/home" >
-              <AiFillHome className='py-0 m-0 text-right' size='1.1rem'/> Home
+              <Link to="/questions/top" >
+              <AiFillHome className='py-0 m-0 text-right' size='1.1rem'/> Top Questions
                 
               </Link>
               </Nav.Link>
@@ -24,32 +22,48 @@ const BlogSidebar = () => {
             
             <Nav.Item className='sidebarItem' >
               <Nav.Link>
-                <Link to="/profile">
-                <CgProfile size='1.1rem'/>  Profile
+                <Link to="/experts">
+                <CgProfile size='1.1rem'/>  Experts
                 </Link>
                 </Nav.Link>
             </Nav.Item>
 
             <Nav.Item className='sidebarItem' >
               <Nav.Link>
-                <Link to="/users" >
-                <FaUsers size='1.1rem'/>    Users
+                <Link to="/farmers" >
+                <FaUsers size='1.1rem'/>    Farmers
                 </Link>
               </Nav.Link>
             </Nav.Item>
           
             <Accordion defaultActiveKey="0">
               <Card>
-                      <Accordion.Item as={Nav.Item} variant="link" eventKey="0">
                 <Card.Header>
+                      <Accordion.Toggle as={Nav.Item} variant="link" eventKey="0">
                         <Link to='/questions'>
                         <FaQuestionCircle size='1.1rem'/> Questions
                       </Link>
+                    </Accordion.Toggle>
                 </Card.Header>
-                    </Accordion.Item>
 
                 <Accordion.Collapse eventKey="0">
                   <Card.Body>
+                    <Nav.Item className='' > 
+                      <Nav.Link> 
+                          <Link to="questions/unanswered" className='p-0'>
+                            <RiQuestionAnswerFill size='1.1rem'/>Unanswered
+                          </Link>
+                      </Nav.Link>
+                    </Nav.Item>
+                    
+                    <Nav.Item className='' > 
+                      <Nav.Link> 
+                          <Link to="/questions/my" className='p-0'>
+                            <RiQuestionAnswerFill size='1.1rem'/>My Questions
+                          </Link>
+                      </Nav.Link>
+                    </Nav.Item>
+
                     <Nav.Item className='' >
                       <Nav.Link>
                         <Link to="/tags">
@@ -57,13 +71,6 @@ const BlogSidebar = () => {
                         </Link>
                       </Nav.Link>
                     </Nav.Item>
-                      <Nav.Item className='' > 
-                      <Nav.Link> 
-                          <Link to="/unanswered" className='p-0'>
-                            <RiQuestionAnswerFill size='1.1rem'/>Unanswered
-                          </Link>
-                        </Nav.Link>
-                      </Nav.Item>
           
                   </Card.Body>
                 </Accordion.Collapse>
@@ -71,18 +78,18 @@ const BlogSidebar = () => {
             </Accordion>
 
         
-          <Nav.Item className='sidebarItem' >
+          {/* <Nav.Item className='sidebarItem' >
           <Nav.Link>
             <Link to="/blogs">
            <RiQuestionAnswerFill size='1.1rem'/>Blogs
             </Link>
             </Nav.Link>
           </Nav.Item>
-        
+         */}
         </Nav>
   
         </>
     )
 }
 
-export default BlogSidebar;
+export default DiscussionsSidebar;
