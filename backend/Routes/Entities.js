@@ -10,9 +10,9 @@ router.put("/farmers/:id",verifyToken,adminVerify,EntitiesController.changeFarme
 //Farmer Reports
 router.get('/farmers/reports',verifyToken,adminVerify,EntitiesController.getReportedFarmers); //get All Reported Farmers
 
-router.get('/farmers/:id/reports',verifyToken,adminVerify,EntitiesController.getFarmerReports); //get Farmer's Reports
+router.get('/farmers/:fid/reports',verifyToken,adminVerify,EntitiesController.getFarmerReports); //get Farmer's Reports
 
-router.get('/farmers/:id/reports/:frid',verifyToken,adminVerify,EntitiesController.getFarmerReport); //get Farmer's Report
+router.get('/farmers/:id/reports/:frid',verifyToken,adminVerify,EntitiesController.getFarmerReport); //get one FarmerReport
 
 router.put('/farmers/:id/reports/:frid',verifyToken,adminVerify,EntitiesController.respondToFarmerReport);//Respond on Farmer's Report
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { BsThreeDotsVertical } from "react-icons/bs";
 import BlogBody from '../Components/BlogBody';
 import BlogComments from '../Components/BlogComments';
-import {UserContext } from '../../Contexts/UserContext';
+import {UserContext } from '../../../Contexts/UserContext';
 const Blog = () => 
 {
 const [user,setUser] = useContext(UserContext);

@@ -24,7 +24,10 @@ module.exports = {
         allowNull:false,
         defaultValue:"US"
       },
-      
+      reportType:{
+        type:Sequelize.STRING,
+        allowNull:false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

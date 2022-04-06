@@ -29,27 +29,19 @@ module.exports = (sequelize, DataTypes) => {
     },
     reporterType: 
     { 
-      type:DataTypes.STRING,
+      type:DataTypes.STRING(1),
       allowNull:false,
       validate:
       { 
         isIn: 
         {
-          args: [['Farmers', 'Experts']],
-          msg: "Must be Farmers or Experts"
+          args: [['F', 'E']],
+          msg: "Must be F or E"
         }
       }},
       reportType: {
         type:DataTypes.STRING,
-        allowNull:false,
-        validate:
-        { 
-          isIn: 
-          {
-            args: [['Wrong Information', 'Not Clear',"Misleading"]],
-            msg: "Review Answer Report Types"
-          }
-        } 
+        allowNull:false, 
       },
     reportDescription: 
     {
@@ -58,8 +50,9 @@ module.exports = (sequelize, DataTypes) => {
   },
     reportStatus: 
     {
-      type:DataTypes.STRING,
-      allowNull:false  
+      type:DataTypes.STRING(2),
+      allowNull:false,
+      defaultValue:"US"
     },
   }, {
     sequelize,

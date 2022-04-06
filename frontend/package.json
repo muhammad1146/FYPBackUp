@@ -1,6 +1,7 @@
 {
   "name": "frontend",
-  "proxy": "http://127.0.0.1:5000",
+  "proxy": "http://localhost:5000",
+  "secure": false,
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,6 +11,10 @@
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
+    "bootstrap-icons": "^1.8.1",
+    "formik": "^2.2.9",
+    "framer-motion": "^4.1.17",
+    "js-cookie": "^3.0.1",
     "react": "^17.0.1",
     "react-bootstrap": "^2.0.0-alpha.2",
     "react-bootstrap-sidebar": "^0.0.1",
@@ -19,7 +24,8 @@
     "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
-    "web-vitals": "^1.1.1"
+    "web-vitals": "^1.1.1",
+    "yup": "^0.32.11"
   },
   "scripts": {
     "start": "react-scripts start",

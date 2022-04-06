@@ -24,13 +24,24 @@ module.exports = {
         type:Sequelize.STRING(10),
       allowNull:false
       },
+      name: 
+    {
+      type:Sequelize.STRING,
+      allowNull:false 
+    },
       description: {
         type:Sequelize.STRING,
-        allowNull:false
+       
+      },
+      city:{
+      type:Sequelize.STRING,
+      allowNull:false
+         
       },
       availability: {
         type:Sequelize.STRING(2),
-      allowNull:false,
+        defaultValue:"A",
+        allowNull:false,
       validate:
       {
         isIn: 
@@ -44,11 +55,7 @@ module.exports = {
         type:Sequelize.INTEGER,
         allowNull:false
       },
-      date: 
-    {
-      type:Sequelize.DATE,
-      allowNull:false
-    },
+     
       farmerId: {
         type: Sequelize.INTEGER,
         allowNull:false

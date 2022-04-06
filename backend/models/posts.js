@@ -38,37 +38,37 @@ module.exports = (sequelize, DataTypes) => {
     },
     cattleType: 
     {
-      type:DataTypes.STRING(10),
+      type:DataTypes.STRING,
+      allowNull:false 
+    },
+    name: 
+    {
+      type:DataTypes.STRING,
       allowNull:false 
     },
     description: 
     {
       type:DataTypes.STRING,
       allowNull:false
+      
+    },
+    city:{
+      type:DataTypes.STRING,
+      allowNull:false
     },
     availability: 
     {
       type:DataTypes.STRING(2),
+      defaultValue:"A",
       allowNull:false,
-      validate:
-      {
-        isIn: 
-        {
-          args:[["A","NA"]],
-          msg:"Must be A (available) or NA (not available)."
-        }
-      }
+      
     },
     weight: 
     {
       type:DataTypes.INTEGER,
       allowNull:false
     },
-    date: 
-    {
-      type:DataTypes.DATE,
-      allowNull:false
-    },
+    
     farmerId: //FK
     {
       type:DataTypes.INTEGER, 

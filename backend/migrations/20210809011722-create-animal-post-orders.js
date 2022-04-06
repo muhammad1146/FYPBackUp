@@ -32,6 +32,7 @@ module.exports = {
       status:
     {
       type: Sequelize.STRING, // status means whether Accepted, pending or rejected
+      defaultValue:"Pending",
       allowNull:false,
       validate:   
       {

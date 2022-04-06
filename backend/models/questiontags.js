@@ -29,4 +29,4 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'QuestionTags',
   });
   return QuestionTags;
-};
+}; 

@@ -1,9 +1,10 @@
 import React,{useState} from 'react'
 import axios from 'axios';
 import { useHistory } from 'react-router';
+import Logo from './../data/Register.jpg'
 
 // import FloatingLabel from "react-bootstrap-floating-label";
-import { Form,Button,FloatingLabel,Badge ,Container,Row,Col,Card   } from 'react-bootstrap';
+import { Form,Button,FloatingLabel,Badge ,Container,Row,Col,Card,Image   } from 'react-bootstrap';
 const Register = () => {
     const [userType, setUserType] = useState('f');
     
@@ -44,6 +45,7 @@ const Register = () => {
       }
       return (
         <>
+   
         <span>{error}</span>
         <Form onSubmit={Login}>
           <Container className='border border-dark my-3 p-4'>
@@ -168,7 +170,7 @@ const Register = () => {
       <>
       <span>{error}</span>
           <Form onSubmit={Login} className='text-white'>
-            <Container className='border border-dark my-3 px-2 py-4 bg-dark'>
+            <Container className='border border-dark my-3 px-2 py-4 bg-dark' fluid="false">
         
            <FloatingLabel
             controlId="floatingInputName"
@@ -238,11 +240,18 @@ const Register = () => {
     }
     return(
         <>
+        <Container fluid>
+        <Row >
+          <Col lg={8} sm={8} xl={7} className="pt-4 mt-4">
+            <Image src={Logo} alt="Logo" fluid />
+          </Col>
+          <Col>
+
         <Form>
         <Card className='mt-3'>
-        <h2 className='text-center mt-3'>
+        <h4 className='text-center mt-3'>
        {userType==='f'?('Farmer'):('Expert')} Register Form
-        </h2>
+        </h4>
         <Card.Body className='text-center'>
         <Button className='mx-3' variant={userType==='f'?('pills'):'secondary'} onClick={(e)=>{
             if(userType==='f'){
@@ -271,6 +280,9 @@ const Register = () => {
         </Card>
         </Form>
     {userType==='f' ? <FarmerRegisterForm /> : <ExpertRegisterForm /> }
+          </Col>
+        </Row>
+        </Container>
     </>
 )
 }

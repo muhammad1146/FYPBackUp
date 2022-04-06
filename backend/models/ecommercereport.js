@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     /**
     Only "Farmers" can Report any "EcommercePost". */
     static associate({Farmers,Posts}) {
-      this.belongsTo(Farmers,{foreignKey:'reporterId'});
+      this.belongsTo(Farmers,{foreignKey:'farmerId'});
       this.belongsTo(Posts,{foreignKey:'postId'});
     } 
   };
@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.INTEGER,
       allowNull:false
     },
-    reporterId: 
+    farmerId:  //reporterId
     {
       type:DataTypes.INTEGER,
       allowNull:false
@@ -26,28 +26,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     reportStatus: 
     {
-      type:DataTypes.STRING(2) ,
+      type:DataTypes.STRING,
       allowNull:false, 
-      validate:
-      { isIn:
-        {
-          args:[["S","US"]],
-          msg:"Must be S or US."
-      }
-      }
+      defaultValue:"UnSeen"
     },
     
     reportType:
     {
-      type:DataTypes.STRING(4),
-      allowNull:false,
-      validate:
-      {
-        isIn:
-        {
-          args:[["spam","fake"]]
-        }
-      }
+      type:DataTypes.STRING,
+      allowNull:false
     }
   }, {
     sequelize,

@@ -16,14 +16,14 @@ module.exports = {
       },
       reporterType: 
       {
-       type:Sequelize.STRING,
+       type:Sequelize.STRING(1),
         allowNull:false,
         validate:
         { 
           isIn: 
           {
-            args: [['Farmers', 'Experts']],
-            msg: "Must be Farmers or Experts"
+            args: [['F', 'E']],
+            msg: "Must be F or E"
           }
         }},
       reportDescription: 
@@ -32,21 +32,15 @@ module.exports = {
       },
       reportStatus: 
       {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(2),
+        allowNull:false,
         defaultValue:"US"
       },
       reportType: 
       {
         type:Sequelize.STRING,
         allowNull:false,
-        validate:
-        { 
-          isIn: 
-          {
-            args: [['Wrong Information', 'Not Clear',"Misleading"]],
-            msg: "Review Answer Report Types"
-          }
-        } 
+        
       },
       createdAt: 
       {

@@ -3,7 +3,7 @@ import {Badge} from 'react-bootstrap'
 import {LinkContainer} from 'react-router-bootstrap'
 import Card from 'react-bootstrap/Card'
 import axios from 'axios'
-import { UserContext } from '../../Contexts/UserContext'
+import { UserContext } from '../../../Contexts/UserContext'
 
 const Tag = () => {
     const [tags, setTags] = useState([]);

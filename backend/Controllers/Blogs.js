@@ -303,9 +303,21 @@ const uuid = req.user.uuid;
     }
 }; 
 exports.getAllBlogTags = async (req,res) => {
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
     try {
-    const tags = await BlogTagBox.findAll({attributes:['id','tag']});
-    return res.json(tags);
+    const tags = await BlogTagBox.findAndCountAll({attributes:['id','tag'],limit:size,offset:size*page});
+    return res.json({content:tags.rows,
+        totalPages:Number.ceil(AllPosts.count / Number.parseInt(size))
+    });
 } catch (error) {
     return res.status(500).json(error);
 }

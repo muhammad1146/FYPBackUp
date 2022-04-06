@@ -11,11 +11,7 @@ module.exports = {
         primaryKey: true, 
         type: Sequelize.INTEGER
       },
-      uuid:{
-        type:Sequelize.STRING,
-        defaultValue:nanoid(6),
-        unique:true
-      },
+     
       farmingType: {
         type: Sequelize.STRING(10),
         allowNull: false,

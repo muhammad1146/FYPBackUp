@@ -14,11 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   PostImages.init({
-    uuid:{
-      type:DataTypes.UUID,
-      defaultValue:DataTypes.UUIDV4,
-      unique: true
-      },
+    
     image:  
     {
       type:DataTypes.STRING,

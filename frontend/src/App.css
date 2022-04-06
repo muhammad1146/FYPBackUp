@@ -55,4 +55,17 @@ background-color: #f5f5f5;
   max-height: 50vh;
 }
 
+.card-Img{
+  width: 300px;
+}
+
+
+.EcommentCard{
+width: 100%;
+border: 1px solid gray;
+border-radius: 10px;
+}
+
+
+
 

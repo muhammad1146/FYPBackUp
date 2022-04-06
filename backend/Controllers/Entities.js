@@ -5,9 +5,9 @@ const {Farmers,Experts,FarmerReports,ExpertReports,EcommerceReport,QuestionRepor
 Blogs,BlogComments,BlogImages,BlogReacts,BlogTags,QuestionTags} = require('../models');
 // Farmers
 exports.changeFarmerStatus = async(req,res) => {
-    const id = req.params.id;
+    const fid = req.params.id;
     const schema = Joi.object( {
-        ActiveStatus:Joi.string().required()
+        activeStatus:Joi.string().required()
     });
     try {
         const value = await schema.validateAsync(req.body);
@@ -17,44 +17,47 @@ exports.changeFarmerStatus = async(req,res) => {
         return;
     }
    
-        const {ActiveStatus } =req.body;
+        const {activeStatus } =req.body;
         try {
-            const farmer = await Farmers.update({ActiveStatus},{where:{id}});
-            return res.json(farmer);
+            const farmer = await Farmers.update({activeStatus},{where:{uuid:fid}});
+            return res.json({farmer});
         } catch (error) {
-            return res.status(500).json(error);
+            return res.status(500).json({error});
         }
     }; 
 //Farmer Reports
 exports.getReportedFarmers = async(req,res) => {
-    const reportStatus = "unseen";
+    const reportStatus = "unSeen";
      try {
          const AllfarmerReports = await FarmerReports.findAll({where:{reportStatus}});
-         return res.json(AllfarmerReports);
+         return res.json({AllfarmerReports});
      } catch (error) {
-         return res.status(500).json(error);
+         return res.status(500).json({error});
      }
      
  };
 
-exports.getFarmerReports = async(req,res) => {
-   const farmerId = req.params.id;
+exports.getFarmerReports = async(req,res) => { //get All reports reported about a farmer
+   const uuid = req.params.fid; 
     try {
-        const reports = await FarmerReports.findAll({where:{farmerId}});
-        return res.json(reports);
+        let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
+        (!farmer) && (res.status(404).json({error:"User Not Found!"}));
+
+        const reports = await FarmerReports.findAll({where:{farmerId:farmer.id}});
+        return res.json({reports});
     } catch (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({error});
     }
     
 };
 
-exports.getFarmerReport = async(req,res) => {
+exports.getFarmerReport = async(req,res) => { //get One Report
     const id = req.params.frid;
      try {
          const report = await FarmerReports.findOne({where:{id}});
-         return res.json(report);
+         return res.json({report});
      } catch (error) {
-         return res.status(500).json(error);
+         return res.status(500).json({error});
      }
      
  };
@@ -64,18 +67,18 @@ exports.respondToFarmerReport = async(req,res) => {
     const reportStatus = "seen";
      try {
          const response = await FarmerReports.update({reportStatus},{where:{id}});
-         return res.json(response);
+         return res.json({response});
      } catch (error) {
-         return res.status(500).json(error);
+         return res.status(500).json({error});
      }
      
  };
 
 //experts
 exports.changeExpertStatus = async(req,res) => {
-    const id = req.params.eid;
+    const uuid = req.params.eid;
     const schema = Joi.object({
-        ActiveStatus:Joi.string().required()
+        activeStatus:Joi.string().required()
     });
     try {
         const value = await schema.validateAsync(req.body);
@@ -85,23 +88,23 @@ exports.changeExpertStatus = async(req,res) => {
         return;
         
     }
-    const {ActiveStatus} = req.body;
+    const {activeStatus} = req.body;
     try {
-        const farmer = await Experts.update({ActiveStatus},{where:{id}});
-        return res.json(farmer);
+        const expert = await Experts.update({activeStatus},{where:{uuid}});
+        return res.json({expert});
     } catch (error) {
-        return res.status(500).json(error);
+        return res.status(500).json({error});
     }
     
     }; 
 // Expert Reports
 exports.getReportedExperts = async(req,res) => {
-    const reportStatus = "unseen";
+    const reportStatus = "unSeen";
      try {
          const AllExpertReports = await ExpertReports.findAll({where:{reportStatus}});
-         return res.json(AllExpertReports);
+         return res.json({AllExpertReports});
      } catch (error) {
-         return res.status(500).json(error);
+         return res.status(500).json({error});
      }
      
  };
@@ -147,7 +150,7 @@ exports.deleteQuestion = (req,res) =>{
         const answers = Answers.destroy({where:{question:id}});
         const reacts = QuestionReacts.destroy({where:{questionId:id}});
         const comments = QuestionComments.destroy({where:{questionId:id}});
-        const tags = QuestionTags.destroy({where:{questionId}});
+        const tags = QuestionTags.destroy({where:{questionId:id}});
         const images = QuestionImages.destroy({where:{questionId:id}});
         const reports = QuestionReport.destroy({where:{questionId:id}});
         const question = Questions.destroy({where:{id}});

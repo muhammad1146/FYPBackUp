@@ -18,7 +18,7 @@ module.exports = {
       },
       reporterType: 
       {
-        type:Sequelize.STRING(2),
+        type:Sequelize.STRING(1),
         allowNull:false,
         validate: 
         {
@@ -30,7 +30,7 @@ module.exports = {
         }},
     reportType: 
     {
-      type:Sequelize.STRING(20),
+      type:Sequelize.STRING,
       allowNull:false,
     },
     reportDescription: {

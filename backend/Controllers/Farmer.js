@@ -1,18 +1,20 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+
 const {Farmers,Experts, Farms,FarmersExperience,FarmerReports,FarmersRank} = require('../models');
 exports.addFarmer = async (req,res) => 
-{
+{ 
     const schema = Joi.object({
         name: Joi.string().required(),
         userName: Joi.string().required(),
         password: Joi.string().required(),
-        phoneNumber: Joi.string(),
+        phoneNumber: Joi.string().required(),
         address: Joi.string(),
-        farmingType: Joi.string(),
+        farmingType: Joi.string().required(),
         description: Joi.string(),
         profileImage: Joi.string(),
+        city:Joi.string().required()
          });
     try { 
         const value = await schema.validateAsync(req.body);
@@ -20,17 +22,18 @@ exports.addFarmer = async (req,res) =>
     return res.status(400).send(error.details[0].message)
     }
     const rankId = 1;
+    const profileImage = req.file.filename;
       const {name,phoneNumber,address,userName,farmingType,
-          description,profileImage,password} = req.body;
+          description,password,city} = req.body;
      const salt = await bcrypt.genSalt(10);
      const hashedPassword = await bcrypt.hash(password,salt);
      try {
          const expert = await Experts.findOne({attributes:['id'],where:{userName}});
          const farmer = await Farmers.findOne({attributes:['id'],where:{userName}});
-         console.log(farmer);
+         console.log(req.file.path);
          if(farmer || expert) return res.status(501).send("Username already exist,try someting else");
          const newfarmer = await Farmers.create({
-              name,phoneNumber,address,password:hashedPassword,userName,farmingType,rankId,description,profileImage
+              name,phoneNumber,address,password:hashedPassword,userName,farmingType,rankId,description,profileImage,city
             });
 
          return res.json(newfarmer);
@@ -41,14 +44,13 @@ exports.addFarmer = async (req,res) =>
 };
 
 exports.addFarm = async (req,res) => {
-    
+    let userName = req.params.username;
     const schema = Joi.object({
         farmName: Joi.string().required(),
         farmSize: Joi.number().required(),
         numberOfCattle: Joi.number().required(),
-        startDate: Joi.string().required(),
         farmLocation: Joi.string().required(),
-        images: Joi.string(),
+        farmImages: Joi.string(),
         farmingType: Joi.string().required()
          });
     try { 
@@ -57,24 +59,33 @@ exports.addFarm = async (req,res) => {
     return res.status(400).send(error.details[0].message)
     }
     const uuid = req.user.uuid;
-    const {farmName,farmLocation,farmSize,numberOfCattle,startDate,images,farmingType} = req.body;
+    const {farmName,farmLocation,farmSize,numberOfCattle,images,farmingType} = req.body;
+    const startDate = new Date();
     try {
-        const farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
-        const farmerId = farmer.id;
+        const farmer = await Farmers.findOne({attributes:['id'],where:{userName}});
+        const FARMER = await Farmers.findOne({attributes:['id'],where:{uuid}});
+        let farmerId = 0;
+        if(farmer.id===FARMER.id){
+             farmerId = farmer.id;
+        }else{
+            return res.status(502).json({error:"Not valid for this request!"});
+        }
         const farm = await Farms.create({farmerId,farmName,farmLocation,farmSize,numberOfCattle,startDate,images,farmingType});
         return res.json(farm);
     } catch (error) {
-        return res.status(400).json(error);
+        console.log(error)
+        return res.status(400).json({error:error});
     }
 };
 
+
 exports.getFarms = async (req,res) => {    
-    console.log('getFarms');
+    const userName = req.params.username;
      const uuid = req.user.uuid;
      try {
-         const farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
+         const farmer = await Farmers.findOne({attributes:['id'],where:{userName}});
          const farmerId = farmer.id;
-          const farms = await Farms.findAll({attributes:['uuid','farmName','farmLocation'], where:{farmerId}});
+          const farms = await Farms.findAll({where:{farmerId}});
          return res.json(farms);
      } catch (error) {
          console.log(error);
@@ -100,7 +111,7 @@ exports.editFarm = async (req,res) => {
         farmSize: Joi.number().required(),
         numberOfCattle: Joi.number().required(),
         farmLocation: Joi.string().required(),
-        images: Joi.string(),
+        farmImages: Joi.array(),
         farmingType: Joi.string().required()
          });
     try {
@@ -148,11 +159,10 @@ exports.deleteFarm = async (req,res) => {
 
 
 exports.getFarmer = async (req,res) => 
-{
-    const uuid = req.params.id;
+{    const uuid = req.params.id;
     try 
     {
-        const farmer = await Farmers.findOne( {attributes:{exclude:['password']}},{where:{uuid},include:[FarmersRank,Farms,FarmersExperience]});
+        const farmer = await Farmers.findOne( {attributes:{exclude:['password']},where:{uuid},include:[FarmersRank,Farms,FarmersExperience]});
         return res.json(farmer);
     } catch (error) 
     {
@@ -162,12 +172,26 @@ exports.getFarmer = async (req,res) =>
 
 exports.getFarmers = async (req,res,) => 
 {
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
         try {
-            const farmers = await Farmers.findAll({attributes:{exclude:['password']}});
-            return res.json(farmers);
+            const farmers = await Farmers.findAndCountAll({attributes:{exclude:['password']},limit:size,offset:page*size}); 
+            return res.json({
+            content:farmers.rows,
+            totalPages:Math.ceil(farmers.count / Number.parseInt(size))
+        });
             
         } catch (error) {
-            return res.status(500).json(error);
+            console.log(error)
+            return res.status(500).send(error);
         }
 };
 
@@ -298,7 +322,8 @@ exports.addRank = async (req,res) =>
 };  
 
 exports.farmerLogin = async (req,res) => 
-{
+{ 
+    console.log("reached the route!");
     const schema = Joi.object(
         {
             userName: Joi.string().required(),
@@ -318,8 +343,21 @@ exports.farmerLogin = async (req,res) =>
         const validPass = await bcrypt.compare(password,farmer.password);
         
         if(!validPass) return res.status(400).send('Invalid Password');
-        const token = jwt.sign({uuid:farmer.uuid,userType:'F'},"secret");
-        res.header('auth-token',token).send(token);
+        // const session = createSession({uuid:farmer.uuid, userType:'F'});
+        const token = jwt.sign({uuid:farmer.uuid,type:'F'},"secret",{
+            expiresIn:'300s'
+        });
+        const refreshToken = jwt.sign({uuid:farmer.uuid,type:'F'},"refreshSecret",{
+            expiresIn:'365d'
+        });
+        res.cookie("refreshToken",refreshToken,{
+            maxAge:300000000
+        })
+        res.cookie("accessToken",token,{
+            maxAge:300000
+        })
+        res.status(200).send({accessToken:token,refreshToken});
+        return;
         } catch (error) {
         return res.status(500).json(error);
     } 
@@ -327,6 +365,7 @@ exports.farmerLogin = async (req,res) =>
 
 exports.addExperience = async (req,res) => 
 {
+    
     const uuid = req.user.uuid;
     const schema = Joi.object(
         {
@@ -352,47 +391,53 @@ exports.addExperience = async (req,res) =>
     } 
 }; 
 
-exports.getExperiences = async (req,res) => 
-{
-    const uuid = req.user.uuid;
-        try {
-        const farmer = await Farmers.findOne ({attributes:['id'],where:{uuid}});
-         const farmerId = farmer.id;
-         const experiences = await FarmersExperience.findAll({where:{farmerId}});
-         return res.json(experiences);
-     } catch (error) {
-         return res.status(500).json(error);
+// exports.getExperiences = async (req,res) => 
+// {
+//     const uuid = req.user.uuid;
+//         try {
+//         const farmer = await Farmers.findOne ({attributes:['id'],where:{uuid}});
+//          const farmerId = farmer.id;
+//          const experiences = await FarmersExperience.findAll({where:{farmerId}});
+//          return res.json(experiences);
+//      } catch (error) {
+//          return res.status(500).json(error);
     
-     } 
-}; 
+//      } 
+// }; 
 
-exports.getExperience = async (req,res) => 
-{
-    const uuid = req.params.exid;
-    try {
+// exports.getExperience = async (req,res) => 
+// {
+//     const uuid = req.params.exid;
+//     try {
 
-        const experience = await FarmersExperience.findOne({uuid});
-        return res.json(experience);
-    } catch (error) {
-        return res.status(500).json(error);
+//         const experience = await FarmersExperience.findOne({uuid});
+//         return res.json(experience);
+//     } catch (error) {
+//         return res.status(500).json(error);
     
-    } 
-}; 
+//     } 
+// }; 
 
 exports.deleteExperience = async (req,res) => 
 {
-    const uuid = req.params.exid
-    if(uuid===req.user.uuid)
+    const id = req.params.exid;
+
     {
 
         try {
-            const deletedExperience = await FarmersExperience.destroy({where:{uuid}});
-            return res.json(deletedExperience);
+            const experience = await FarmersExperience.findOne({where:{id},attributes:['farmerId']});
+            const farmer = await Farmers.findOne({where:{uuid:(req.user.uuid)},attributes:[id]});
+            if(experience.farmerId===farmer.id){
+                const deletedExperience = await FarmersExperience.destroy({where:{id}});
+                return res.json(deletedExperience);
+            }else{
+                return res.status(501).json({error:"resource not valid for this request!!"});
+            }
         } catch (error) {
             return res.status(500).json(error);
             
         } 
-    }else {
-        return res.status(401).send("Unautorized user");
     }
 }; 
+
+

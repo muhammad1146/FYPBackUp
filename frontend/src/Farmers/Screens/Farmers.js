@@ -1,38 +1,70 @@
 // This Screen is without the right side bar 
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Card } from 'react-bootstrap';
-import '../../App.css'
+import { Card,Button, Container,Row,Col,Image } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import FarmerScreenCSS from './Farmers.module.css';
 const Farmers = () => {
     const [farmers,setFarmers] = useState([]);
-    useEffect(()=> {
-        const data = axios.get();
-        setFarmers(data);
+    useEffect( async()=> {
+       try {
+           const result = await axios.get('/api/farmers/');
+           console.log(result)
+           if(result.data.content.length>0)
+           setFarmers(result.data.content);
+           else setFarmers(-1)
+           
+       } catch (error) {
+           console.log(error)
+       }
     },[]);
-const FarmerContainer = (props) =>{
+const FarmerContainer = ({farmer}) =>{
 return(
+    <Col sm={4}>
             <Card style={{ width: '18rem' }}>
+            <div className='text-center mt-2'>
+            <Link to={`/farmers/${farmer.uuid}`}>
+            <Image variant="top" src={`/${farmer.profileImage}`} rounded width="170px" height="170px" className="text-center"/>
+            </Link>
+            </div>
             <Card.Body>
-                <Card.Title>FarmerName</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">Farming</Card.Subtitle>
+                <Link to={`/farmers/${farmer.uuid}/`}>
+                <Card.Title>{farmer.userName}
+                </Card.Title>
+                </Link>
+                <Card.Subtitle className="mb-2 text-muted">
+                {farmer.farmingType}
+                </Card.Subtitle>
                 <Card.Text>
-                Some quick example text to build on the card title and make up the bulk of
-                the card's content.
+                {farmer.description}
                 </Card.Text>
-                <Card.Link href="#">Card Link</Card.Link>
-                <Card.Link href="#">Another Link</Card.Link>
+                <Card.Link href="#">{farmer.rankId}</Card.Link>
+                <Card.Link href="#">{farmer.city}</Card.Link>
             </Card.Body>
             </Card>
+    </Col>
+
 )
 }
     return (
         <div className='contentSection'>
-            <h1>Farmers</h1>
-            {farmers.map((farmer) => {
-                return (
-                    <FarmerContainer farmer />
-                )
-            })}
+        <Container className="border" style={{borderRadius:"20px", marginTop:"50px",paddingBottom:'30px'}}>
+        <Link to={'/'} className={FarmerScreenCSS.backbutton}>
+        <Button variant="outline-dark" className={FarmerScreenCSS.button}>
+        Back
+        </Button>
+        </Link>
+            <h1 className={FarmerScreenCSS.h1}>Farmers</h1>
+            <hr style={{marginTop:"30px"}} />
+            <Row>
+            {
+                farmers.length>0
+                ? farmers.map((farmer) =>(<FarmerContainer farmer={farmer} />) )
+                :(<h2>Loading...</h2>)
+                
+            }
+        </Row>
+        </Container>
         </div>
     )
 }

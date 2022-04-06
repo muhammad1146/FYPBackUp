@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(Posts,{foreignKey:'postId'});
       this.belongsTo(Farmers,{foreignKey:'farmerId'});
     }
-    toJSON(){
-      return {...this.get(), id:undefined}
-    }
+    // toJSON(){
+    //   return {...this.get(), id:undefined}
+    // }
   }; 
   AnimalPostOrders.init({
     uuid: {
@@ -18,12 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: nanoid(10),
       unique:true
     },
-    postId: 
+    postId: //fk
     {
       type: DataTypes.INTEGER,
       allowNull:false
     },
-   farmerId:
+   farmerId: //fk
    {
      type: DataTypes.INTEGER,
      allowNull:false
@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
   status:
   {
     type: DataTypes.STRING, // status means whether Accepted, pending or rejected
+    defaultValue:"Pending",
     allowNull:false,
    validate: 
    {

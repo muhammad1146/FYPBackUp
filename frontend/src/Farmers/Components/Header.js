@@ -19,16 +19,7 @@ if (!isLoggedIn){
       <Navbar.Brand> <GiTalk size='1.4rem' className='pr-1'/>CATTLETALK</Navbar.Brand>
     </LinkContainer>
        
-    <Form >
-      <Row>
-        <Col >
-      <FormControl type="text" placeholder="Search" className="mr-sm-2" inline />
-        </Col>
-        <Col lg='2'>
-      <Button variant="outline-success" className='' >Search</Button>
-        </Col>
-      </Row>
-    </Form>
+    
   <Navbar.Toggle aria-controls="basic-navbar-nav" />
   <Navbar.Collapse id="basic-navbar-nav">
   <Nav className="ml-auto">

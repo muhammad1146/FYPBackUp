@@ -2,3 +2,79 @@
 main{
 min-height: 80vh;
 }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 8rem);
+  grid-auto-rows: 8rem;
+  justify-items: center;
+  align-items: center;
+}
+
+.loading-box {
+  width: calc(100% - 1rem);
+  height: calc(100% - 1rem);
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.01);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+
+.post_modal h3{
+padding: 10px;
+}
+
+.post_modal Form{
+  padding: 10px;
+}
+
+
+.post_modal Form
+{
+  padding: 10px;
+  box-shadow: 0 0 4px 4px gray;
+  border-radius: 10px;
+  margin: 30px 30px;
+}
+
+.post_modal input{
+  border-radius: 10px;
+}
+
+.post_modal input[type=file]{
+  border-radius: 10px;
+}
+
+.post_modal select{
+  border-radius: 5px;
+  width: 100%;
+}
+
+.post_modal button{
+  border-radius: 10px;
+}
+
+.post_modal img{
+  border-radius: 5px;
+  border: 1px solid  gray;
+  margin: 5px;
+}
+
+.post_modal input[type=file]{
+}
+
+.post-image-cross{
+ 
+  
+}
+.post-image-container{
+  text-align: center;
+  border-radius: 10%;
+
+  background-color: lightgray;
+}
+

@@ -45,8 +45,8 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(FarmerFollows,{foreignKey:'farmerId'});
       this.hasMany(FarmerBookmarks,{foreignKey:'farmerId'});
       this.hasMany(Posts,{foreignKey:'farmerId'});
-      this.hasMany(PostComments,{foreignKey:'commenterId'});
-      this.hasMany(PostReacts,{foreignKey:'commiterId'});
+      this.hasMany(PostComments,{foreignKey:'farmerId'});
+      this.hasMany(PostReacts,{foreignKey:'farmerId'});
       this.hasMany(FarmersExperience,{foreignKey:'farmerId'});
       this.hasMany(AnimalPostOrders,{foreignKey:'farmerId'});
       this.hasMany(AnswerReport,
@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
           }
         });
       this.hasMany(BlogReport,{foreignKey:'reporterId'});
-      this.hasMany(EcommerceReport,{foreignKey:'reporterId'});
+      this.hasMany(EcommerceReport,{foreignKey:'farmerId'});
       this.hasMany(AnswerReacts,
         {
           foreignKey:'commiterId',
@@ -116,9 +116,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     phoneNumber: DataTypes.STRING(12),
     farmingType: DataTypes.STRING(20),
+    city:DataTypes.STRING,
     address: DataTypes.STRING,
     profileImage: DataTypes.STRING,
     description: DataTypes.STRING,
+    description: {
+      type:DataTypes.BOOLEAN,
+      defaultValue:true,
+      allowNull:false
+    },
     rankId: 
     {
       type:DataTypes.INTEGER,

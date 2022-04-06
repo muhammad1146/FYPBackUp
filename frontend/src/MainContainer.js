@@ -1,25 +1,23 @@
-import React,{useContext} from 'react'
-import FarmerDiscussion from './Farmers/Screens/DiscussionMain';
-import Ecommerce from './Farmers/Screens/EcommerceMain';
-import FarmerBlog from './Farmers/Screens/BlogMain';
+import React from 'react'
+import FarmerDiscussion from './Farmers/Screens/Discussion/DiscussionMain';
+import Ecommerce from './Farmers/Screens/Ecommerce/EcommerceMain';
+import FarmerBlog from './Farmers/Screens/Blogs/BlogMain';
 import ExpertDiscussion from './Experts/Screens/DiscussionMain';
 import ExpertBlog from './Experts/Screens/BlogMain';
 import {Container,Row,Col} from 'react-bootstrap'
 import { Switch,Route,Redirect,useHistory } from 'react-router';
-import { UserContext } from './Contexts/UserContext';
 
-const MainContainer = () => {
-    const {user} = useContext(UserContext);
+const MainContainer = ({user,setUser}) => {
     
       return (
           <>
-    <Container fluid className=' h-70'>
+    <div className='h-70'>
         <Row>
         <Col lg={12} className="bg-light ">
         <main>
             <Switch> 
            
-    <Route  path='/discussion' component={() =>{
+    <Route  path='/discussion/' component={() =>{
             if(user.type==='F')
             {
                 return( <FarmerDiscussion />)
@@ -34,17 +32,17 @@ const MainContainer = () => {
             
     <Route  path='/ecommerce' component={() =>{
            if (user.type==='F'){
-          return ( <Ecommerce /> )  
+          return ( <Ecommerce user={user} /> )  
            }  
            else{
               return (<Redirect to='/' />)
            }}} />
-    <Route  path='/blogs' component={() =>{
+    <Route  path='/blogs/' component={() =>{
            if( user.type==='F'){
-          return( <FarmerBlog /> )
+          return( <FarmerBlog user={user}/> )
            }
            else if(user.type==='E' || user.type==='A'){
-          return ( <ExpertBlog /> ) 
+          return ( <ExpertBlog user={user} /> ) 
            }
            else{
             <Redirect to='/login' />
@@ -54,11 +52,8 @@ const MainContainer = () => {
         </main>
         </Col>    
         </Row>
-    </Container> 
+    </div> 
         </>
     )
 }
-
-
-
 export default MainContainer

@@ -221,10 +221,21 @@ const expertuuid = req.user.uuid;
 } 
 
 exports.getExperts = async(req,res,next) => {
-   
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
     try {
-        const experts = await Experts.findAll({attributes:['name','userName','phoneNumber','address','profileImage','description','rankId','experties'],include:[ExpertsRank]});
-        return res.json(experts);
+        const experts = await Experts.findAndCountAll({attributes:['name','userName','phoneNumber','address','profileImage','description','rankId','experties'],include:[ExpertsRank],limit:size,offset:size*page});
+        return res.json({content:experts.rows,
+        totalPages:Math.ceil(experts.count /Number.parseInt(size))
+        });
     } catch (error) {
        return res.status(500).json(error); 
     }

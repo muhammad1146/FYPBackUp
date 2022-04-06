@@ -32,11 +32,15 @@ module.exports = (sequelize, DataTypes) => {
       {
         isIn: 
         {
-          args:[["seen","unseen"]],
-          msg:"Must be seen or unseen."
+          args:[["S","US"]],
+          msg:"Must be S or US."
         }
       }
-    }, 
+    },       
+    reportType:{
+      type:DataTypes.STRING,
+      allowNull:false
+    }
     
   }, {
     sequelize,

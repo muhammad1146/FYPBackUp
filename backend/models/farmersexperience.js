@@ -15,11 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   FarmersExperience.init({
-    uuid:{
-      type:DataTypes.STRING,
-      defaultValue:nanoid(6),
-      unique:true
-    }, 
+    
     farmingType: {
       type:DataTypes.STRING(10),
     allowNull:false

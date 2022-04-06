@@ -1,107 +1,142 @@
 const Joi = require('joi');
+const fetch = require("node-fetch");
 const {Questions,QuestionImage,QuestionTags,QuestionReacts,QuestionTagBox,
-    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers} = require('../models/questions'); 
+    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers} = require('../models'); 
 exports.getQuestions = async (req,res) => {
-    let category = req.query.cat;
-if(category){
-
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
     }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
+    // let category = req.query.cat;
+// if(category){
+
+//     }
     try { 
-        const questions = await Questions.findAll({include:[Farmers,QuestionReacts]});
-        return res.json(questions);
+        
+        const questions = await Questions.findAndCountAll({include:[{model:Farmers,attributes:["userName","profileImage","rankId"]},{model:QuestionReacts,attributes:["commitType","commiterId"]}],limit:size,offset:size*page});
+        return res.json({
+        content:questions.rows,
+        totalPages:Math.ceil(questions.count/Number.parseInt(size))
+        });
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     }
-
 };
-
 exports.getQuestion = async (req,res) => {
-    const id = req.params.qid;
+    const uuid = req.params.qid;
     try { 
-        const question = await Questions.findOne({where:{id},include:[Farmers,QuestionReacts]});
+        console.log("reached question route!");
+        const questions = await Questions.findOne({where:{uuid},include:[Farmers,QuestionReacts,QuestionComments,QuestionImage,QuestionTags]});
         return res.json(questions);
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     }
 };
-
 exports.addQuestion = async (req,res) =>{
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         body: Joi.string().required(),
-        farmerId:Joi.string().required(),
         farmingType: Joi.string().required(),
-        img: Joi.array().required(),
+        img: Joi.array(),
         tags: Joi.array().required()
     });
     try {
         const value = await schema.validateAsync(req.body);
-        
     } catch (error) {
         res.status(400).send(error.details[0].message);
-        return;
-        
+        return; 
     }
-    const  {body,farmerId,farmingType} = req.body;
+    let uuid = req.user.uuid;
+    const  {body,farmingType} = req.body;
     const {img} = req.body;
     const {tags} = req.body;
+    let farmerId;
     try {
+        let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
+        if(farmer.id) farmerId=farmer.id 
+        else return res.status(401).send("invalid request");
         const question = await Questions.create({body,farmerId,farmingType});
-        const questionImages = [], questionTags = [];
-        for (let j = 0; j<img.length; j++){
-            const obj = {
-                image:img[j],
-                questionId: question.id
-            }
-            questionImages.push(obj);
-
-        }
-        
-        for (let j = 0; j<tags.length; j++){
-            const obj = {
-                tagId:tags[j],
-                questionId: question.id
-            }
-            questionTags.push(obj);
-
-        }
-        
+        let questionImages = [], questionTags = [];
+        questionImages = questionImages.map((img)=>{
+                    let obj ={};
+                    obj.image = img;
+                    obj.questionId = question.id;
+                    return obj
+        })
+        questionTags = questionTags.map((tag)=>{
+            let obj = {}
+            obj.tagId=tags,
+            obj.questionId= question.id
+            return obj
+        })
         const images = await QuestionImage.bulkCreate(questionImages,{returning:true});
         const qTags = await QuestionTags.bulkCreate(questionTags,{returning:true});
         return res.json(question,images,qTags);
     } catch (error) {
+        console.log(error)
         return res.status(500).json(error);
     }
 
 }
 
 exports.editQuestion =async (req,res) =>{
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         body: Joi.string().required(),
         farmingType: Joi.string().required(),
         questionTags: Joi.array().required(),
-        questionImages:Joi.array().required()
+        questionImages:Joi.array()
     });
     try {
-        const value = await schema.validateAsync(req.body);
-        
+        const value = await schema.validateAsync(req.body);    
     } catch (error) {
         res.status(400).send(error.details[0].message);
-        return;
-        
+        return; 
     }
-    const questionId = req.params.qid;
+    const uuid = req.params.qid;
     const {body,farmingType} = req.body;
-    const {questionTags} = req.body;
-    const {questionImages} = req.body;
+    let {questionTags,questionImages} = req.body;
+    let tags,images;
+    let questionId;
     try { 
-        const updatedQuestion = await Questions.update({body,farmingType},{where:{id:questionId}});
-        const updatedquestionTags = await QuestionTags.bulkCreate({questionTags},
-            {updateOnDuplicate:["tagId"]},{where:{questionId}});
-        const updatequestionImages = QuestionImage.bulkCreate({questionImages},
-            {updateOnDuplicate:["image"]},{where:{questionId}});
-            return res.json(updatedQuestion,updatedquestionTags,updatequestionImages);
+        let farmer = await Farmers.findOne({attributes:['id'],where:{uuid:req.user.uuid}});
+        let question = await Questions.findOne({attributes:["farmerId","id"],where:{uuid}});
+        tags = questionTags.map((tag)=>{
+            let obj = {}
+            obj.tagId=parseInt(tag),
+            obj.questionId= question.id
+            return obj
+        });
+        images = questionImages.map((img)=>{
+            let obj = {}
+            obj.image = img;
+            obj.questionId= question.id
+            return obj
+        });
+        console.log(tags);
+        if(question.id) questionId=question.id;
+        else return res.status(500).send("Question Not Found!!");
+        if(farmer.id === question.farmerId){
+            let updatedQuestion = await Questions.update({body,farmingType},{where:{uuid}});
+            let deletedQuestionTags = await QuestionTags.destroy({where:{questionId}});
+            let deletedQuestionImages = await QuestionImage.destroy({where:{questionId}});
+            let newImages = await QuestionImage.bulkCreate(images,{returning:true});
+            let newTags = await QuestionTags.bulkCreate(tags,{returning:true});      
+            let newQuestion = await Questions.findOne({where:{uuid},include:[Farmers,QuestionReacts,QuestionComments,QuestionImage,QuestionTags]})
+                    return res.json(newQuestion);
+                }
+                else {
+                    return res.status(401).send("User has no priveleges for this action...")
+                }
         
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     }
 
@@ -109,16 +144,27 @@ exports.editQuestion =async (req,res) =>{
 exports.deleteQuestion = async (req,res) =>{
     const questionuuid = req.params.qid;
     let questionId;
-    let questionFarmerId, uuid=req.user.uuid,userType=req.user.type, farmerId;
-    if(userType==='F') 
+    let questionFarmerId, uuid=req.user.uuid, farmerId;
+    if(req.user.userType==='F') 
     {
         try {
-            const question = Questions.findOne({where:{uuid:questionuuid}});
-            questionFarmerId = question.farmerId;
-            questionId = question.id;
-            const farmer = Farmers.findOne({where:{uuid}});
-            farmerId = farmer.id;
+            const question = await Questions.findOne({attributes:["id","farmerId"], where:{uuid:questionuuid}});
+            const farmer = await Farmers.findOne({where:{uuid}});
+            if(question.id){
+                questionFarmerId = question.farmerId;
+                questionId = question.id;
+            }else {
+                return res.status(400).send("Question Not Found!!");
+            }
+            if(farmer.id){
+                farmerId = farmer.id;
+
+            }
+            else {
+                return res.status(400).send("Farmer Not Found!!");
+            }
         } catch (error) {
+            console.log(error);
             return res.status(501).send("Internal Server Error!");
         }
         if(farmerId===questionFarmerId)
@@ -128,10 +174,13 @@ exports.deleteQuestion = async (req,res) =>{
                 const reacts = await QuestionReacts.destroy({where:{questionId}});
                 const comment = await QuestionComments.destroy({where:{questionId}});
                 const report = await QuestionReport.destroy({where:{questionId}});
+                const images = await QuestionImage.destroy({where:{questionId}});
+                const tags = await QuestionTags.destroy({where:{questionId}});
                 const question = await Questions.destroy({where:{id:questionId}});
-                return res.json({question,answers,reacts,comment,report}); 
+                return res.json({question,answers,reacts,comment,report,images,tags}); 
             }
             catch (error) {
+                console.log(error);
                 return res.status(500).json(error);
             }
         }
@@ -139,7 +188,7 @@ exports.deleteQuestion = async (req,res) =>{
             return res.status(401).send("Forbidden access!");
         }
     }
-    else if(userType==='A'){
+    else if(req.user.userType==='A'){
         try {
             const answers = await Answers.destroy({where:{questionId}});
             const reacts = await QuestionReacts.destroy({where:{questionId}});
@@ -148,13 +197,14 @@ exports.deleteQuestion = async (req,res) =>{
             const question = await Questions.destroy({where:{id:questionId}});
             return res.json({question,answers,reacts,comment,report}); }
         catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
 }
 }
 
 exports.addQuestionReact = async (req,res) => {
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         questionId:Joi.string().required(),
         commitType:Joi.string().required(),
         commiterType :Joi.string().required(),
@@ -179,7 +229,7 @@ exports.addQuestionReact = async (req,res) => {
 };
 
 exports.addQuestionComment = async (req,res) => {
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         body:Joi.string().required(),
         questionId:Joi.string().required(),
         commenterType :Joi.string().required(),
@@ -238,7 +288,7 @@ try {
 
 //QuestionReport
 exports.reportQuestion = async (req,res) => {
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         reporterId:Joi.string().required(),
         reportDescription: Joi.string().required()
     });
@@ -295,8 +345,7 @@ exports.getAnswer = async (req,res,next) =>{ //getAnswerOfAQuestion *For Expert/
 };
 
 exports.addAnswer = async (req,res) =>{ // For Expert Entity
-    const schema = Joi.obect( {
-        questionId: Joi.string().required(),
+    const schema = Joi.object( {
         body: Joi.string().required()
     });
     try {
@@ -307,20 +356,35 @@ exports.addAnswer = async (req,res) =>{ // For Expert Entity
         res.status(400).send(error.details[0].message);
         return;
     }
-    const expertId = req.params.eid;
-    const questionId = req.params.qid;
+
+    const uuid = req.user.uuid;
+    const questionuuid = req.params.qid;
+    let questionId;
+    let expertId;
     const {body} = req.body;
     try {
-        const answer = await Answers.create({body,questionId,expertId});
-        return res.json(answer);
-    } catch (error) {
+        if(!(req.user.type==='F'))
+        {
+            let question = await Questions.findOne({attributes:["id"],where:{uuid:questionuuid}})
+            if(question.id) questionId= question.id;
+            else return res.status(401).send("Question Not Found!");
+            let expert = await Experts.findOne({attributes:["id"],where:{uuid}})
+            if(expert.id) expertId= expert.id;
+            else return res.status(401).send("Not Allowed for this action!");
+            const answer = await Answers.create({body,questionId,expertId});
+            return res.json(answer);
+        }else {
+            return res.status(401).send("Farmers are not allowed to answer!");
+        }
+        } catch (error) {
+            console.log(error);
         return res.status(500).json(error);
     }
 };
 
 exports.editAnswer = async (req,res) =>
 { //For Expert Entity
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         body: Joi.string().required()
     });
     try {
@@ -383,7 +447,7 @@ exports.deleteAnswer = async (req,res) =>
 exports.addAnswerReact = async (req,res) =>{ // For Expert Entity
     const answerId = req.params.aid;
     const questionId = req.params.qid;
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         commitType: Joi.string().required(),
         commiterType: Joi.string().required(),
         commiterId:Joi.string().required()
@@ -408,7 +472,7 @@ exports.addAnswerReact = async (req,res) =>{ // For Expert Entity
 exports.addAnswerReport = async (req,res) =>{ //Add new Tag to QuestionTagBox
     const answerId = req.params.aid;
     const date = new Date();
-    const schema = Joi.obect( {
+    const schema = Joi.object( {
         reporterId: Joi.string().required(),
         reporterType: Joi.string().required(),
         reportDescription:Joi.string().required(),
@@ -432,13 +496,50 @@ exports.addAnswerReport = async (req,res) =>{ //Add new Tag to QuestionTagBox
     }
 };
 //Question Tags
-exports.getQuestionTags = (req,res) =>
+exports.getDiscussionTags = async (req,res) =>
 { //get All Tags from QuestionTagBox
-    
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
     try 
     {
-        const tags = QuestionTagBox.findAll();
-        return res.json(tags);
+        const tags = await QuestionTagBox.findAndCountAll({limit:size,offset:page*size});
+  
+        return res.json({content:tags.rows,
+            totalPages:Math.ceil(tags.count / Number.parseInt(size))
+        });
+    } catch (error) 
+    {   
+        return res.status(500).json(error);
+    } 
+};
+
+exports.getQuestionTag = (req,res) =>
+{ //get All Tags from QuestionTagBox
+    let tagId = req.params.tid;
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
+    try 
+    {
+        const tags = QuestionTags.findOne({where:{tagId},include:[{model:Questions,limit:15,offset:15*page}]});
+        return res.json({content:tags.rows,
+            totalPages:Number.ceil(AllPosts.count / Number.parseInt(size))
+        });
     } catch (error) 
     {
         return res.status(500).json(error);
@@ -446,7 +547,7 @@ exports.getQuestionTags = (req,res) =>
 };
 
 exports.addTagToQuestionTagBox = async (req,res) =>{ //Add new Tag to QuestionTagBox
-    const schema = Joi.obect( {
+    const schema = Joi.object({
         tag: Joi.string().required(),
         description: Joi.string().required(),
         
@@ -459,10 +560,17 @@ exports.addTagToQuestionTagBox = async (req,res) =>{ //Add new Tag to QuestionTa
         res.status(400).send(error.details[0].message);
         return;
     }
-
+    if(req.user.userType==='F'){
+        return res.status(401).send("illegal function!!");
+    }
+    let uuid = req.user.uuid;
+    let expertId ;
     const {tag,description} = req.body;
     try {
-        const newTag = await QuestionTagBox.create({tag,description});
+        let expert = await Experts.findOne({attributes:["id"],where:{uuid}});
+        if(expert.id) expertId=expert.id
+        else return res.status(401).send("illegal action!!");
+        const newTag = await QuestionTagBox.create({tag,description,expertId});
         return res.json(newTag);
     } catch (error) {
         return res.status(500).json(error);

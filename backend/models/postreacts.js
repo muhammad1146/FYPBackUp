@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate({Posts, Farmers}) {
       // define association here
       this.belongsTo(Posts,{foreignKey:'postId'});
-      this.belongsTo(Farmers,{foreignKey:'commiterId'});
+      this.belongsTo(Farmers,{foreignKey:'farmerId'});
     }
   };
   PostReacts.init({

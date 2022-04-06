@@ -19,7 +19,7 @@ module.exports = {
       commentBody: {
         type: Sequelize.STRING
       },
-      commenterId: {
+      farmerId: { //foreignKey
         type: Sequelize.INTEGER,
         allowNull:false
       },

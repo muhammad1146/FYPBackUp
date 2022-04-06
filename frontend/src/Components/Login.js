@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react'
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-import {Form,Button,Col,Row,FloatingLabel, Container} from "react-bootstrap"
-import {UserContext} from '../Contexts/UserContext'
+import {Form,Button,Col,Row,FloatingLabel, Container,Image} from "react-bootstrap"
 import { useHistory } from 'react-router';
-const Login = () => {
+import logo from '../data/LoginPNG.jpg'
+const Login = ({setUser}) => {
   let history = useHistory();
-const {user,setUser} = useContext(UserContext);
+// const {user,setUser} = useContext(UserContext);
 const [userType,setUsertype] = useState("F");
 const [username,setUsername] = useState('');
 const [password, setPassword] = useState('');
@@ -17,35 +17,46 @@ const handleRadioChange = (event) =>{
   const onSubmitFunction  = async (e) => 
   {
       e.preventDefault();
+      // console.log("reached login fn");
       let result ;
       let url = (userType==='F')?'farmers' :'experts';
         try {
           let data =  JSON.stringify({userName:username,password});
+      // console.log("reached login fn1");
+         
           result = await axios({
               method:'post',
               headers: { 'Content-Type': 'application/json' },
-              url:`api/${url}/login`,
+              url:`api/${url}/login`, 
               data
             });   
             } catch (error) {
-              
-              setError(error.response.data);
+            console.log(error.response.data);  
+               setError(error.response.data);
               return;
           }
-             const payload = jwt.verify(result.data,'secret');
-           
-           setUser(prev => ({
-                 ...prev,
-                uuid:payload.uuid,
-               type:payload.userType,
-                token:result.data
-              }));
-              history.push('/')
+          // console.log(result);
+              const payload = jwt.verify(result.data.accessToken,'secret');
+           setUser(payload);
+          //  setUser(prev => ({
+          //        ...prev,
+          //       uuid:payload.uuid,
+          //      type:payload.type,
+          //       token:result.data
+          //     }));
+              history.push('/');
               
           
 }
   
   return (
+    <Container >
+    <Row className="my-4">
+
+    <Col lg={7} sm={5} xl={6}>
+    <Image src={logo} alt="logo" fluid />
+    </Col>
+    <Col>
     <Form onSubmit={onSubmitFunction} >
     <h2 className='my-2 text-center'>Login</h2>
     <h5 className="text-danger">{error}</h5>
@@ -132,6 +143,9 @@ const handleRadioChange = (event) =>{
     </Form.Group>
     </Container>
   </Form>
+  </Col>
+    </Row>
+    </Container>
   );
 }
 

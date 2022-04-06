@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import Cattle from '../data/cattleForSale'
 import {LinkContainer} from 'react-router-bootstrap';
 import axios from 'axios'
-import CommentSection from '../components/CommentSectionAD'
+import CommentSection from './CommentSectionAD'
 import { AiFillPhone,AiOutlineUser } from "react-icons/ai";
 const   AnimalDetail = ({match}) => {
     const [Animal,setAnimal] = useState({})
@@ -37,13 +37,6 @@ const   AnimalDetail = ({match}) => {
     if(Animal){
         return (
             <>
-         {
-             console.log(images)
-         }
-                    
-        {
-            console.log("using typeof: "+typeof(images))
-        }
          <Link className='btn btn-dark my-3' to='/animals'> Back </Link>
          <Row className='border' >
         <Col lg='6' className='text-center my-auto' >

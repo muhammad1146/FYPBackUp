@@ -14,8 +14,9 @@ module.exports = {
       },
       reporterType:
       {
-        type:Sequelize.STRING(10),
-        allowNull:false
+        type:Sequelize.STRING(1),
+        allowNull:false,
+        
       },
       reporterId: {
         type: Sequelize.INTEGER,
@@ -26,21 +27,15 @@ module.exports = {
       },
       reportStatus: 
       {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING(2),
         allowNull:false,
+        defaultValue:"US"
       },
       reportType: 
     {
-      type:Sequelize.STRING(2),
+      type:Sequelize.STRING,
       allowNull:false,
-      validate:
-      {
-        isIn:
-        {
-          args:[["F","E"]],
-          msg:"Must be F or E."
-        }
-      }
+    
     },
       createdAt: {
         allowNull: false,

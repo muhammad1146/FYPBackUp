@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useEffect,useContext,useState } from 'react'
 import { Container, Table, Image, Row, Col,Button } from 'react-bootstrap';
-import { UserContext } from '../../Contexts/UserContext';
 const AdminProfile = (props) => {
     const userName = props.match.params.userName;
     const token = props.token;

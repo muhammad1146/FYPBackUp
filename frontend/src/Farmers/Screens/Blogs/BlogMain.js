@@ -1,7 +1,8 @@
 import React,{useEffect} from 'react';
 import { Col, Container,Row } from 'react-bootstrap';
 import { Route, BrowserRouter as Router, Switch,withRouter} from 'react-router-dom'
-import Sidebar from '../Components/BlogSidebar'
+import BlogSearchForm from '../../Components/Blogs/BlogSearchForm';
+import Sidebar from '../../Components/Blogs/BlogSidebar'
 
 const BlogMain = () => 
 {
@@ -12,7 +13,7 @@ const BlogMain = () =>
 
         <Container>
             <Switch> 
-
+            <BlogSearchForm />
                 {/* <Route path='/' component={()=>(<div className='contentSection'>
                         <Row>
                         <InflateData />

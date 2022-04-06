@@ -2,8 +2,8 @@ import React,{useEffect} from 'react';
 import { Container,Row,Col } from 'react-bootstrap';
 import { Route, BrowserRouter as Router, Switch,withRouter} from 'react-router-dom'
 import Sidebar from '../Components/DiscussionSidebar'
-import Questions from '../../Farmers/Screens/Questions';
-import Question from '../../Farmers/Screens/Question';
+import Questions from '../../Farmers/Screens/Discussion/Questions';
+import Question from '../../Farmers/Screens/Discussion/Question';
 import Farmers from '../../Farmers/Screens/Farmers';
 import FarmerProfile from '../../Farmers/Components/FarmerProfile';
 import Experts from './Experts'

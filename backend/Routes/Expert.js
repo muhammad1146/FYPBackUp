@@ -6,7 +6,7 @@ const router = express.Router();
 require('dotenv').config();
 // Experts 
 
-router.post('/ranks',ExpertController.addExpertRank) // add Expert Rank
+router.post('/ranks',ExpertController.addExpertRank) // add Expert Rank 
 
 router.get('/ranks',ExpertController.getExpertRanks) // get Expert ranks 
 
@@ -44,7 +44,7 @@ router.get('/:eid/reports',verifyToken,ExpertController.getAllReports); //get Al
 
 router.delete('/:eid/reports/:erid',verifyToken,ExpertController.deleteExpertReport); //Delete Report
 
-router.post('/',ExpertController.addExpert) // add/register Expert
+router.post('/',ExpertController.addExpert) // add/register Expert (image included)
 
 
 module.exports = router;

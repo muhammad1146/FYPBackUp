@@ -8,11 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      postId: {
+      postId: { //fk
         type: Sequelize.INTEGER,
         allowNull:false
       },
-      reporterId: {
+      farmerId: { //fk reporterId
         type: Sequelize.INTEGER,
         allowNull:false
 
@@ -24,25 +24,13 @@ module.exports = {
       reportStatus: {
         type: Sequelize.STRING,
         allowNull:false, 
-      validate:
-      { isIn:
-        {
-          args:[["S","US"]],
-          msg:"Must be S or US."
-      }
-      }
+        defaultValue:"UnSeen"
       },
       reportType:
     {
-      type:Sequelize.STRING(4),
+      type:Sequelize.STRING,
       allowNull:false,
-      validate:
-      {
-        isIn:
-        {
-          args:[["spam","fake"]]
-        }
-      }
+      
     },
       createdAt: {
         allowNull: false,

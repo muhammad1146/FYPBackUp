@@ -38,6 +38,9 @@ module.exports = {
         type: Sequelize.STRING(20),
         allowNull:false
       },
+      city:{
+        type:Sequelize.STRING
+      },
       address: {
         type: Sequelize.STRING
       },
@@ -46,6 +49,11 @@ module.exports = {
       },
       description: {
         type: Sequelize.STRING
+      },
+      activeStatus: {
+        type: Sequelize.BOOLEAN,
+        allowNull:false,
+        defaultValue:true
       },
       rankId: {
         type: Sequelize.INTEGER,

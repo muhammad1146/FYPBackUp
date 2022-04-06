@@ -1,14 +1,28 @@
 const express = require ( 'express');
+const bodyParser = require('body-parser');
 const app = express();
 const {sequelize} = require('./models')
+const  cookieParser = require("cookie-parser");
+const cors = require('cors');
+app.use(express.json());
+app.use(cors());
+app.options('*', cors());
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}));
 const BlogRoutes = require('./Routes/Blogs'); //  Finished
 const Discussion = require('./Routes/Discussion'); // Finished
 const FarmerRoutes = require('./Routes/Farmer'); // Finished
 const ExpertRoutes = require('./Routes/Expert'); // Finished
 const AdminRoutes = require('./Routes/Entities'); //  Finished
 const Ecommerce = require('./Routes/Ecommerce'); // Finished
-app.use(express.json());
-// this is called filtering paths
+const upload = require('./Controllers/ImageManagement')
+app.use(cookieParser())
+
+app.use(express.static('backend/uploads'))
+app.get('/', (req, res) => {
+res.send(" CattleTalk Api is active and running...")
+})
 app.use('/api/blogs',BlogRoutes);
 app.use('/api/questions',Discussion);
 app.use('/api/ecommerce',Ecommerce);
@@ -16,9 +30,14 @@ app.use('/api/admin',AdminRoutes);
 app.use('/api/farmers',FarmerRoutes);
 app.use('/api/experts',ExpertRoutes);
 
-app.get('/', (req, res) => {
-res.send(" CattleTalk Api is active and running...")
+app.post('/api/image-practice',upload.array("imageToUpload",2),(req,res)=>{
+  console.log(req.body);
+  let names = req.files.map(item =>{
+    return item.filename
+  })
+  res.send(names)
 })
+
 // app.get('/api/animals',(req,res)=> {
 //     res.json(animals);
 // })

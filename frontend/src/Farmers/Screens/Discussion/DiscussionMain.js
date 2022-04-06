@@ -1,14 +1,15 @@
 import React,{useEffect} from 'react';
-import { Container,Row,Col } from 'react-bootstrap';
+import { Container,Row,Col,Button } from 'react-bootstrap';
 import { Route, BrowserRouter as Router, Switch,withRouter} from 'react-router-dom'
-import Sidebar from '../Components/DiscussionsSidebar'
-import Tag from '../Components/Tag';
+import Sidebar from '../../Components/Discussion/DiscussionsSidebar'
+import Tag from '../../Components/Discussion/Tag';
 import Question from './Question';
 import Questions from './Questions';
-import Farmers from './Farmers'
-import Experts from '../../Experts/Screens/Experts';
-import FarmerProfile from './FarmerProfile';
-import ExpertProfile from '../../Experts/Components/ExpertProfile';
+import Farmers from '../Farmers'
+import Experts from '../../../Experts/Screens/Experts';
+import FarmerProfile from '../../Components/FarmerProfile';
+import ExpertProfile from '../../../Experts/Components/ExpertProfile';
+import DiscussionSearchForm from '../../Components/Discussion/DiscussionSearchForm';
 
 const DiscussionMain = () => 
 {
@@ -17,7 +18,9 @@ const DiscussionMain = () =>
     {
         return (
         <Container className='w-100 border'>
-           {console.log("rendered from Discussion Container")};
+        <DiscussionSearchForm />
+        <Button>Add Question </Button>
+         
             <Switch> 
                  <Route path='/' component={Questions} exact /> 
                 <Route exact path='/questions' component={Questions }   /> {/*Done */}

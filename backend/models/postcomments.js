@@ -9,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate({Posts,Farmers }) {
       // define association here
       this.belongsTo(Posts,{foreignKey:'postId'});
-      this.belongsTo(Farmers,{foreignKey:'commenterId'});
+      this.belongsTo(Farmers,{foreignKey:'farmerId'});
     }
-    toJSON() {
-      return {...this.get(),id:undefined}
-    }
+    // toJSON() {
+    //   return {...this.get(),id:undefined}
+    // }
   };
   PostComments.init({
     uuid:{
@@ -26,12 +26,8 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.STRING,
       allowNull:false
     },
-    date: 
-    {
-      type:DataTypes.DATE,
-      allowNull:false
-    },
-    commenterId: //FK 
+    
+    farmerId: //FK 
     {
       type:DataTypes.INTEGER,
       allowNull:false

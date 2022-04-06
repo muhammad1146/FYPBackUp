@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import '../../App.css'
+import '../../../App.css'
 import {Row,Col, Container, Card} from 'react-bootstrap'
 import axios from 'axios'
 const Questions = () => {

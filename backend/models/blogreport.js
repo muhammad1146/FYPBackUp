@@ -46,6 +46,10 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    reportType:{
+      type:DataTypes.STRING,
+      allowNull:false
+    },
   }, {
     sequelize,
     tableName:'blogreport',

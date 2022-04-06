@@ -23,16 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     reporterType:
     {
       type:DataTypes.STRING,
-      allowNull:false
-    },
-    reporterId: 
-    {
-      type:DataTypes.INTEGER,
-      allowNull:false
-    },
-    reportType: 
-    {
-      type:DataTypes.STRING(2),
       allowNull:false,
       validate:
       {
@@ -43,13 +33,25 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    reporterId: 
+    {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    reportType: 
+    {
+      type:DataTypes.STRING(2),
+      allowNull:false,
+     
+    },
     reportDescription: 
     {
       type:DataTypes.STRING
     },
     reportStatus: 
     {
-      type:DataTypes.STRING
+      type:DataTypes.STRING,
+      defaultValue:"US"
     },
     
   }, {

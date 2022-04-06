@@ -1,9 +1,9 @@
 import React, { useContext, useState,useEffect } from 'react'
-import '../../App.css'
+import '../../../App.css'
 import {Row,Card,Form,Image, Container, Button} from 'react-bootstrap'
-import { UserContext } from '../../Contexts/UserContext'
+import { UserContext } from '../../../Contexts/UserContext'
 import axios from 'axios'
-import Answers from '../Components/Answers'
+import Answers from '../../Components/Discussion/Answers'
 const Question = () => {
     const [user,setUser] = useContext(UserContext);
     const [question,setQuestion] = useState({});
@@ -37,9 +37,7 @@ const Question = () => {
         const [questionId, setQuestionId] = useState('');
         const [commentorType, setCommentorType] = useState('');
         const handleCommentSubmit = () =>{
-
         }
-        
         return(
         <Form onSubmit={handleCommentSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">

@@ -4,9 +4,9 @@ import '../../App.css';
 import axios from 'axios';
 import FarmerFarms from '../Components/FarmerFarms';
 import FarmerExperience from '../Components/FarmerExperience';
-import { Container } from 'react-bootstrap';
-const userName = props.match.params.userName;
-const FarmerProfile = () => {
+import { Container,Image,Table } from 'react-bootstrap';
+const FarmerProfile = (props) => {
+    const userName = props.match.params.userName;
     const [farmerPersonal,setFarmerPersonal] = useState([]);
     useEffect(() =>{
         let data = axios.get()

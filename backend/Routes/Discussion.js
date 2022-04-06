@@ -3,12 +3,17 @@ const DiscussionController = require ( '../Controllers/Discussion');
 const verifyToken = require('./verifyToken');
 const router = express.Router();
 //Questions  
+router.get('/tags',verifyToken,DiscussionController.getDiscussionTags); // get all Tags from QuestionTagBox
+
+router.get('/tags/:tid',verifyToken,DiscussionController.getQuestionTag); // get all Tags from QuestionTagBox
+
+router.post('/tags',verifyToken,DiscussionController.addTagToQuestionTagBox); // add new tag to QuestionTagBox
 
 router.get('/',verifyToken, DiscussionController.getQuestions); // get Questions
 
 router.get('/:qid',verifyToken,DiscussionController.getQuestion); //get Question
 
-router.post('/',verifyToken,DiscussionController.addQuestion); //add Question post
+router.post('/',verifyToken,DiscussionController.addQuestion); //add Question post (image included)
 
 router.put('/:qid',verifyToken,DiscussionController.editQuestion); // edit Question post
 
@@ -31,7 +36,7 @@ router.get('/:qid/answers',verifyToken,DiscussionController.getAnswers); // get 
 
 router.get('/:qid/answers/:aid',verifyToken,DiscussionController.getAnswer);//get Answer
 
-router.post('/:qid/answers',verifyToken,DiscussionController.addAnswer); // Add Answer 
+router.post('/:qid/answers',verifyToken,DiscussionController.addAnswer); // Add Answer (image included) 
 
 router.put('/:qid/answers/:aid',verifyToken,DiscussionController.editAnswer); // edit answer
 
@@ -42,8 +47,5 @@ router.post('/:qid/answers/:aid',verifyToken,DiscussionController.addAnswerReact
 //Answer Reports
 router.post('/:qid/answers/:aid/reports',verifyToken,DiscussionController.addAnswerReport); // add Answer Report
 
-router.get('/tags',verifyToken,DiscussionController.getQuestionTags); // get all Tags from QuestionTagBox
-
-router.post('/tags',verifyToken,DiscussionController.addTagToQuestionTagBox); // add new tag to QuestionTagBox
 
 module.exports = router;

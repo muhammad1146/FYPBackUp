@@ -25,19 +25,22 @@ module.exports = {
 
       },
       reportStatus: {
-        type: Sequelize.STRING(6),
+        type: Sequelize.STRING(2),
       allowNull:false,
       validate:
       {
         isIn: 
         {
-          args:[["seen","unseen"]],
+          args:[["S","US"]],
           msg:"Must be seen or unseen."
         }
       }
 
       },
-     
+      reportType:{
+        type:Sequelize.STRING,
+        allowNull:false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
