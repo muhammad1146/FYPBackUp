@@ -1,11 +1,10 @@
 import React, { useContext, useState,useEffect } from 'react'
 import '../../../App.css'
 import {Row,Card,Form,Image, Container, Button} from 'react-bootstrap'
-import { UserContext } from '../../../Contexts/UserContext'
+
 import axios from 'axios'
 import Answers from '../../Components/Discussion/Answers'
 const Question = () => {
-    const [user,setUser] = useContext(UserContext);
     const [question,setQuestion] = useState({});
     const [answers, setAnswers] = useState([]);
     const [questionComments, setQuestionComments] = useState([]);

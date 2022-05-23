@@ -31,17 +31,16 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.TEXT,
     allowNull:false
   },
+  title:{
+    type:DataTypes.STRING,
+    allowNull:false
+  },
     farmerId: 
     {
       type:DataTypes.INTEGER,
       allowNull:false
     },
-    farmingType: 
-    {
-      type:DataTypes.STRING(20),
-      defaultValue:"cattle",
-      allowNull:false
-    }
+    
   }, {
     sequelize,
     tableName:'questions',

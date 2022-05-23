@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { Modal,Button,Form } from 'react-bootstrap';
-const AddExperience = ({addExperienceToggle,setAddExperienceToggle}) => {
+const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage}) => {
   const [farmingType,setFarmingType] = useState('cattle');
   const [position,setPostion] = useState('');
   const [from,setFrom] = useState(0);
@@ -10,20 +10,21 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle}) => {
   
   const addExperiece = async (e) =>{
     e.preventDefault();
-    let data = new FormData()
     try {
-      data.append("farmingType",farmingType);
-      data.append("position",position);
-      data.append("from",from);
-      data.append("to",to);
       let result = await axios(
         {
           method:"POST",
           url:`/api/farmers/experiences`,
-          data:data
+          data:{farmingType,position,from,to}
         }
       );
       console.log(result);
+      if(result.status===200){
+        alert("Experience added successfully.")
+        setAddExperienceToggle(false);
+        refreshPage();
+
+      }
     } catch (error) {
       console.log(error)
     }
@@ -37,7 +38,7 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle}) => {
             keyboard={false}
           >
             <Modal.Header >
-              <Modal.Title>Add New Farm</Modal.Title>
+              <Modal.Title>Add Experience</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form id='addExeprienceForm' onSubmit={addExperiece}>

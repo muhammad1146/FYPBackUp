@@ -7,46 +7,44 @@ import Question from '../../Farmers/Screens/Discussion/Question';
 import Farmers from '../../Farmers/Screens/Farmers';
 import FarmerProfile from '../../Farmers/Components/FarmerProfile';
 import Experts from './Experts'
-import Expert from './Expert';
+import ExpertProfile from '../Components/ExpertProfile';
+import Tags from './Tags';
 const DiscussionMain = () => 
 {
     const DiscussionContainer = () =>
     {
-
         return ( 
             <>
-        {console.log('rendered from expert module')}
+           {console.log('rendered from expert module')}
             <Container>
-            <h3>Experts Container </h3>
+          
             <Switch> 
-                <Route path='/' component={ Questions } exact />
-                <Route exact path='/questions' component={Questions }   /> {/*Done */}
-                {/* <Route path='/questions/unanswered' component={<Questions />}  /> */}
-                <Route exact path='/questions/my' component={ Questions  }  />
-                {/* <Route path='/questions/tags/' component={ }  /> */}
-                {/* <Route path='/tags' component={<Tag />}  /> */}
-                <Route path='/questions/:qid' component={ Question }  />
-                <Route path='/farmers' component={ Farmers }  />
-                <Route path='/farmers/:fid' component={ FarmerProfile }  />
-                <Route path='/experts' component={ Experts }  />
-                <Route path='/experts/:eid' component={ Expert }  />
+            <Route path='/discussion/experts/:eid' component={ExpertProfile} exact/>
+                <Route path='/discussion/farmers' component={ Farmers } exact />
+                <Route exact path='/discussion' component={Questions }   /> {/*Done */}
+                <Route exact path='/discussion/my' component={ Questions  }  />
+                {/* <Route path='/discussion/:qid' component={ Question } /> */}
+                <Route path='/discussion/farmers' component={ Farmers }  />
+                <Route path='/discussion/farmers/:fid' component={ FarmerProfile }  />
+                <Route path='/discussion/experts' component={Experts} />
+                
+                <Route path='/discussion/*' component={(
+                    <>
+                        <h4>Page Not Found</h4>
+                    </>
+                )} />
             </Switch>
         </Container>
         
         </>
         )
     }
-//1) Sidebar
-// i)
-// ii)
-// iii)
-//2) Container
     return (
         <Row>
         <Col xs={2} lg={2}>
             <Sidebar />
         </Col>
-        <Col lg={10}>
+        <Col lg={10} style={{padding:"0"}} className="border border-secondary">
             <DiscussionContainer />   
         </Col>
         </Row>

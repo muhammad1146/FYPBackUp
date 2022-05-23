@@ -5,6 +5,7 @@ import { Card,Button, Container,Row,Col,Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import FarmerScreenCSS from './Farmers.module.css';
 const Farmers = () => {
+    console.log('reached farmers of src/farmers/screens and js')
     const [farmers,setFarmers] = useState([]);
     useEffect( async()=> {
        try {
@@ -38,7 +39,7 @@ return(
                 <Card.Text>
                 {farmer.description}
                 </Card.Text>
-                <Card.Link href="#">{farmer.rankId}</Card.Link>
+                <Card.Link href="#">{farmer.FarmersRank?.rankname}</Card.Link>
                 <Card.Link href="#">{farmer.city}</Card.Link>
             </Card.Body>
             </Card>
@@ -48,12 +49,8 @@ return(
 }
     return (
         <div className='contentSection'>
-        <Container className="border" style={{borderRadius:"20px", marginTop:"50px",paddingBottom:'30px'}}>
-        <Link to={'/'} className={FarmerScreenCSS.backbutton}>
-        <Button variant="outline-dark" className={FarmerScreenCSS.button}>
-        Back
-        </Button>
-        </Link>
+        <Container className="border" style={{borderRadius:"20px", paddingBottom:'30px'}}>
+        
             <h1 className={FarmerScreenCSS.h1}>Farmers</h1>
             <hr style={{marginTop:"30px"}} />
             <Row>

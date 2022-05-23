@@ -2,6 +2,7 @@
 const express = require ( 'express');
 const ExpertController = require ( '../Controllers/Expert');
 const verifyToken = require('./verifyToken');
+const upload = require('../Controllers/ImageManagement'); 
 const router = express.Router();
 require('dotenv').config();
 // Experts 
@@ -22,15 +23,18 @@ router.put('/experience/:eeid',verifyToken,ExpertController.editExpertExperience
 
 router.delete('/experience/:eeid',verifyToken,ExpertController.deleteExpertExperience) // delete Expert experience
 
-// router.post('/qualification',ExpertController.addExpertQualification) // add/register Expert
+router.post('/qualification',ExpertController.addExpertQualification) // add/register Expert
 
-// router.get('/qualification', ExpertController.getExpertQualification); // get Expert Qualification
+router.delete('/qualification/:id',ExpertController.deleteExpertQualification); // get Expert Qualification
+
 
 router.post('/login',ExpertController.expertLogin) // Expert login
 
 router.get('/',verifyToken,ExpertController.getExperts) // get All Experts 
 
-router.get('/:username',verifyToken,ExpertController.getExpert) // get Expert
+router.get('/all',ExpertController.getAllExperts) // get All Experts 
+
+router.get('/:uuid',verifyToken,ExpertController.getExpert) // get Expert
 
 // router.get('/:username',verifyToken,ExpertController.getExpert) // get Expert
 
@@ -43,6 +47,8 @@ router.post('/:eid/reports',verifyToken,ExpertController.addExpertReport); //Pos
 router.get('/:eid/reports',verifyToken,ExpertController.getAllReports); //get All Reports by Expert
 
 router.delete('/:eid/reports/:erid',verifyToken,ExpertController.deleteExpertReport); //Delete Report
+
+router.put("/:uuid/picture",verifyToken,upload.single('profileImage'),ExpertController.changePicture) // edit a farmer
 
 router.post('/',ExpertController.addExpert) // add/register Expert (image included)
 

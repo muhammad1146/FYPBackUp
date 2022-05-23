@@ -1,7 +1,7 @@
 const Joi = require('joi');
-const fetch = require("node-fetch");
+const { Op } = require('sequelize');
 const {Questions,QuestionImage,QuestionTags,QuestionReacts,QuestionTagBox,
-    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers} = require('../models'); 
+    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers,FarmersRank} = require('../models'); 
 exports.getQuestions = async (req,res) => {
     let pageAsNumber = req.query.page;
     let sizeAsNumber = req.query.size;
@@ -13,13 +13,10 @@ exports.getQuestions = async (req,res) => {
     if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
         size = sizeAsNumber;
     }
-    // let category = req.query.cat;
-// if(category){
-
-//     }
+   
     try { 
         
-        const questions = await Questions.findAndCountAll({include:[{model:Farmers,attributes:["userName","profileImage","rankId"]},{model:QuestionReacts,attributes:["commitType","commiterId"]}],limit:size,offset:size*page});
+        const questions = await Questions.findAndCountAll({include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts}],limit:size,offset:size*page});
         return res.json({
         content:questions.rows,
         totalPages:Math.ceil(questions.count/Number.parseInt(size))
@@ -41,10 +38,11 @@ exports.getQuestion = async (req,res) => {
     }
 };
 exports.addQuestion = async (req,res) =>{
+    console.log(req.body.title);
     const schema = Joi.object( {
+        title:Joi.string().required(),
         body: Joi.string().required(),
-        farmingType: Joi.string().required(),
-        img: Joi.array(),
+        images: Joi.array(),
         tags: Joi.array().required()
     });
     try {
@@ -54,31 +52,29 @@ exports.addQuestion = async (req,res) =>{
         return; 
     }
     let uuid = req.user.uuid;
-    const  {body,farmingType} = req.body;
-    const {img} = req.body;
-    const {tags} = req.body;
+    const  {title,body,images,tags} = req.body;
+    console.log(tags);
     let farmerId;
     try {
         let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
         if(farmer.id) farmerId=farmer.id 
         else return res.status(401).send("invalid request");
-        const question = await Questions.create({body,farmerId,farmingType});
+        const question = await Questions.create({title,body,farmerId});
         let questionImages = [], questionTags = [];
-        questionImages = questionImages.map((img)=>{
-                    let obj ={};
-                    obj.image = img;
-                    obj.questionId = question.id;
-                    return obj
+        questionImages = images?.map((img)=>{
+            return {image:img,questionId:question.id}
+
         })
-        questionTags = questionTags.map((tag)=>{
-            let obj = {}
-            obj.tagId=tags,
-            obj.questionId= question.id
-            return obj
+        questionTags = tags.map((tag)=>{
+            return {tagId:tag,questionId:question.id}
+
         })
-        const images = await QuestionImage.bulkCreate(questionImages,{returning:true});
+        let qimages;
+        if(images){
+             qimages = await QuestionImage.bulkCreate(questionImages,{returning:true});
+        };
         const qTags = await QuestionTags.bulkCreate(questionTags,{returning:true});
-        return res.json(question,images,qTags);
+        return res.json(question,qimages,qTags);
     } catch (error) {
         console.log(error)
         return res.status(500).json(error);
@@ -204,11 +200,9 @@ exports.deleteQuestion = async (req,res) =>{
 }
 
 exports.addQuestionReact = async (req,res) => {
+    const uuid = req.params.qid; 
     const schema = Joi.object( {
-        questionId:Joi.string().required(),
-        commitType:Joi.string().required(),
-        commiterType :Joi.string().required(),
-        commiterId :Joi.string().required()
+        commitType:Joi.string().required()
     });
     try {
         const value = await schema.validateAsync(req.body);
@@ -218,8 +212,21 @@ exports.addQuestionReact = async (req,res) => {
         res.status(400).send(error.details[0].message);
         return;
     }
-    const {questionId,commitType,commiterType,commiterId} = req.body;
+    let questionId,commiterType = req.user.type,commiterId; 
+    const {commitType} = req.body;
     try {
+        let question = await Questions.findOne({attributes:['id'],where:{uuid}});
+        if(question.id) questionId =question.id; 
+       //fetch the commiter now
+        let result;
+        if(commiterType==='F'){
+            result = await Farmers.findOne({attributes:['id'],where:{uuid:req.user.uuid}});
+            if(result.id) commiterId=result.id;
+        }else{
+            result = await Experts.findOne({attributes:['id'],where:{uuid:req.user.uuid}});
+            if(result.id) commiterId= result.id;
+        }
+        
         const qReact = await QuestionReacts.create({questionId,commitType,commiterType,commiterId});
         return res.json(qReact);
     } catch (error) {
@@ -227,6 +234,16 @@ exports.addQuestionReact = async (req,res) => {
     }
 
 };
+
+exports.getQuestionReacts = async (req,res) => {
+    const uuid = req.params.qid;
+    try {
+        
+        const reacts = QuestionReacts
+    } catch (error) {
+        
+    }
+}
 
 exports.addQuestionComment = async (req,res) => {
     const schema = Joi.object( {
@@ -483,8 +500,7 @@ exports.addAnswerReport = async (req,res) =>{ //Add new Tag to QuestionTagBox
         
     } catch (error) {
         res.status(400).send(error.details[0].message);
-        return;
-        
+        return; 
     }
 
     const {reporterId,reporterType,reportDescription,reportStatus} = req.body;
@@ -522,24 +538,26 @@ exports.getDiscussionTags = async (req,res) =>
 };
 
 exports.getQuestionTag = (req,res) =>
-{ //get All Tags from QuestionTagBox
+{ //get Tag from QuestionTagBox
     let tagId = req.params.tid;
-    let pageAsNumber = req.query.page;
-    let sizeAsNumber = req.query.size;
-    let page = 0;
-    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
-        page = pageAsNumber;
-    }
-    let size = 15
-    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
-        size = sizeAsNumber;
-    }
     try 
     {
-        const tags = QuestionTags.findOne({where:{tagId},include:[{model:Questions,limit:15,offset:15*page}]});
-        return res.json({content:tags.rows,
-            totalPages:Number.ceil(AllPosts.count / Number.parseInt(size))
-        });
+        const tags = QuestionTags.findOne({where:{tagId}});
+        return res.json({tags});
+    } catch (error) 
+    {
+        return res.status(500).json(error);
+    } 
+};
+
+exports.deleteQuestionTag = (req,res) =>
+{ 
+    let tagId = req.params.tid;
+    try 
+    {
+        const qtags = QuestionTags.destroy({where:{tagId}});
+        const tag = QuestionTagBox.destroy({where:{tagId}});
+        return res.json({qtags,tag});
     } catch (error) 
     {
         return res.status(500).json(error);
@@ -549,8 +567,7 @@ exports.getQuestionTag = (req,res) =>
 exports.addTagToQuestionTagBox = async (req,res) =>{ //Add new Tag to QuestionTagBox
     const schema = Joi.object({
         tag: Joi.string().required(),
-        description: Joi.string().required(),
-        
+        description: Joi.string().required(),    
     });
     try {
         const {error} = await schema.validateAsync(req.body);
@@ -577,6 +594,25 @@ exports.addTagToQuestionTagBox = async (req,res) =>{ //Add new Tag to QuestionTa
     }
 };
 
+
+exports.searchTags = async (req,res) =>{ //search all Question Tags
+   
+    let query = req.query.query;
+    try {
+        let tags = await QuestionTagBox.findAll
+        (
+            {
+                where:
+                {
+                    tag: {[Op.iLike]:'%' + query + '%'}
+                }
+            }        
+        );
+        return res.json(tags);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+};
 
 
  

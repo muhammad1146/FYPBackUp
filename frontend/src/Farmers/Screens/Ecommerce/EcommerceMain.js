@@ -5,16 +5,15 @@ import { UserContext } from '../../../Contexts/UserContext';
 import EcommerceNavbar from '../../Components/Ecommerce/EcommerceNavbar';
 import Post from './Post';
 import Posts from './Posts';
-import PostOrders from './PostOrders';
+import PostOrders from './PostOrders.jsx';
 import PostForm from '../../Components/Ecommerce/PostForm'
 import MyPosts from './MyPosts';
 const EcommerceMain = ({user}) => 
 {
     const [postFormToggle,setPostFormToggle] = useState(false);
-    const [cattleType,setCattleType] = useState('All');
-    const [city,setCity] = useState('All');
+    
 
-const EcommerceContainer = ({city,cattleType,user}) =>
+const EcommerceContainer = ({user}) =>
 {
         return (
         <>
@@ -24,17 +23,18 @@ const EcommerceContainer = ({city,cattleType,user}) =>
             <EcommerceNavbar postFormToggle={postFormToggle} setPostFormToggle={setPostFormToggle} />
             <Switch> 
                 <Route path='/ecommerce/all'  exact >
-                    <Posts city={city} cattleType={cattleType} setCattleType={setCattleType} setCity={setCity} />
+                    <Posts  user={user} />
                 </Route>
-                {/* <Route path='/ecommerce/top'  >
-                    <Posts city={city} cattleType={cattleType}/>
-                </Route> */}
+               
                 <Route path='/ecommerce/my' >
                     <MyPosts />
                 </Route>
                 <Route path='ecommerce/posts/:pid/order' exact component={PostOrders} />
                 <Route path='/ecommerce/:pid' exact render={(prevProps)=> <Post user={user} {...prevProps} />
                 } />
+
+                <Route path='/ecommerce/:pid/orders' exact render={(prevProps)=> <PostOrders user={user} {...prevProps} />
+                                } />
                     
                          
             </Switch>
@@ -47,7 +47,7 @@ const EcommerceContainer = ({city,cattleType,user}) =>
 
             
             {/* <Col lg={10} xl={10}>  */}
-            <EcommerceContainer city={city} cattleType={cattleType}/> 
+            <EcommerceContainer  user={user}/> 
             {/* </Col> */}
       </>
     );

@@ -10,19 +10,17 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(Farmers,{foreignKey:'farmerId'});
       
     }
-    toJSON() {
-      return {...this.get(),id:undefined}
-    }
+    
   };
   FarmersExperience.init({
     
     farmingType: {
-      type:DataTypes.STRING(10),
+      type:DataTypes.STRING,
     allowNull:false
   },
     position: 
     {
-      type:DataTypes.STRING(10),
+      type:DataTypes.STRING,
       allowNull:false
     },
     from: {

@@ -13,12 +13,12 @@ module.exports = {
       },
      
       farmingType: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING,
         allowNull: false,
 
       },
       position: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING,
         allowNull: false,
       },
       from: {

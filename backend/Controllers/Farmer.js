@@ -1,7 +1,7 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
+const {Op} = require('sequelize');
 const {Farmers,Experts, Farms,FarmersExperience,FarmerReports,FarmersRank} = require('../models');
 exports.addFarmer = async (req,res) => 
 { 
@@ -44,13 +44,13 @@ exports.addFarmer = async (req,res) =>
 };
 
 exports.addFarm = async (req,res) => {
-    let userName = req.params.username;
+    let farmerUUID = req.params.uuid;
     const schema = Joi.object({
         farmName: Joi.string().required(),
         farmSize: Joi.number().required(),
         numberOfCattle: Joi.number().required(),
         farmLocation: Joi.string().required(),
-        farmImages: Joi.string(),
+      
         farmingType: Joi.string().required()
          });
     try { 
@@ -59,10 +59,12 @@ exports.addFarm = async (req,res) => {
     return res.status(400).send(error.details[0].message)
     }
     const uuid = req.user.uuid;
-    const {farmName,farmLocation,farmSize,numberOfCattle,images,farmingType} = req.body;
+    
+   
+    const {farmName,farmLocation,farmSize,numberOfCattle,farmingType} = req.body;
     const startDate = new Date();
     try {
-        const farmer = await Farmers.findOne({attributes:['id'],where:{userName}});
+        const farmer = await Farmers.findOne({attributes:['id'],where:{uuid:farmerUUID}});
         const FARMER = await Farmers.findOne({attributes:['id'],where:{uuid}});
         let farmerId = 0;
         if(farmer.id===FARMER.id){
@@ -70,7 +72,7 @@ exports.addFarm = async (req,res) => {
         }else{
             return res.status(502).json({error:"Not valid for this request!"});
         }
-        const farm = await Farms.create({farmerId,farmName,farmLocation,farmSize,numberOfCattle,startDate,images,farmingType});
+        const farm = await Farms.create({farmerId,farmName,farmLocation,farmSize,numberOfCattle,startDate,farmingType});
         return res.json(farm);
     } catch (error) {
         console.log(error)
@@ -143,7 +145,8 @@ exports.deleteFarm = async (req,res) => {
     const uuid = req.params.farmid;
         const farmerId = await Farms.findOne({attributes:['farmerId'],where:{uuid}});
         const farmer = await Farmers.findOne({attributes:['id'],where:{uuid:user.uuid}});
-        if(farmerId.farmerId===farmer.id && user.userType==="F")
+        console.log(farmerId,farmer);
+        if(farmerId.farmerId===farmer.id && user.type==="F")
         {
             try {
                 const deletedfarm = await Farms.destroy({where:{uuid}});
@@ -159,7 +162,8 @@ exports.deleteFarm = async (req,res) => {
 
 
 exports.getFarmer = async (req,res) => 
-{    const uuid = req.params.id;
+{    const uuid = req.params.uuid;
+    console.log('reached getFarmer endpoint')
     try 
     {
         const farmer = await Farmers.findOne( {attributes:{exclude:['password']},where:{uuid},include:[FarmersRank,Farms,FarmersExperience]});
@@ -183,7 +187,7 @@ exports.getFarmers = async (req,res,) =>
         size = sizeAsNumber;
     }
         try {
-            const farmers = await Farmers.findAndCountAll({attributes:{exclude:['password']},limit:size,offset:page*size}); 
+            const farmers = await Farmers.findAndCountAll({attributes:{exclude:['password']},include:[FarmersRank],limit:size,offset:page*size}); 
             return res.json({
             content:farmers.rows,
             totalPages:Math.ceil(farmers.count / Number.parseInt(size))
@@ -195,36 +199,93 @@ exports.getFarmers = async (req,res,) =>
         }
 };
 
+exports.getAllFarmers = async (req,res) => 
+{
+    console.log('inside getAllFarmers')
+    let query = req.query.text;
+        try {
+            const farmers = await Farmers.findAll({attributes:['userName'],where:{userName: {[Op.iLike]:'%' + query + '%'}}}); 
+            return res.json({
+            farmers
+            });
+            
+        } catch (error) {
+            console.log(error)
+            return res.status(500).send(error);
+        }
+};
+
 exports.updateFarmer = async (req,res) => 
 {   
+    console.log("updateFarmer fn")
+
     const schema = Joi.object({
     name: Joi.string().required(),
     phoneNumber: Joi.string(),
     address: Joi.string(),
     farmingType: Joi.string(),
-    rankId: Joi.number().required(),
     description: Joi.string(),
-    profileImage: Joi.string(),
      });
 try { 
     const value = await schema.validateAsync(req.body);
 } catch (error) {
 return res.status(400).send(error.details[0].message)
 }
-    const farmerUUID = req.params.id;
+    const farmerUUID = req.params.uuid;
     const uuid = req.user.uuid;
     if(uuid===farmerUUID)
     {
-        const {name,address,phoneNumber,description,rankId,farmingType,profileImage} = req.body;       
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password,salt);  
+        const {name,address,phoneNumber,description,farmingType,profileImage} = req.body;       
         try     
         {
-            const updatedFarmer = await Farmers.update({name,address,phoneNumber,description,rankId,farmingType,profileImage},{where:{uuid}});
+            const updatedFarmer = await Farmers.update({name,address,phoneNumber,description,farmingType,profileImage},{where:{uuid}});
+            console.log(updatedFarmer,"updatedFarmer")
             return res.json(updatedFarmer);   
     }
     catch (error)    
     {
+        console.log(error)
+        return res.status(500).json(error);    
+    }
+}
+else {
+    return res.status(401).send("Irrelevent user");
+}
+};
+
+
+exports.changePicture = async (req,res) => 
+{   
+    console.log("updateFarmer picture")
+    const schema = Joi.object({
+        profileImage:Joi.string()
+     });
+
+     try 
+    {
+        const value = await schema.validateAsync(req.body);
+    } catch (error) 
+    {
+        return res.status(400).send(error.details[0].message)
+    }
+    const farmerUUID = req.params.uuid;
+    const uuid = req.user.uuid;
+    if(uuid===farmerUUID)
+    {
+        if(!req.file){
+           return res.status(500).send("file missing...")
+        }
+        const profileImage = req.file.filename;    
+        console.log(profileImage);   
+        try     
+        {
+            const updatedPicture = await Farmers.update({profileImage},{where:{uuid}});
+            console.log(updatedPicture,"updatedPicture")
+            return res.json(updatedPicture);   
+    }
+    catch (error)    
+    {
+        console.log(error)
         return res.status(500).json(error);    
     }
 }
@@ -367,6 +428,7 @@ exports.addExperience = async (req,res) =>
 {
     
     const uuid = req.user.uuid;
+    console.log('req.user.uuid ',uuid);
     const schema = Joi.object(
         {
             farmingType: Joi.string().required(),
@@ -382,11 +444,14 @@ exports.addExperience = async (req,res) =>
     }
     const {farmingType,position,from,to} = req.body;
     try {
-        const farmer = await Farmers.findOne({attributes:['id']},{where:{uuid}});
+        const farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
         const farmerId = farmer.id;
+    console.log('farmerId ',farmerId);
+
         const experience = await FarmersExperience.create({farmingType,position,from,to,farmerId});
         return res.json(experience);
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     } 
 }; 
@@ -419,14 +484,17 @@ exports.addExperience = async (req,res) =>
 // }; 
 
 exports.deleteExperience = async (req,res) => 
-{
+{   const uuid = req.user.uuid;
     const id = req.params.exid;
+    console.log('inside delete experience ', id);
 
     {
 
         try {
             const experience = await FarmersExperience.findOne({where:{id},attributes:['farmerId']});
-            const farmer = await Farmers.findOne({where:{uuid:(req.user.uuid)},attributes:[id]});
+            console.log(experience.farmerId)
+            const farmer = await Farmers.findOne({where:{uuid},attributes:['id']});
+            console.log(farmer.id)
             if(experience.farmerId===farmer.id){
                 const deletedExperience = await FarmersExperience.destroy({where:{id}});
                 return res.json(deletedExperience);

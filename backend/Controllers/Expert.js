@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 require('dotenv').config({path:'D:/cattletalk/backend/.env'});
 const {Experts,ExpertsRank,ExpertExperience,
     ExpertQualification,ExpertReports} = require('../models');
@@ -39,12 +40,6 @@ exports.addExpert =async (req,res) => {
       }
   };
 
-//   exports.updateImage = async (req,res) => {
-//       const schema = Joi.object({
-
-//       })
-//   }
-
   exports.addExpertExperience = async (req,res) => {
     const schema = Joi.object({
         institute: Joi.string().required(),
@@ -72,7 +67,49 @@ exports.addExpert =async (req,res) => {
     } catch (error) {
         return res.status(400).send(error);
     }
-  } 
+  };
+
+  exports.changePicture = async (req,res) => 
+{   
+    console.log("updateExpert picture")
+    const schema = Joi.object({
+        profileImage:Joi.string()
+     });
+
+     try 
+    {
+        const value = await schema.validateAsync(req.body);
+    } catch (error) 
+    {
+        return res.status(400).send(error.details[0].message)
+    }
+    const expertUUID = req.params.uuid;
+    const uuid = req.user.uuid;
+    console.log(uuid,expertUUID)
+    if(uuid===expertUUID)
+    {
+        if(!req.file){
+           return res.status(500).send("file missing...")
+        }
+        const profileImage = req.file.filename;    
+        console.log(profileImage);   
+        try     
+        {
+            const updatedPicture = await Experts.update({profileImage},{where:{uuid}});
+            console.log(updatedPicture,"updatedPicture")
+            return res.json(updatedPicture);   
+    }
+    catch (error)    
+    {
+        console.log(error)
+        return res.status(500).json(error);    
+    }
+}
+else {
+    return res.status(401).send("Irrelevent user");
+}
+};
+
 
   exports.getExperiences = async (req,res) => {
     const uuid = req.user.uuid;
@@ -218,7 +255,7 @@ const expertuuid = req.user.uuid;
     } catch (error) {
         return res.status(400).send(error);
     }  
-} 
+};
 
 exports.getExperts = async(req,res,next) => {
     let pageAsNumber = req.query.page;
@@ -232,7 +269,7 @@ exports.getExperts = async(req,res,next) => {
         size = sizeAsNumber;
     }
     try {
-        const experts = await Experts.findAndCountAll({attributes:['name','userName','phoneNumber','address','profileImage','description','rankId','experties'],include:[ExpertsRank],limit:size,offset:size*page});
+        const experts = await Experts.findAndCountAll({attributes:['name','uuid','userName','phoneNumber','address','profileImage','description','rankId','experties'],include:[ExpertsRank],limit:size,offset:size*page});
         return res.json({content:experts.rows,
         totalPages:Math.ceil(experts.count /Number.parseInt(size))
         });
@@ -241,11 +278,25 @@ exports.getExperts = async(req,res,next) => {
     }
 };
 
-exports.getExpert = async (req,res) => {
-    const username = req.params.username;
+
+exports.getAllExperts = async(req,res,next) => {
+    let query = req.query.text;
+    console.log('inside getAllExperts')
     try {
-        const experts = await Experts.findOne({attributes:{exclude:['password']}},{include:[ExpertsRank,ExpertExperience,ExpertQualification]},{where: {username}});
-        return res.json(experts);
+        const experts = await Experts.findAll({attributes:['userName'],where:{userName: {[Op.iLike]:'%' + query + '%'}}});
+        return res.json({experts});
+    } catch (error) {
+       return res.status(500).json(error); 
+    }
+};
+
+exports.getExpert = async (req,res) => {
+    console.log('inside getExpert function')
+    const uuid = req.params.uuid;
+    try {
+        const expert = await Experts.findOne({where: {uuid},include:[ExpertsRank,ExpertExperience,ExpertQualification]});
+        console.log(expert)
+        return res.json(expert);
     } catch (error) {
        return res.status(500).json(error); 
     }
@@ -286,45 +337,7 @@ exports.editExpert  = async (req,res) => {
 };
 
 
-// exports.addExpert = (req,res) => {
-//   //rankId will be set by default
 
-//     const {name,UserName,phoneNumber,
-//     address,date,profileImage,description,experties} = req.body;
-//     const {qualification,duration,percentage,institution} = req.body;
-//     const {institute,startDate,endDate,position} = req.body;
-//     const qualificationArray =[],experience =[];
-//     for(let i=0; i<Qualification.length; i++)
-//     {
-//         const q = {
-//             qualification:qualification[i],
-//             duration:duration[i],
-//             percentage:percentage[i],
-//             institution:institution[i]
-//         }
-//         qualificationArray.push(q);
-//     }
-
-//     for(let i=0; i<institute.length; i++)
-//     {
-//         const exper = {
-//             institute:institute[i],
-//             startDate:startDate[i],
-//             endDate:endDate[i],
-//             position:position[i]
-//         }
-//         experience.push(exper);
-//     }
-//     try {
-//         const expert = Experts.create({name,UserName,phoneNumber,address,date,profileImage,description,experties});
-//         const q = ExpertQualification.bulkCreate(qualificationArray,{returning:true});
-//         const e = ExpertExperience.bulkCreate(experience,{returning:true});
-//         return res.json(expert,q,e);
-//     } catch (error) {
-//         return res.status(500).json(error);
-//     }
-// };
-// Expert Reports
 exports.addExpertReport = async (req,res) => {
     const date = new Date();
     const expertId = req.params.eid; 
@@ -388,11 +401,71 @@ exports.expertLogin = async (req,res) => {
         if(!validPass) return res.status(401).json({error:'Password/username is not correct!'});
         const expertType = (expert.isAdmin) ? "A" : "E";
         // if(!(expertType===type)) return res.status(401).send("user type is not valid for these credentials");
-        const token = jwt.sign({uuid:expert.uuid,userType:expertType},"secret");
-        return res.header('auth-token',token).send(token);
+        const token = jwt.sign({uuid:expert.uuid,type:'E'},"secret",{
+            expiresIn:'300s'
+        });
+        const refreshToken = jwt.sign({uuid:expert.uuid,type:'E'},"refreshSecret",{
+            expiresIn:'365d'
+        });
+        res.cookie("refreshToken",refreshToken,{
+            maxAge:300000000
+        })
+        res.cookie("accessToken",token,{
+            maxAge:300000
+        })
+        res.status(200).send({accessToken:token,refreshToken});
+        return;
         } catch (err) {
-         return res.status(500).json(err);
+         return res.status(500).json({err});
      }
 
 };
 
+
+exports.addExpertQualification = async (req,res) => {
+    const schema = Joi.object({
+        institute: Joi.string().required(),
+        percentage: Joi.number().required(),
+        qualification: Joi.string().required(),
+        duration: Joi.number().required(),   
+    });
+    try {
+        const value = await schema.validateAsync(req.body);   
+    } catch (error) {
+       return res.status(400).send(error.details[0].message)
+               
+    }
+    const {institute,percentage,qualification,duration} = req.body;
+    const uuid = req.user.uuid;
+    try {
+        const expert = await Experts.findOne({attributes:['id'],where:{uuid}});
+        if(expert.id){
+            const experience = await ExpertQualification.create({expertId:expert.id,institute,qualification,percentage,duration});
+            return res.json(experience);
+        }
+        else {
+            return res.status(401).send("User is not valid for this action");
+        }
+    } catch (error) {
+        return res.status(400).send(error);
+    }
+  };
+
+  exports.deleteExpertQualification = async (req,res) => {
+    const id = req.params.id;
+    const uuid = req.user.uuid;
+    
+        try {
+            const expert = await Experts.findOne({attributes:['id'],where:{uuid}});
+            const qualification = await ExpertQualification.findOne({attributes:['expertId'],where:{id}});
+            if(expert.id===qualification.expertId){
+                const deletedQualification = await ExpertQualification.destroy({where:{uuid}});
+                return res.json(deletedQualification);
+            }
+            else{
+                return res.status(401).send("User is forbidden for this action");
+            }
+        } catch (error) {
+            return res.status(400).send(error);
+        }  
+    };

@@ -1,6 +1,6 @@
-import React,{useContext, useState} from 'react'
+import React,{useContext, useEffect, useState} from 'react'
 import {LinkContainer} from 'react-router-bootstrap'
-import { Navbar, Nav, Container,Form,Button,FormControl,Row,Col, NavDropdown  } from 'react-bootstrap';
+import { Navbar, Nav, Container,Form,Button,FormControl,Row,Col, NavDropdown,Image  } from 'react-bootstrap';
 import { FaSignInAlt,FaShoppingCart  } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { useHistory } from 'react-router';
@@ -11,22 +11,30 @@ import { GiSellCard } from "react-icons/gi";
 // import { NavLink } from 'react-router-dom';
 // import jwt from 'jsonwebtoken';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 // import {UserContext} from '../Contexts/UserContext'
-const Header = ({user}) => {
+const Header = ({user,resetUser}) => {
 //     console.log("from header!");
 //     let token = jwt.verify(Cookies.get("accessToken"),"secret");
 // const [user,setUser] = useState(token);
 
 const LoggedInHeader = () =>{
-        let url = user.type==='F'? `/farmers/${user.uuid}`:user.type==='E'?`/experts/${user.uuid}`:`/admin/${user.uuid}`;
+    let [userProfile,setUserProfile] = useState({});
+        let url = user.type==='F'? `/api/farmers/${user.uuid}`:user.type==='E'?`/api/experts/${user.uuid}`:`/api/admin/${user.uuid}`;
+      
+        useEffect( async()=>{
+            let result = await axios.get(url);
+            setUserProfile(result.data)
+
+        },[])
         let history = useHistory()
         const Logout = (e) => {
             Cookies.remove("accessToken");
             Cookies.remove("refreshToken");
-            
+            resetUser({});
             history.push('/login');    
         }
-        console.log(user)
         return (
             <header>
     <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
@@ -38,12 +46,7 @@ const LoggedInHeader = () =>{
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="w-100">
-                    {/* <LinkContainer to={url}>
-                        <Nav.Link>
-                            <CgProfile size='1.2rem' className='pr-1'/>
-                            Profile
-                        </Nav.Link>
-                    </LinkContainer> */}
+                    
                     <LinkContainer to='/discussion'>
                         <Nav.Link>
                             <RiQuestionAnswerFill size='1.2rem' className='pr-1'/>
@@ -51,12 +54,12 @@ const LoggedInHeader = () =>{
                         </Nav.Link>
                     </LinkContainer>
 
-                    <LinkContainer to='/blogs'>
+                    {/* <LinkContainer to='/blogs'>
                         <Nav.Link>
                             <SiBloglovin size='1.2rem' className='pr-1'/>
                             Blogs
                         </Nav.Link>
-                    </LinkContainer>
+                    </LinkContainer> */}
                     {
                         user.type==='F'?(
                             <LinkContainer to='/ecommerce/all'>
@@ -73,7 +76,11 @@ const LoggedInHeader = () =>{
                             Logout
                             </Button>
                         </Nav.Item>
-                        
+                        <Link to={`/${user.type==='F'?'discussion/farmers':'discussion/experts'}/${user.uuid}`}>
+                        <Image width="40px" style={{borderRadius:"20px",margin:"5px",height:"40px"}} src ={userProfile.profileImage?`http://localhost:5000/${userProfile.profileImage}`:'/blankProfile.jpg'}  
+                        />
+                        </Link>
+                
                 </Nav>
             
             </Navbar.Collapse>

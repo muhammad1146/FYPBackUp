@@ -1,10 +1,9 @@
-import React, { useState,useEffect, useContext } from 'react'
+import React, { useState,useEffect } from 'react'
 import {Formik} from 'formik'
 import axios from 'axios';
 import * as yup from 'yup';
 import { ImCross } from "react-icons/im";
 import {Form,Row,Col,Image,Button,Modal} from "react-bootstrap"
-import { UserContext } from '../../../Contexts/UserContext';
 import { useHistory } from 'react-router';
 let validationSchema = yup.object().shape({
   name:yup.string().required(),
@@ -16,11 +15,11 @@ let validationSchema = yup.object().shape({
 });
 const PostForm = ({postFormToggle,setPostFormToggle}) => {
   let history = useHistory();
-  const {user} = useContext(UserContext);
+
   let [images,setImages] = useState([]);
   let [imageUrls,setImageUrls] = useState([]);
   let [error, setError] = useState('');
-  let token = user.token;
+
   const onImageChange = (e) => {
     setImages([...e.target.files]);
   };
@@ -49,7 +48,7 @@ initialValues= {{
   validationSchema={validationSchema}
   
   onSubmit ={ async (values,actions)=>{
-    console.log("entered submission!")
+   
     let data = new FormData();
     try
     {
@@ -62,26 +61,26 @@ initialValues= {{
     images.forEach(file=>{
       data.append("cattleImages",file);
     })
-    console.log(token);
+    
    let result =  await axios(
      {
         method: "POST",
         url: "/api/ecommerce/",
         data: data,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "auth-token" : `Bearer ${token}`
-        }
+     
       });
+    
     }
     catch(error){
-      setError(error.response.data)
+      setError(error.response.data);
+      setPostFormToggle(false);
+      alert(error.message);
       return;
     }
     alert("Post Submitted Successfully!");
 
    actions.resetForm();
-   history.push('/ecommerce')
+   history.push('/ecommerce/all')
     
   }}
 >
@@ -101,7 +100,7 @@ initialValues= {{
   </Row>
   <Row>
     <Form.Group as={Col} controlId="formGridPrice" className="mb-3">
-  {/* <Field type="number" name="price" placeholder="price" /> */}
+
       
       <Form.Control type="number" 
       placeholder="Price" 
@@ -137,6 +136,7 @@ initialValues= {{
   <Form.Group as={Col} controlId="formGridCity" className="m-3" >
       <Form.Label className="mr-4">City:</Form.Label>
       <Form.Select defaultValue="Choose..." name="city" onChange={props.handleChange} >
+      <option disabled>Select City....</option>
         <option>Attock</option>
         <option>Rawalpindi</option>
       </Form.Select>
@@ -171,9 +171,6 @@ initialValues= {{
   <Button variant="primary" type="submit" className='ml-4'>
     Submit
   </Button>
-  {/* <pre>{JSON.stringify(props.values,null,2)}</pre> */}
-  
-  
   
 </Form>
 

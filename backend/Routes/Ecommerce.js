@@ -27,12 +27,13 @@ router.put('/:pid/comments/:cid',verifyToken,EcommerceController.editPostComment
 
 router.post('/:pid/reacts',verifyToken, EcommerceController.addPostReact)  //add post react(testing:done)
 
-router.put('/:pid/reacts/:rid',verifyToken,EcommerceController.editPostReact) //editPostReact 
+router.delete('/:pid/reacts/:rid',verifyToken,EcommerceController.deletePostReact) //editPostReact 
 
 // Animal Post Order
 
 router.post('/:pid/orders',verifyToken,EcommerceController.orderEcommercePost) //orderEcommercePost (testing:done)
 router.get('/:pid/orders',verifyToken,EcommerceController.getPostOrders) // Get All Orders of Post (testing:done)
+router.delete('/:pid/orders/:oid',verifyToken,EcommerceController.deletePostOrder)
 
 router.put('/:pid/orders/:oid',verifyToken,EcommerceController.confirmOrder) //Accept one Order (testing:done)
 //Post Reports

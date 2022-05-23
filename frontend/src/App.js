@@ -16,7 +16,6 @@ import { useState } from 'react';
 import FarmerProfile from './Farmers/Components/FarmerProfile';
 
 function App() {
-  // console.log("app rendered!!")
   const [user,setUser]= useState(()=>{
     if(Cookies.get("refreshToken")){
       try {
@@ -32,29 +31,15 @@ function App() {
     }
   });
  
-    const linking =( ) =>{
-      try {
-
-        console.log(Cookies.get("refreshToken"))
-        let refreshToken = Cookies.get("refreshToken");
-        if(refreshToken){
-          let payload = jwt.verify(refreshToken,"refreshSecret");
-          // console.log(payload)
-          setUser(payload);
-          console.log(payload)
-
-        }
-      } catch (error) {
-        setUser({});
-        console.log(error)
-      }
-    }
+  const resetUser = (arg) => {
+    setUser(arg);
+  }
   let history= useHistory();
   return (
     <>
       <Router >
-        <Header user={user} />
-        <Container  fluid>
+        <Header user={user} resetUser={resetUser} />
+        <Container  fluid style={{padding:"0px"}}>
           <Switch>
             <Route exact path='/login' >
               <Login setUser={setUser} />

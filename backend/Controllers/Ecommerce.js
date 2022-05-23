@@ -29,7 +29,7 @@ exports.getPosts = async (req,res)=>{
             }});
             if(farmer){
                 
-                AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{farmerId:farmer.id},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,attributes:['commitType']}]},{limit:size,offset:size*page});
+                AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{farmerId:farmer.id},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts, include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
 
             }else {
                return res.status(401).json({error:"Farmer not Found!"});
@@ -38,19 +38,19 @@ exports.getPosts = async (req,res)=>{
         }
         else if(city!='All' && type!="All"){
             console.log("both city and type is true")
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type,city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,attributes:['commitType']}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type,city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts, include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else if(city==='All' && type !='All')
         {
             console.log("City is yes and type is no")
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,attributes:['commitType']}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else if(city!="All" && type==='All'){
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,attributes:['commitType']}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else {
             console.log("not city and no type!");
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,attributes:['commitType']}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         } 
         dbDebugger("GetAnimalPosts db fetching passed!!");
         return res.json({content:AllPosts.rows,
@@ -76,14 +76,14 @@ exports.getAnimalPost = async (req,res) =>{
          animalPost = await Posts.findOne({attributes:{exclude:['farmerId']},where:{uuid:postId},include:
          [
              {model:Farmers,attributes:{exclude:['password']},include:[{model:FarmersRank,attributes:["rankname"]}]},
-             {model:PostImages,required:true,attributes:['image']},{model:PostReacts,attributes:['commitType']},
+             {model:PostImages,required:true,attributes:['image']},{model:PostReacts},
         ]}) 
          console.log(farmer.id," ",post.farmerId," mine post!!");
         }else{
             animalPost = await Posts.findOne({attributes:{exclude:['farmerId']},where:{uuid:postId},
             include:
             [
-                {model:Farmers,attributes:{exclude:['password','createdAt','updatedAt','description','farmingType','address']},include:[{model:FarmersRank,attributes:["rankname"]}]},{model:PostImages,required:true,attributes:['image']},{model:PostReacts,attributes:['commitType']},{model:AnimalPostOrders},
+                {model:Farmers,attributes:{exclude:['password','createdAt','updatedAt','description','farmingType','address']},include:[{model:FarmersRank,attributes:["rankname"]}]},{model:PostImages,required:true,attributes:['image']},{model:PostReacts,attributes:['commitType']},{model:AnimalPostOrders,include:[{model:Farmers,attributes:["id","uuid"]}]},
         ]});
         console.log(farmer.id," ",post.farmerId," not mine post!!");
         console.log(animalPost)
@@ -340,26 +340,14 @@ try {
     return res.status(500).json({error});
  }
 };
-exports.editPostReact = async (req,res) =>{
-    const farmerId = req.params.id;
-    const postId = req.params.pid;
-    const schema = Joi.object( {
-        commitType:Joi.string().required(),
-    });
+exports.deletePostReact = async (req,res) =>{
+    const rid = req.params.rid;
+    
     try {
-        const value = await schema.validateAsync(req.body);
-        
-    } catch (error) {
-        
-        res.status(400).send(error.details[0].message);
-        return;
-    }
-    const {commitType} = req.body;
-    try {
-        const updatedReact = await PostReacts.update({commitType}, { where: { postId,farmerId}});
+        const deletedReact = await PostReacts.destroy({ where: { id:rid}});
     dbDebugger("editAnimalPostComment db process passed!!");
 
-        return res.json(updatedReact);
+        return res.json(deletedReact);
     } catch (error) {
         return res.status(500).json(error);
     }
@@ -428,7 +416,7 @@ try {
     let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
     let post = await Posts.findOne({attributes:['id','farmerId'],where:{uuid:postId}});
     if(farmer.id && post.farmerId && (farmer.id===post.farmerId)){
-        const orders = await AnimalPostOrders.findAll({where:{postId:post.id}});
+        const orders = await AnimalPostOrders.findAll({where:{postId:post.id},include:[{model:Farmers,attributes:['userName','uuid','profileImage']}]});
         dbDebugger("getAnimalPostsOrders db process passed!!");
         return res.json({orders});
     }else{
@@ -438,6 +426,24 @@ try {
     return res.status(500).json({error});
 }
 };
+exports.deletePostOrder = async(req,res) => {
+    const id = req.params.oid;
+    const uuid = req.user.uuid;
+    console.log("reched deletePostOrder")
+    try {
+        let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
+        // let post = await Posts.findOne({attributes:['id','farmerId'],where:{uuid:postId}});
+        // if(farmer.id && post.farmerId && (farmer.id===post.farmerId)){
+            const orders = await AnimalPostOrders.destroy({where:{id}});
+            dbDebugger("getAnimalPostsOrders db process passed!!");
+            return res.json({orders});
+        // }else{
+            return res.status(501).json({error:"This Post does not belongs to you!!"});
+        // }
+    } catch (error) {
+        return res.status(500).json({error});
+    }
+    };
 exports.confirmOrder = async(req,res) => {
     const postId = req.params.pid;
     const id = req.params.oid;
@@ -465,7 +471,7 @@ exports.confirmOrder = async(req,res) => {
              newPost = await Posts.update({availability},{where:{id:post.id},returning:true});
         }
         dbDebugger("AnimalPostConfirm db process passed!!");
-        return res.json({order,newPost});
+        return res.json(order);
         }else{
             res.status(501).json({error:"User not valid for this operation!"});
         }

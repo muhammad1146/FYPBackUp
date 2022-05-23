@@ -13,19 +13,19 @@ module.exports = {
       },
       uuid:{
         type:Sequelize.STRING,
-        defaultValue:nanoid(10),
+        defaultValue:()=>nanoid(10),
         unique: true
         },
       body: {
         type: Sequelize.TEXT,
         allowNull:false
       },
-      farmerId: {
-        type: Sequelize.INTEGER,
+      title:{
+        type:Sequelize.STRING,
         allowNull:false
       },
-      farmingType: {
-        type: Sequelize.STRING,
+      farmerId: {
+        type: Sequelize.INTEGER,
         allowNull:false
       },
       createdAt: {

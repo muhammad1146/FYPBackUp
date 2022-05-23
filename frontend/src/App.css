@@ -66,6 +66,14 @@ border: 1px solid gray;
 border-radius: 10px;
 }
 
+.public-DraftStyleDefault-block > div {
+	margin: 0px !important;
+}
+
+
+.deleteIcon:hover {
+background-color: gray !important;
+}
 
 
 

@@ -1,11 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {  useEffect, useState } from 'react'
 import '../../App.css'
-import {Row,Col, Container, Button} from 'react-bootstrap'
-import Question from '../Components/QuestionComponent'
-import { UserContext } from '../../Contexts/UserContext'
+import {Row, Container, Button,Card,Image,Form} from 'react-bootstrap'
+import axios from 'axios';
 import Answers from '../Components/Answers'
 const Question = () => {
-    const [user,setUser] = useContext(UserContext);
+    // const [user,setUser] = useContext(UserContext);
     const [question,setQuestion] = useState({});
     const [answers, setAnswers] = useState([]);
     const [questionComments, setQuestionComments] = useState([]);

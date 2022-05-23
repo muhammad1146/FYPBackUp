@@ -14,6 +14,8 @@ router.post("/",upload.single('profileImage'),FarmerController.addFarmer) // add
 
 router.get("/",verifyToken,FarmerController.getFarmers) // get farmers
 
+router.get("/all",FarmerController.getAllFarmers) // get all farmers
+
 // Farmer Reports   
 router.post('/reports/:id',verifyToken,FarmerController.addReportForFarmer); //Post new Farmer's Report
 
@@ -31,9 +33,9 @@ router.post('/ranks',verifyToken,adminVerify,FarmerController.addRank); //get Al
 
 router.post("/login",FarmerController.farmerLogin) //  farmer login
 //Farms 
-router.get('/:username/farms',verifyToken,FarmerController.getFarms); // get all farms of a farmer
+router.get('/:username/farms',verifyToken ,FarmerController.getFarms); // get all farms of a farmer
 
-router.post('/:username/farms',verifyToken,upload.array("farmImages",5),FarmerController.addFarm); //add a farm (image included)
+router.post('/:uuid/farms',verifyToken,upload.single('farmImage'),FarmerController.addFarm); //add a farm (image included)
 
 router.get('/:username/farms/:farmid',verifyToken,FarmerController.getFarm); //get a farm
 
@@ -43,8 +45,11 @@ router.delete('/:username/farms/:farmid',verifyToken,FarmerController.deleteFarm
 
 
 
-router.get('/:id',verifyToken,FarmerController.getFarmer) // get farmer
+router.get('/:uuid',verifyToken,FarmerController.getFarmer) // get farmer
 
-router.put("/:id",verifyToken,FarmerController.updateFarmer) // edit a farmer
+router.put("/:uuid",verifyToken,FarmerController.updateFarmer) // edit a farmer
+
+router.put("/:uuid/picture",verifyToken,upload.single('profileImage'),FarmerController.changePicture) // edit a farmer
+
 
 module.exports = router;

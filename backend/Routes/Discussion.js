@@ -5,7 +5,11 @@ const router = express.Router();
 //Questions  
 router.get('/tags',verifyToken,DiscussionController.getDiscussionTags); // get all Tags from QuestionTagBox
 
+router.get('/tags/search',verifyToken,DiscussionController.searchTags); // search all Tags from QuestionTagBox
+
 router.get('/tags/:tid',verifyToken,DiscussionController.getQuestionTag); // get all Tags from QuestionTagBox
+
+router.delete('/tags/:tid',verifyToken,DiscussionController.deleteQuestionTag); // get all Tags from QuestionTagBox
 
 router.post('/tags',verifyToken,DiscussionController.addTagToQuestionTagBox); // add new tag to QuestionTagBox
 
@@ -19,10 +23,14 @@ router.put('/:qid',verifyToken,DiscussionController.editQuestion); // edit Quest
 
 router.delete('/:qid',verifyToken,DiscussionController.deleteQuestion); // delete Question post
 
-router.post('/:qid',verifyToken,DiscussionController.addQuestionReact); // adding a question react
+router.post('/:qid/reacts',verifyToken,DiscussionController.addQuestionReact); // adding a question react
+
+router.get('/:qid/reacts',verifyToken,DiscussionController.getQuestionReacts); // getting question reacts
 
 //Question Comments 
-router.post('/:qid/comments',verifyToken,DiscussionController.addQuestionComment); // adding a question react
+router.post('/:qid/comments',verifyToken,DiscussionController.addQuestionComment); // adding a question comment
+
+
 
 router.delete('/:qid/comments/:commentid',verifyToken,DiscussionController.deleteQuestionComment); // adding a question react
 

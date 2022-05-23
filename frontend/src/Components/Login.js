@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import {Form,Button,Col,Row,FloatingLabel, Container,Image} from "react-bootstrap"
 import { useHistory } from 'react-router';
 import logo from '../data/LoginPNG.jpg'
+import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router-dom';
 const Login = ({setUser}) => {
   let history = useHistory();
 // const {user,setUser} = useContext(UserContext);
@@ -17,12 +19,10 @@ const handleRadioChange = (event) =>{
   const onSubmitFunction  = async (e) => 
   {
       e.preventDefault();
-      // console.log("reached login fn");
       let result ;
       let url = (userType==='F')?'farmers' :'experts';
         try {
           let data =  JSON.stringify({userName:username,password});
-      // console.log("reached login fn1");
          
           result = await axios({
               method:'post',
@@ -32,21 +32,14 @@ const handleRadioChange = (event) =>{
             });   
             } catch (error) {
             console.log(error.response.data);  
-               setError(error.response.data);
+               setError(error.response.data.error);
               return;
           }
-          // console.log(result);
+         
               const payload = jwt.verify(result.data.accessToken,'secret');
            setUser(payload);
-          //  setUser(prev => ({
-          //        ...prev,
-          //       uuid:payload.uuid,
-          //      type:payload.type,
-          //       token:result.data
-          //     }));
-              history.push('/');
-              
           
+              history.push('/');
 }
   
   return (
@@ -85,16 +78,6 @@ const handleRadioChange = (event) =>{
             onChange={handleRadioChange}
           />
           </Col>
-          {/* <Col>
-          <Form.Check
-            type="radio"
-            label="Admin"
-            value="a"
-            name="formHorizontalRadios"
-            id="formHorizontalRadios3"
-            onChange={handleRadioChange}
-          />
-        </Col> */}
       </Form.Group>
     </fieldset>
   <FloatingLabel
@@ -104,30 +87,10 @@ const handleRadioChange = (event) =>{
   >
   <Form.Control type="text" placeholder="Username" onChange={(e)=>{
     setUsername(e.target.value)
-   
         }} />
         
   </FloatingLabel>
-    {/* <Form.Group as={Row} controlId="formHorizontalEmail">
-      <Form.Label>
-        Username
-      </Form.Label>
-      <Col sm={10}>
-        <Form.Control type="email" placeholder="Email" onChange={(value)=>{
-          setUsername=value;
-        }} />
-      </Col>
-    </Form.Group> */}
-  {/* <Form.Group as={Row} controlId="formHorizontalPassword">
-      <Form.Label >
-        Password
-      </Form.Label>
-      <Col sm={10}>
-        <Form.Control type="password" placeholder="Password" onChange={(value)=>{
-          setPassword=value;
-        }} />
-      </Col>
-    </Form.Group> */}
+    
     <FloatingLabel controlId="floatingPassword" label="">
     <Form.Control type="password" placeholder="Password"  onChange={(e)=>{
           setPassword(e.target.value);
@@ -138,8 +101,14 @@ const handleRadioChange = (event) =>{
     
     <Form.Group as={Row}>
       <Col className='text-center' >
-        <Button type="submit" >Sign in</Button>
+        <Button type="submit" style={{display:"block",marginLeft:"auto"}} >Sign in</Button>
       </Col>
+      <Col style={{alignSelf:"center",textAlign:"center"}}>
+        <Link to={'/register'} style={{color:"blue"}}>
+          Register
+        </Link> 
+     </Col>
+  
     </Form.Group>
     </Container>
   </Form>

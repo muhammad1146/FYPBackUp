@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import Logo from './../data/Register.jpg'
@@ -10,6 +10,7 @@ const Register = () => {
     
     const ExpertRegisterForm = () => {
       let history = useHistory();
+      const [currentExpertUserNames,setCurrentExpertUserNames] = useState([]);
       const [name,setName] = useState('');
       const [userName,setuserName] = useState('');
       const [password,setPassword] = useState('');
@@ -18,7 +19,13 @@ const Register = () => {
       const [number,setNumber] = useState('');
       const [error, setError] = useState(null);
 
-      const Login = async (e) => {
+      useEffect(async()=>{
+        let result = await axios.get(`api/experts/all/?text=${userName}`);
+        setCurrentExpertUserNames(result.data.experts);
+        
+      },[userName]);
+
+      const signIn = async (e) => {
         e.preventDefault();
         let result;
         try {
@@ -36,7 +43,6 @@ const Register = () => {
           setError(error.response.data)
           return;
         }
-        console.log(result);
         if(result){
 
           history.push('/login');
@@ -47,7 +53,7 @@ const Register = () => {
         <>
    
         <span>{error}</span>
-        <Form onSubmit={Login}>
+        <Form onSubmit={signIn}>
           <Container className='border border-dark my-3 p-4'>
             <FloatingLabel
             controlId="floatingInputName"
@@ -57,15 +63,16 @@ const Register = () => {
               setName(e.target.value);
             }} />
           </FloatingLabel>
-                
+          {currentExpertUserNames.length>0?(<span>Username must be unique</span>):null} 
           <FloatingLabel
             controlId="floatingInputUsername"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Username" onChange={(e)=>{
+            <Form.Control type="text" placeholder="Username" min={3}  onChange={(e)=>{
               setuserName(e.target.value);
             }} />
           </FloatingLabel>
+          
 
           <FloatingLabel
             controlId="floatingInputPassword"
@@ -120,9 +127,6 @@ const Register = () => {
               setNumber(e.target.value);
             }} />
           </FloatingLabel>
-          <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check type="checkbox" label="Check me out" />
-          </Form.Group>
           <Button variant="primary" type="submit">
               Submit
           </Button>
@@ -134,6 +138,7 @@ const Register = () => {
 
     const FarmerRegisterForm = ( ) => {
       const history = useHistory();
+      const [currentFarmerUserNames,setCurrentFarmerUserNames] = useState([]);
       const [name,setName] = useState('');
       const [userName,setuserName] = useState('');
       const [password,setPassword] = useState('');
@@ -141,7 +146,11 @@ const Register = () => {
       const [farmingType,setFarmingType] = useState('');
       const [number,setNumber] = useState('');
       const [error,setError] = useState(null);
-
+      useEffect(async()=>{
+        let result = await axios.get(`api/farmers/all/?text=${userName}`);
+        setCurrentFarmerUserNames(result.data.farmers);
+        
+      },[userName]);
       const Login = async (e) => {
         e.preventDefault();
         let result;
@@ -160,7 +169,6 @@ const Register = () => {
           setError(error.response.data)
           return;
         }
-        console.log(result);
         if(result){
 
           history.push('/login');
@@ -180,7 +188,7 @@ const Register = () => {
               setName(e.target.value);
             }} />
           </FloatingLabel>
-                
+          {currentFarmerUserNames.length>0?(<span>Username must be unique</span>):null}       
           <FloatingLabel
             controlId="floatingInputUsername"
             label=""
@@ -238,6 +246,9 @@ const Register = () => {
 
         )
     }
+    const handleRadioChange = (e) => {
+      setUserType(e.target.value)
+    }
     return(
         <>
         <Container fluid>
@@ -247,38 +258,39 @@ const Register = () => {
           </Col>
           <Col>
 
-        <Form>
         <Card className='mt-3'>
+        <Form>
         <h4 className='text-center mt-3'>
        {userType==='f'?('Farmer'):('Expert')} Register Form
         </h4>
-        <Card.Body className='text-center'>
-        <Button className='mx-3' variant={userType==='f'?('pills'):'secondary'} onClick={(e)=>{
-            if(userType==='f'){
-              return;
-            }
-            else{
-              setUserType('f');
-            }  
-        }}>
-        Farmers</Button>
-
-      <Button  variant={userType==='e'?('pills'):'secondary'} onClick={()=>{
-            if(userType==='e'){
-
-              return;
-            }
-            else{
-              setUserType('e');
-            }  
-        }}>
-        Experts</Button>
-      
-      
-        </Card.Body>
-
-        </Card>
+        <fieldset className="p-2 m-3">
+      <Form.Group as={Row} style={{textAlign:"center"}}>
+        <Col>
+          <Form.Check
+            type="radio"
+            label="Farmers"
+            value= "f"
+             defaultChecked={true}
+            //  checked={userType==='E'?false:true}
+            name="formHorizontalRadios"
+            onChange= {handleRadioChange}
+            id="formHorizontalRadios1"
+          />
+          </Col>
+          <Col>
+          <Form.Check 
+            type="radio"
+            label="Experts"
+            value= "e"
+            name="formHorizontalRadios"
+            id="formHorizontalRadios2"
+            onChange={handleRadioChange}
+          />
+          </Col>
+      </Form.Group>
+    </fieldset>
         </Form>
+        </Card>
     {userType==='f' ? <FarmerRegisterForm /> : <ExpertRegisterForm /> }
           </Col>
         </Row>

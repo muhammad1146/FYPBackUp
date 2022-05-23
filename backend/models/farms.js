@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   Farms.init({
     uuid:{
       type:DataTypes.STRING,
-      defaultValue:nanoid(10),
+      defaultValue:()=>nanoid(10),
       unique: true
       },
     farmName: 

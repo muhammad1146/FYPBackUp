@@ -7,85 +7,62 @@ import { RiQuestionAnswerFill } from "react-icons/ri";
 import {Nav,Card,Accordion} from 'react-bootstrap';
 
 const DiscussionsSidebar = () => {
- 
+    console.log('from expert sidebar')
     return (
       <>
-        <Nav className='sidebarRight py-4 m-1 w-100 border'>
-            <Nav.Item className='sidebarItem' >
-              <Nav.Link>
-              <Link to="/questions/top" >
+        <Nav className='sidebarRight' defaultActiveKey='1' style={{padding:"0",paddingLeft:'8px'}}>
+        <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
+            <Nav.Link>
+              <Link to="/discussion/top" >
               <AiFillHome className='py-0 m-0 text-right' size='1.1rem'/> Top Questions
                 
               </Link>
               </Nav.Link>
-            </Nav.Item>
-            
-            <Nav.Item className='sidebarItem' >
-              <Nav.Link>
-                <Link to="/experts">
-                <CgProfile size='1.1rem'/>  Experts
+        </Nav.Item>
+
+          <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
+              <Nav.Link eventKey='2'>
+                <Link to="/ecommerce/my">
+                  My Posts
                 </Link>
                 </Nav.Link>
-            </Nav.Item>
-
-            <Nav.Item className='sidebarItem' >
-              <Nav.Link>
-                <Link to="/farmers" >
-                <FaUsers size='1.1rem'/>    Farmers
+          </Nav.Item>
+          <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
+            <Nav.Link>
+                <Link to="discussion/experts">
+                <CgProfile size='1.1rem'/>  Experts
                 </Link>
-              </Nav.Link>
-            </Nav.Item>
-          
-            <Accordion defaultActiveKey="0">
-              <Card>
-                <Card.Header>
-                      <Accordion.Toggle as={Nav.Item} variant="link" eventKey="0">
-                        <Link to='/questions'>
-                        <FaQuestionCircle size='1.1rem'/> Questions
-                      </Link>
-                    </Accordion.Toggle>
-                </Card.Header>
-
-                <Accordion.Collapse eventKey="0">
-                  <Card.Body>
-                    <Nav.Item className='' > 
-                      <Nav.Link> 
-                          <Link to="questions/unanswered" className='p-0'>
-                            <RiQuestionAnswerFill size='1.1rem'/>Unanswered
-                          </Link>
-                      </Nav.Link>
-                    </Nav.Item>
-                    
-                    <Nav.Item className='' > 
-                      <Nav.Link> 
-                          <Link to="/questions/my" className='p-0'>
-                            <RiQuestionAnswerFill size='1.1rem'/>My Questions
-                          </Link>
-                      </Nav.Link>
-                    </Nav.Item>
-
-                    <Nav.Item className='' >
-                      <Nav.Link>
-                        <Link to="/tags">
-                          <FaTags size='1.1rem'/>Tags
-                        </Link>
-                      </Nav.Link>
-                    </Nav.Item>
-          
-                  </Card.Body>
-                </Accordion.Collapse>
-              </Card>
-            </Accordion>
-
-        
-          {/* <Nav.Item className='sidebarItem' >
+            </Nav.Link>
+          </Nav.Item>
+           
+          <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
           <Nav.Link>
-            <Link to="/blogs">
-           <RiQuestionAnswerFill size='1.1rem'/>Blogs
+            <Link to="/farmers">
+           <RiQuestionAnswerFill size='1.1rem'/>Farmers
             </Link>
             </Nav.Link>
           </Nav.Item>
-         */}
+          <Nav.Item style={{margin:"5px 0"}}>
+              <Nav.Link>
+                <Link to="/discussion/tags">
+                    <FaTags size='1.1rem'/>Tags
+                </Link>
+              </Nav.Link>
+          </Nav.Item>
+          <Nav.Item style={{margin:"5px 0"}}>
+              <Nav.Link>
+                <Link to="/discussion/my">
+                    <FaTags size='1.1rem'/>My Questions
+                </Link>
+              </Nav.Link>
+          </Nav.Item>
+          <Nav.Item style={{margin:"5px 0"}}>
+              <Nav.Link>
+                <Link to="/discussion/unanswered">
+                    <FaTags size='1.1rem'/>Unanswered
+                </Link>
+              </Nav.Link>
+          </Nav.Item>
         </Nav>
   
         </>

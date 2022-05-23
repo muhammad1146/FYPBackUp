@@ -4,26 +4,26 @@ import Ecommerce from './Farmers/Screens/Ecommerce/EcommerceMain';
 import FarmerBlog from './Farmers/Screens/Blogs/BlogMain';
 import ExpertDiscussion from './Experts/Screens/DiscussionMain';
 import ExpertBlog from './Experts/Screens/BlogMain';
-import {Container,Row,Col} from 'react-bootstrap'
-import { Switch,Route,Redirect,useHistory } from 'react-router';
+import {Row,Col} from 'react-bootstrap'
+import { Switch,Route,Redirect } from 'react-router';
 
 const MainContainer = ({user,setUser}) => {
     
       return (
           <>
     <div className='h-70'>
-        <Row>
+        <Row className='m-0'>
         <Col lg={12} className="bg-light ">
         <main>
             <Switch> 
            
-    <Route  path='/discussion/' component={() =>{
+    <Route  path='/discussion' component={() =>{
             if(user.type==='F')
             {
-                return( <FarmerDiscussion />)
+                return( <FarmerDiscussion user={user} />)
             }
             else if(user.type==='E' || user.type==='A'){
-                return( <ExpertDiscussion /> )
+                return( <ExpertDiscussion user={user} /> )
             }
             else {
                 return (<Redirect to="/login" />)

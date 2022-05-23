@@ -58,31 +58,5 @@ module.exports = function  (req,res,next)  {
     else {
       return res.send("No Token Found!");
     }
-// if((accessToken))
-//      return res.status(401).send('access denied,bcz no jwt token!');
-//         const {payload,expired} = verifyJWT(accessToken);
-//         if(payload){
-//         req.user = payload;
-//         console.log(payload);
-//         console.log("token checking ended, without refreshing....")
-//         next()
-//         }
-        
-//         const refresh = expired && refreshToken ? verifyJWT(refreshToken) : { payload: null };
-//     console.log("refresh Object is this: "+refresh[0])
-//     if(refresh.expired){
-//     //refresh token expired too
-//         return res.status(402).send("Login Again!");
-//     }
-//     else{
-//       const newAccessToken = jwt.sign(refresh.payload, "secret",{
-//           expiresIn:'300s'});   
-//           console.log("new AccessToken generated!");
-//           res.cookie("accessToken",newAccessToken,{
-//               maxAge:300000
-//           })
-        
-//     }
-//     }
 
 }
