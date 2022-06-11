@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   Answers.init({
     uuid:{
       type:DataTypes.STRING,
-      defaultValue:nanoid(8),
+      defaultValue:()=>nanoid(8),
       unique: true
       },
     body: {

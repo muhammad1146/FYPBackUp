@@ -7,13 +7,19 @@ router.get('/tags',verifyToken,DiscussionController.getDiscussionTags); // get a
 
 router.get('/tags/search',verifyToken,DiscussionController.searchTags); // search all Tags from QuestionTagBox
 
-router.get('/tags/:tid',verifyToken,DiscussionController.getQuestionTag); // get all Tags from QuestionTagBox
+router.get('/alltags/:tid',verifyToken,DiscussionController.getQuestionTag); // get all Tags from QuestionTagBox
 
 router.delete('/tags/:tid',verifyToken,DiscussionController.deleteQuestionTag); // get all Tags from QuestionTagBox
+
+router.get('/tags/:id',verifyToken, DiscussionController.getTagQuestions); // get Questions
 
 router.post('/tags',verifyToken,DiscussionController.addTagToQuestionTagBox); // add new tag to QuestionTagBox
 
 router.get('/',verifyToken, DiscussionController.getQuestions); // get Questions
+
+router.get('/search',verifyToken, DiscussionController.searchQuestions); // get Questions
+
+router.get('/my',verifyToken, DiscussionController.getMyQuestions); // get Questions
 
 router.get('/:qid',verifyToken,DiscussionController.getQuestion); //get Question
 
@@ -27,8 +33,12 @@ router.post('/:qid/reacts',verifyToken,DiscussionController.addQuestionReact); /
 
 router.get('/:qid/reacts',verifyToken,DiscussionController.getQuestionReacts); // getting question reacts
 
+router.delete('/:qid/reacts',verifyToken,DiscussionController.deleteQuestionReacts); // getting question reacts
+
 //Question Comments 
 router.post('/:qid/comments',verifyToken,DiscussionController.addQuestionComment); // adding a question comment
+
+router.get('/:qid/comments',verifyToken,DiscussionController.getQuestionComments); // adding a question comment
 
 
 

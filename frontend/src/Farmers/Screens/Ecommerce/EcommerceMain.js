@@ -15,19 +15,23 @@ const EcommerceMain = ({user}) =>
 
 const EcommerceContainer = ({user}) =>
 {
+    const [searchText, setSearchText] = useState('');
+        const setText = (e) => {
+            setSearchText(e);
+        }
         return (
         <>
         <PostForm postFormToggle={postFormToggle} setPostFormToggle={setPostFormToggle} />
         <Container>
 
-            <EcommerceNavbar postFormToggle={postFormToggle} setPostFormToggle={setPostFormToggle} />
+            <EcommerceNavbar postFormToggle={postFormToggle} setPostFormToggle={setPostFormToggle} setText={setText} />
             <Switch> 
                 <Route path='/ecommerce/all'  exact >
-                    <Posts  user={user} />
+                    <Posts  user={user} searchText={searchText} />
                 </Route>
                
                 <Route path='/ecommerce/my' >
-                    <MyPosts />
+                    <MyPosts searchText={searchText} />
                 </Route>
                 <Route path='ecommerce/posts/:pid/order' exact component={PostOrders} />
                 <Route path='/ecommerce/:pid' exact render={(prevProps)=> <Post user={user} {...prevProps} />

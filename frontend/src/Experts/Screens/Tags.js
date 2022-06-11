@@ -2,7 +2,7 @@ import React, { useEffect, useState,useCallback } from 'react'
 import {Card,Row,Col,Button,Modal,Form, FormGroup} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-const Tags = ({user}) => {
+const Tags = ({user,search}) => {
   console.log('rendered from tag module')
   const [tags,setTags] = useState([]);
   const [addTagToggle,setAddTagToggle] = useState(false);
@@ -10,12 +10,24 @@ const Tags = ({user}) => {
   const [description,setDescription] = useState('');
   const [previousTagData,setPreviousTagData] = useState([]);
   const [isTagNameValid,setIsTagNameValid] = useState(false);
+  const [refresh,setRefresh] = useState(false);
   
+  useEffect( async()=>{
+    if(search===''){
+      let result = await axios.get('/api/questions/tags');
+      console.log(result);
+      setTags(result.data.content);
+    }else{
+      let result = await axios.get(`/api/questions/tags/search?query=${search}`);
+      console.log(result);
+      setTags(result.data)
+    }
+  },[]);
   useEffect( async()=>{
     let result = await axios.get('/api/questions/tags');
     console.log(result);
     setTags(result.data.content);
-  },[]);
+  },[refresh]);
   const delayedCallback = async(e)=>{
     if(e.target.value==='') {
       setPreviousTagData([]);
@@ -23,25 +35,38 @@ const Tags = ({user}) => {
     }
     setTag(e.target.value);
     let result = await axios.get(`/api/questions/tags/search?query=${e.target.value}`);
-    console.log(result.data);
     setPreviousTagData(result.data);
-   if(previousTagData.length<1) setIsTagNameValid(true);
+   if(result.data.length>0) {
+     setIsTagNameValid(false)
+    }else {
+      setIsTagNameValid(true);
+    }
   }; 
   
 // const previousTags =useCallback(()=>debounce(delayedCallback,600),[]);
   
   const addNewTag = async(e) =>{
     e.preventDefault();
+    console.log(isTagNameValid);
     if(!isTagNameValid){
       alert("tag name must be unique.")
       return
     }
-    let result = await axios.post('/api/questions/tags',{
-      tag,description
-    });
-    if(result.status===200 ){
-      alert('tag added successfully.')
-      setAddTagToggle(false);
+    try {
+      
+      let result = await axios.post('/api/questions/tags',{
+        tag,description
+      });
+      if(result.status===200 ){
+        alert('tag added successfully.');
+        setRefresh(i=>!i);
+        setAddTagToggle(false);
+      }else{
+        alert("Error creating new Tag!");
+      }
+
+    } catch (error) {
+      alert(error.message);
     }
 
   }
@@ -51,7 +76,7 @@ const Tags = ({user}) => {
     <Row>
       <Col lg={5}></Col>
       <Col lg={4}></Col>
-      <Col >{(user.type==='E')&&(<Button onClick={()=>setAddTagToggle(true)}>New Tag</Button>)}</Col>
+      <Col >{(user.type==='E')&&(<Button style={{display:'block',marginLeft:'auto',marginTop:'10px'}} onClick={()=>setAddTagToggle(true)}>New Tag</Button>)}</Col>
     </Row>
     <Modal
             show={addTagToggle}
@@ -86,16 +111,16 @@ const Tags = ({user}) => {
           </Modal>
     <Row>
         {tags.map(i=>(
-          <Col>
+          <Col lg={3}>
           <Card
           bg='light'
           key={i.id}
           text={'dark'}
-          style={{ width: '18rem' }}
+          // style={{ width: '18rem' }}
           className="mb-2"
         >
           <Card.Body>
-          <Link to=''> <Card.Title> {i.tag} </Card.Title></Link>
+          <Link to={`/discussion/tags/${i.id}`}> <Card.Title> {i.tag} </Card.Title></Link>
             <Card.Text>
         {i.description}
             </Card.Text>

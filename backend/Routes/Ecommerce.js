@@ -7,6 +7,8 @@ const upload = require('../Controllers/ImageManagement');
 //Ecommerce Posts
 router.get('/',verifyToken, EcommerceController.getPosts) // get animal posts (testing:done)
 
+router.get('/search',verifyToken, EcommerceController.searchPosts) // get animal posts (testing:done)
+
 router.get('/myreports',verifyToken,EcommerceController.getAllUserReports); //Get All Reports reported by a user.
 
 router.get('/:pid',verifyToken,EcommerceController.getAnimalPost)  // get animal post(testing:done)

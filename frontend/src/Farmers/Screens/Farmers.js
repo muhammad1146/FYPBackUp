@@ -1,7 +1,7 @@
 // This Screen is without the right side bar 
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
-import { Card,Button, Container,Row,Col,Image } from 'react-bootstrap';
+import { Card, Container,Row,Col,Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import FarmerScreenCSS from './Farmers.module.css';
 const Farmers = () => {
@@ -25,7 +25,7 @@ return(
             <Card style={{ width: '18rem' }}>
             <div className='text-center mt-2'>
             <Link to={`/farmers/${farmer.uuid}`}>
-            <Image variant="top" src={`/${farmer.profileImage}`} rounded width="170px" height="170px" className="text-center"/>
+            <Image variant="top" src={farmer.profileImage?`/${farmer.profileImage}`:'/blankProfile.jpg'} rounded width="170px" height="170px" className="text-center"/>
             </Link>
             </div>
             <Card.Body>
@@ -44,7 +44,6 @@ return(
             </Card.Body>
             </Card>
     </Col>
-
 )
 }
     return (
@@ -58,7 +57,6 @@ return(
                 farmers.length>0
                 ? farmers.map((farmer) =>(<FarmerContainer farmer={farmer} />) )
                 :(<h2>Loading...</h2>)
-                
             }
         </Row>
         </Container>

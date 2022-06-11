@@ -14,7 +14,6 @@ exports.addFarmer = async (req,res) =>
         farmingType: Joi.string().required(),
         description: Joi.string(),
         profileImage: Joi.string(),
-        city:Joi.string().required()
          });
     try { 
         const value = await schema.validateAsync(req.body);
@@ -22,7 +21,7 @@ exports.addFarmer = async (req,res) =>
     return res.status(400).send(error.details[0].message)
     }
     const rankId = 1;
-    const profileImage = req.file.filename;
+    const profileImage = req.file?.filename;
       const {name,phoneNumber,address,userName,farmingType,
           description,password,city} = req.body;
      const salt = await bcrypt.genSalt(10);
@@ -30,7 +29,6 @@ exports.addFarmer = async (req,res) =>
      try {
          const expert = await Experts.findOne({attributes:['id'],where:{userName}});
          const farmer = await Farmers.findOne({attributes:['id'],where:{userName}});
-         console.log(req.file.path);
          if(farmer || expert) return res.status(501).send("Username already exist,try someting else");
          const newfarmer = await Farmers.create({
               name,phoneNumber,address,password:hashedPassword,userName,farmingType,rankId,description,profileImage,city
@@ -38,6 +36,7 @@ exports.addFarmer = async (req,res) =>
 
          return res.json(newfarmer);
      } catch (error) {
+         console.log(error)
          return res.status(500).send(error);
          
      }
@@ -204,7 +203,7 @@ exports.getAllFarmers = async (req,res) =>
     console.log('inside getAllFarmers')
     let query = req.query.text;
         try {
-            const farmers = await Farmers.findAll({attributes:['userName'],where:{userName: {[Op.iLike]:'%' + query + '%'}}}); 
+            const farmers = await Farmers.findAll({attributes:['userName'],where:{userName:query }}); 
             return res.json({
             farmers
             });
@@ -388,7 +387,7 @@ exports.farmerLogin = async (req,res) =>
     const schema = Joi.object(
         {
             userName: Joi.string().required(),
-            password: Joi.string().min(4).max(10).required()
+            password: Joi.string().min(8).required()
         }
     );
     try {
@@ -400,11 +399,10 @@ exports.farmerLogin = async (req,res) =>
     const {userName,password} = req.body;
     try {
         const farmer = await Farmers.findOne({where:{userName}});   
-        if(!farmer) return res.status(400).send('Farmer not found');
+        if(!farmer) return res.status(400).send('User not found');
         const validPass = await bcrypt.compare(password,farmer.password);
         
         if(!validPass) return res.status(400).send('Invalid Password');
-        // const session = createSession({uuid:farmer.uuid, userType:'F'});
         const token = jwt.sign({uuid:farmer.uuid,type:'F'},"secret",{
             expiresIn:'300s'
         });

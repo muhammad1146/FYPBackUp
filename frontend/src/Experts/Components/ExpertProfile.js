@@ -204,8 +204,7 @@ const ExpertProfile = (props) => {
             if(result.status===200) {
                 alert("Profile picture changed successfully");
                 setPictureToggle(false);
-                refreshPage();
-                
+                refreshPage();    
             }
         
         } catch (error) {
@@ -215,8 +214,14 @@ const ExpertProfile = (props) => {
 useEffect(async() =>{
     const result = await axios.get(`/api/experts/${username}`);
     setExpertData(result.data);
-    console.log("result",result)
+    console.log("result",result);
 },[]);
+
+useEffect(async() =>{
+  const result = await axios.get(`/api/experts/${username}`);
+  setExpertData(result.data);
+  console.log("result",result);
+},[refresh]);
 
     return (
         <Container className='p-4'>       
@@ -228,10 +233,12 @@ useEffect(async() =>{
         <EditInfo />
         <Col>
 
-            <div className="">
-                <Image src={expertData.profileImage?`/${expertData.profileImage}`:'/blankProfile.jpg'} rounded fluid width={"250px"} height={"250px"} />
+            <div className="mb-3">
+                <Image src={expertData.profileImage?`/${expertData.profileImage}`:'/blankProfile.jpg'} rounded fluid width={"250px"} height={"250px"} style={{maxWidth:'300px',maxHeight:'300px'}} />
             </div>
-            <Button style={{display:`${props.user.uuid===username?'block':'none'}`}} onClick={()=>setPictureToggle(true)}> Change</Button>
+            <div className='w-100'>
+            <Button style={{display:`${props.user.uuid===username?'block':'none'}`,margin:'auto'}} onClick={()=>setPictureToggle(true)}> Change </Button>
+            </div>
             <Modal
             show={pictureToggle}
             onHide={()=>setPictureToggle(false)}
@@ -257,7 +264,7 @@ useEffect(async() =>{
         </Col>
 
 </Row>  ):(<h3>Loading...</h3>)}
-        <div style={{display:`${props.user.uuid===username?'flex':"none"}`,justifyContent:'end',width:"100%"}}>
+        <div style={{display:`${props.user?.uuid===username?'flex':"none"}`,justifyContent:'center',width:"60%",marginTop:'15px'}}>
         <Button  onClick={()=>setUdpateInfoToggle(true)}>Edit</Button>
         </div>
 <Row>

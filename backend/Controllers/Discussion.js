@@ -1,10 +1,14 @@
+const e = require('express');
 const Joi = require('joi');
 const { Op } = require('sequelize');
+
 const {Questions,QuestionImage,QuestionTags,QuestionReacts,QuestionTagBox,
-    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReports,Experts,Farmers,FarmersRank} = require('../models'); 
+    Answers,QuestionComments,QuestionReport,AnswerImages,AnswerReacts,AnswerReport,Experts,Farmers,FarmersRank} = require('../models'); 
 exports.getQuestions = async (req,res) => {
+    console.log('inside getQuestions');
     let pageAsNumber = req.query.page;
     let sizeAsNumber = req.query.size;
+    let tag = req.query.tag;
     let page = 0;
     if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
         page = pageAsNumber;
@@ -15,8 +19,9 @@ exports.getQuestions = async (req,res) => {
     }
    
     try { 
+      
         
-        const questions = await Questions.findAndCountAll({include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts}],limit:size,offset:size*page});
+        const questions = await Questions.findAndCountAll({include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts,include:[{model:Farmers,attributes:['uuid']}]}],limit:size,offset:size*page});
         return res.json({
         content:questions.rows,
         totalPages:Math.ceil(questions.count/Number.parseInt(size))
@@ -26,11 +31,99 @@ exports.getQuestions = async (req,res) => {
         return res.status(500).json(error);
     }
 };
+
+
+exports.searchQuestions = async (req,res) => {
+    console.log('inside searchQuestions');
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let search = req.query.search;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
+   
+    try { 
+        const questions = await Questions.findAndCountAll({where:{
+            [Op.or]:[
+                {title: {[Op.iLike]: '%' + search + '%'}},
+                {body: {[Op.iLike]: '%' + search + '%'}}
+            ]
+
+        },include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts,include:[{model:Farmers,attributes:['uuid']}]}],limit:size,offset:size*page});
+        return res.json({
+        content:questions.rows,
+        totalPages:Math.ceil(questions.count/Number.parseInt(size))
+        });
+        console.log(questions);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+exports.getMyQuestions = async (req,res) => {
+    console.log('reached getMyQuestions:');
+    const search = req.query.search;
+    try { 
+        const farmer = await Farmers.findOne({attributes:['id'], where:{uuid:req.user.uuid}});
+        if(farmer){
+            let questions;
+            console.log(search);
+            if(search !== null){
+                console.log('in if portion')
+                questions = await Questions.findAll({where:{farmerId:farmer.id,
+                [Op.or]:[
+                    {title: {[Op.iLike] : '%' + search + '%'}}
+                ]
+                },include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts,include:[{model:Farmers,attributes:['uuid']}]}]});
+            }else{
+                console.log('in else portion')
+                questions = await Questions.findAll({where:{farmerId:farmer.id
+                },include:[{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]},{model:QuestionReacts,attributes:["commitType", "commiterId"]},{model:QuestionTags,include:[QuestionTagBox]},{model:QuestionReacts,include:[{model:Farmers,attributes:['uuid']}]}]});
+
+            }
+            return res.json(questions);
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
+exports.getTagQuestions = async (req,res) => {
+    console.log('reached getTagQuestions');
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+   let tag = req.params.id;
+   console.log('get tag id', tag);
+
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    }
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    }
+    try { 
+            const questions = await QuestionTags.findAndCountAll({where:{tagId:tag},include:[{model:Questions,include:[{model:QuestionReacts,include:[{model:Farmers,attributes:['uuid']}]},{model:QuestionTags,include:[QuestionTagBox]},{model:Farmers,attributes:["userName","uuid","profileImage"],include:[FarmersRank]}]}],limit:size,offset:size*page});
+                return res.json({content:questions.rows,totalPages:Math.ceil(questions.count/Number.parseInt(size))});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+};
+
 exports.getQuestion = async (req,res) => {
     const uuid = req.params.qid;
     try { 
         console.log("reached question route!");
-        const questions = await Questions.findOne({where:{uuid},include:[Farmers,QuestionReacts,QuestionComments,QuestionImage,QuestionTags]});
+        const questions = await Questions.findOne({where:{uuid},include:[Farmers,{model:QuestionReacts,include:[Farmers]},{model:QuestionTags,include:[QuestionTagBox]}]});
         return res.json(questions);
     } catch (error) {
         console.log(error);
@@ -141,18 +234,19 @@ exports.deleteQuestion = async (req,res) =>{
     const questionuuid = req.params.qid;
     let questionId;
     let questionFarmerId, uuid=req.user.uuid, farmerId;
-    if(req.user.userType==='F') 
+    if(req.user.type==='F') 
     {
+        console.log('passed first check!');
         try {
             const question = await Questions.findOne({attributes:["id","farmerId"], where:{uuid:questionuuid}});
             const farmer = await Farmers.findOne({where:{uuid}});
-            if(question.id){
+            if(question){
                 questionFarmerId = question.farmerId;
                 questionId = question.id;
             }else {
                 return res.status(400).send("Question Not Found!!");
             }
-            if(farmer.id){
+            if(farmer){
                 farmerId = farmer.id;
 
             }
@@ -184,7 +278,7 @@ exports.deleteQuestion = async (req,res) =>{
             return res.status(401).send("Forbidden access!");
         }
     }
-    else if(req.user.userType==='A'){
+    else if(req.user.type==='A'){
         try {
             const answers = await Answers.destroy({where:{questionId}});
             const reacts = await QuestionReacts.destroy({where:{questionId}});
@@ -218,18 +312,21 @@ exports.addQuestionReact = async (req,res) => {
         let question = await Questions.findOne({attributes:['id'],where:{uuid}});
         if(question.id) questionId =question.id; 
        //fetch the commiter now
-        let result;
+        let result,deletedCommiter;
         if(commiterType==='F'){
             result = await Farmers.findOne({attributes:['id'],where:{uuid:req.user.uuid}});
             if(result.id) commiterId=result.id;
+            deletedCommiter = await QuestionReacts.destroy({where:{commiterId,questionId}});
         }else{
             result = await Experts.findOne({attributes:['id'],where:{uuid:req.user.uuid}});
             if(result.id) commiterId= result.id;
+            deletedCommiter = await QuestionReacts.destroy({where:{commiterId,questionId}});
         }
         
         const qReact = await QuestionReacts.create({questionId,commitType,commiterType,commiterId});
         return res.json(qReact);
     } catch (error) {
+        console.log(error)
         return res.status(500).json(error);
     }
 
@@ -238,36 +335,97 @@ exports.addQuestionReact = async (req,res) => {
 exports.getQuestionReacts = async (req,res) => {
     const uuid = req.params.qid;
     try {
-        
+
         const reacts = QuestionReacts
     } catch (error) {
         
     }
 }
 
+exports.deleteQuestionReacts = async (req,res) => {
+    const qid = req.params.qid,uuid= req.user.uuid;
+    try {
+        const question = await Questions.findOne({attributes:['id'],where:{uuid:qid}});
+        const farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
+        let reacts;
+        if(farmer && question){
+            reacts = QuestionReacts.destroy({where:{commiterId:farmer.id,questionId:question.id}});
+        }
+        return res.status(200).json(reacts);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error});
+    }
+}
+
 exports.addQuestionComment = async (req,res) => {
     const schema = Joi.object( {
         body:Joi.string().required(),
-        questionId:Joi.string().required(),
-        commenterType :Joi.string().required(),
-        commenterId :Joi.string().required()
     });
     try {
         const value = await schema.validateAsync(req.body);
         
     } catch (error) {
-        
         res.status(400).send(error.details[0].message);
         return;
     }
-    const {body,questionId,commenterType,commenterId} = req.body;
+    const questionUUID = req.params.qid,uuid= req.user.uuid;
+    let questionId,commenterId,commenterType = req.user.type; 
+    const {body} = req.body;
     try {
+        const question = await Questions.findOne({attributes:['id'],where:{uuid:questionUUID}});
+        if(question){
+            questionId = question.id;
+        }else{
+            return res.status(401).json({error:'Invalid Request'});
+        }
+        let commenter;
+        if(commenterType==='E'){
+            commenter = await Experts.findOne({attributes:['id'],where:{uuid}});
+            if(commenter){
+                commenterId = commenter.id;
+            }
+        }else{
+            commenter = await Farmers.findOne({attributes:['id'],where:{uuid}});
+            if(commenter){
+                commenterId = commenter.id;
+            }
+        }
         const qComment = await QuestionComments.create({body,questionId,commenterId,commenterType});
         return res.json(qComment);
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     }
 
+};
+
+exports.getQuestionComments = async (req,res,next) =>{ //getAnswerOfAQuestion *For Expert/Farmer Entity*
+    console.log('inside getQuestionComments');
+    const id = req.params.qid;
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    } 
+    let size = 5;
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    } 
+    try {
+        const question = await Questions.findOne({attributes:['id'],where:{uuid:id}})
+        if(question.id){
+            const comments = await QuestionComments.findAndCountAll({where:{questionId:question.id},include:[Experts,Farmers],limit:size,offset:size*page});
+        return res.json({content:comments.rows,
+            totalPages:Math.ceil(comments.count / Number.parseInt(size))});
+        }else{
+            return res.status(500).json({error:'The Question not found!'});
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
 };
 
 exports.deleteQuestionComment = async (req,res) => {
@@ -328,24 +486,29 @@ exports.reportQuestion = async (req,res) => {
 
 };
 
-// export.removeQuestionReact = async (req,res) => {
-//     const {questionId,commiterId} = req.body;
-//     try {
-//         const qReact = await QuestionReacts.destroy({where:{questionId,commiterId}});
-//         return res.json(qReact);
-//     } catch (error) {
-//         return res.status(500).json(error);
-//     }
-
-// };
-// Answers
-
 
 exports.getAnswers = async (req,res,next) =>{ //getAnswerOfAQuestion *For Expert/Farmer Entity*
     const id = req.params.qid;
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    } 
+    let size = 8;
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    } 
     try {
-        const answers = await Answers.findAll({where:{questionId:id}},{include:[Experts]});
-        return res.json(answers);
+        const question = await Questions.findOne({attributes:['id'],where:{uuid:id}});
+        if(question.id){
+            const answers = await Answers.findAndCountAll({where:{questionId:question.id},include:[Experts],limit:size,offset:size*page});
+            console.log(answers);
+            return res.json({content:answers.rows,
+                totalPages:Math.ceil(answers.count / Number.parseInt(size))});
+        }else{
+            return res.status(500).json({error:"Question not found!"})
+        }
     } catch (error) {
         return res.status(500).json(error);
     }
@@ -431,33 +594,22 @@ exports.deleteAnswer = async (req,res) =>
     const uuid = req.user.uuid;
     let answerExpertId;
     let expertId;
-
-    if(req.user.type !== 'A') {
-
-        try {
-            const expert = Experts.findOne({where:{uuid}});
-            const answer = Answers.findOne({where:{id}});
-            expertId = expert.id;
-            answerExpertId = answer.expertId;
-        } catch (error) {
-            return res.status(500).send('Internal Server Error!');
-        }
-    }
     try 
     {
         if(expertId===answerExpertId || req.user.type==='A'){
-            const reports = await AnswerReports.destroy({where:{answerId:id}});
-            const reacts = await AnswerReacts.destroy({where:{answerId:id}});
-            const images = await AnswerImages.destroy({where:{answerId:id}});
-            const answer = await Answers.destroy({where:{id}});
+            const answerData = await Answers.findOne({attributes:['id'], where:{uuid:id}});
+            const reports = await AnswerReport.destroy({where:{answerId:answerData.id}});
+            const reacts = await AnswerReacts.destroy({where:{answerId:answerData.id}});
+            const images = await AnswerImages.destroy({where:{answerId:answerData.id}});
+            const answer = await Answers.destroy({where:{uuid:id}});
             return res.json({answer,reports,reacts,images}); 
         }
         else{
             return res.status(401).send('Forbidden Access!');
         }
     } catch (error) 
-    {
-        return res.status(500).json(error);
+    {   console.log(error)
+        return res.status(500).json({error});
     }
 };
 
@@ -604,12 +756,16 @@ exports.searchTags = async (req,res) =>{ //search all Question Tags
             {
                 where:
                 {
-                    tag: {[Op.iLike]:'%' + query + '%'}
+                    [Op.or]:[
+                        {tag: {[Op.iLike] : '%' + query + '%'} },
+                        {description: {[Op.iLike]: '%' + query + '%'}}
+                    ]
                 }
             }        
         );
         return res.json(tags);
     } catch (error) {
+        console.log(error);
         return res.status(500).json(error);
     }
 };

@@ -1,11 +1,13 @@
 const Joi = require('joi');
 const dbDebugger = require('debug')('app:db')
 const fs = require('fs');
+const { Op } = require('sequelize');
 const {Posts,Farmers,PostComments,PostReacts,PostImages,AnimalPostOrders,EcommerceReport,FarmersRank} = require('../models');
 exports.getPosts = async (req,res)=>{
     let price = (req.query.price? req.query.price:0);
    let city = (req.query.city ? req.query.city:null);
    let type = (req.query.type? req.query.type:null); //cattleType
+   let availability = req.query.availability;
    
    let pType = (req.query.ptype==='my'?req.query.ptype:null);
     let pageAsNumber = req.query.page;
@@ -38,20 +40,59 @@ exports.getPosts = async (req,res)=>{
         }
         else if(city!='All' && type!="All"){
             console.log("both city and type is true")
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type,city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts, include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type,city,availability:availability?availability:'A'},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts, include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else if(city==='All' && type !='All')
         {
             console.log("City is yes and type is no")
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{cattleType:type,availability:availability?availability:'A'},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else if(city!="All" && type==='All'){
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{city},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{city,availability:availability?availability:'A'},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         }
         else {
             console.log("not city and no type!");
-            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
+            AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{availability:availability?availability:'A'},include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts,include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
         } 
+        dbDebugger("GetAnimalPosts db fetching passed!!");
+        return res.json({content:AllPosts.rows,
+        totalPages:Math.ceil(AllPosts.count / Number.parseInt(size))
+    });
+    } catch (error) {
+        console.log(error)
+        return res.status(501).json(error);
+    }
+};
+
+exports.searchPosts = async (req,res)=>{
+    let search = req.query.search;
+    let pageAsNumber = req.query.page;
+    let sizeAsNumber = req.query.size;
+    let page = 0;
+    if(!Number.isNaN(pageAsNumber) && (pageAsNumber>1) && (pageAsNumber<15)){
+        page = pageAsNumber;
+    } 
+    let size = 15
+    if(!Number.isNaN(sizeAsNumber) && (sizeAsNumber>1) && (sizeAsNumber<15)){
+        size = sizeAsNumber;
+    } 
+    try { 
+            let farmer = await Farmers.findOne({attributes:['id'],where:{
+                uuid:req.user.uuid}});
+                let AllPosts ;
+            if(farmer){
+             AllPosts = await Posts.findAndCountAll({attributes:{exclude:['farmerId']},where:{farmerId:farmer.id},where:{
+                    [Op.or]:[
+                        {name: {[Op.iLike] : '%' + search + '%'} },
+                        {description: {[Op.iLike]: '%' + search + '%'}},
+                        {city:{[Op.iLike]: '%' + search + '%'}}
+                    ],availability:'A'
+                },include:[{model:Farmers,attributes:['userName','profileImage']},{model:PostImages,attributes:['image']},{model:PostReacts, include:[{model:Farmers,attributes:['userName','uuid']}]}]},{limit:size,offset:size*page});
+
+            }else {
+               return res.status(401).json({error:"Farmer not Found!"});
+            }
+        
         dbDebugger("GetAnimalPosts db fetching passed!!");
         return res.json({content:AllPosts.rows,
         totalPages:Math.ceil(AllPosts.count / Number.parseInt(size))
@@ -462,13 +503,17 @@ exports.confirmOrder = async(req,res) => {
         let farmer = await Farmers.findOne({attributes:['id'],where:{uuid}});
         let post = await Posts.findOne({attributes:['id','farmerId'],where:{uuid:postId}});
         if(farmer.id && post.farmerId && (farmer.id===post.farmerId)){
+        if(status==='Accepted') {
+            const previousOrders =  await AnimalPostOrders.update({status:'Pending'},{where:{postId:post.id, status:'Accepted'}});
+        }
         const order = await AnimalPostOrders.update({status},{where:{postId:post.id,id},returning:true});
         let newPost;
-        let newStatus=order[1][0].dataValues.status;
-        console.log(order[1][0].dataValues.status)
-        if(newStatus==="Accepted"){
+        if(status==="Accepted"){
             let availability="NA"
              newPost = await Posts.update({availability},{where:{id:post.id},returning:true});
+        } else {
+            availability = 'A';
+            newPost = await Posts.update({availability},{where:{id:post.id},returning:true}); 
         }
         dbDebugger("AnimalPostConfirm db process passed!!");
         return res.json(order);

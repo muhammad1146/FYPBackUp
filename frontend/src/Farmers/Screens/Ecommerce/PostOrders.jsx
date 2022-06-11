@@ -43,8 +43,8 @@ const PostOrders = (props) => {
     const result = await axios.put(`/api/ecommerce/${uuid}/orders/${id}`,{
       status:"Pending"
     });
-    console.log(result);
-    setPostOrderStatus(null);
+    setPostOrderStatus(result.data[1]);
+       alert("Post Order moved to pending.");
   } catch (error) {
     alert(error.message);
   }
@@ -78,7 +78,7 @@ const PostOrders = (props) => {
             <ListGroup variant="flush">
               <ListGroup.Item>Status: {order.status}</ListGroup.Item>
             </ListGroup>
-            <Button onClick={()=>handleOrderSubmission(order.id,order.status)}>{postOrderStatus?('Accept'):('Move To Pending')}</Button>
+            <Button variant={`${order.status==='Pending'?'primary':'danger'}`} onClick={()=>handleOrderSubmission(order.id,order.status)}>{order.status==='Pending'?('Accept'):('Move To Pending')}</Button>
             <Card.Footer>
             <small className="text-muted" style={{display:"block",fontSize:"11px",textAlign:"end"}}>Last updated {`${date.getDate()}/${(date).getMonth()+1}/${(date).getFullYear()}`}</small>
             </Card.Footer>

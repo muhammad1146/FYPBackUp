@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   AnimalPostOrders.init({
     uuid: {
       type:DataTypes.STRING,
-      defaultValue: nanoid(10),
+      defaultValue: ()=>nanoid(10),
       unique:true
     },
     postId: //fk

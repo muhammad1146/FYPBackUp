@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom'
 import '../../../App.css'
 import { AiFillHome } from "react-icons/ai";
 import { FaUsers,FaQuestionCircle,FaTags } from "react-icons/fa";
+import { AiOutlineArrowDown } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { RiQuestionAnswerFill } from "react-icons/ri";
 import {Nav, Form} from 'react-bootstrap'
@@ -31,18 +32,18 @@ const EcommerceSidebar = ({setCity,setCattleType}) => {
             <Nav.Item className='sidebarItem' style={{margin:"0"}} >
               <Nav.Link eventKey='2'>
                 <Link to="/ecommerce/my">
-               
+                <AiOutlineArrowDown className='py-0 m-0 text-right' size='1.1rem' />
                   My Posts
                 </Link>
                 </Nav.Link>
             </Nav.Item>
-            <Nav.Item className='sidebarItem' style={{margin:"0"}} >
+            {/* <Nav.Item className='sidebarItem' style={{margin:"0"}} >
               <Nav.Link>
                 <Link to="/ecommerce/posts/unsold" >
                 <FaUsers size='1.1rem'/>    Unsold
                 </Link>
               </Nav.Link>
-            </Nav.Item>
+            </Nav.Item> */}
             <p style={{borderBottom:"1px solid gray",width:"100%",marginBottom:"5px"}}>
             City 
             </p>

@@ -5,14 +5,14 @@ import Sidebar from '../../Components/Ecommerce/EcommerceSidebar';
 
 import {Link} from 'react-router-dom'
 import {AiOutlineHeart,AiFillHeart} from 'react-icons/ai';
-const Posts = ({user}) => {
+const Posts = ({user,searchText}) => {
     const [cattleType,setCattleType] = useState('All');
     const [city,setCity] = useState('All');
     const [posts,setPosts] = useState([]);
     
     useEffect( async () => {
             
-            let result = await axios.get(`/api/ecommerce?city=${city}&type=${cattleType}`,{  
+            let result = await axios.get(searchText===''?`/api/ecommerce?city=${city}&type=${cattleType}`:`/api/ecommerce/search?search=${searchText}`,{  
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -28,7 +28,8 @@ const Posts = ({user}) => {
         return () => {
         
         }
-    }, [city,cattleType]);
+    }, [city,cattleType,searchText]);
+
 
     const PostsCard = ({post}) => {
         const [postlike,setPostLike] = useState(()=>{
@@ -75,7 +76,7 @@ const Posts = ({user}) => {
         }
         }
         return(
-            <Card style={{ width: '18rem' }} className='m-1 p-1'> 
+            <Card className='m-1 p-1'> 
            <Link to={`/ecommerce/${post.uuid}`}>
             <Card.Img variant="top" 
              src={`http://localhost:5000/${post.PostImages[0].image}`} alt='farmers picture' 
@@ -94,7 +95,7 @@ const Posts = ({user}) => {
      
                 <>
                     <span>
-                    {postlike?(<AiFillHeart size="1.5rem" />):(<AiOutlineHeart size='1.5rem'/>) }
+                    {postlike?(<AiFillHeart style={{cursor:'pointer'}} size="1.5rem" onClick={processReact} />):(<AiOutlineHeart size='1.5rem'style={{cursor:'pointer'}} onClick={processReact} />) }
                     
                     {reactCounts===0?(null):(reactCounts)}
                     </span>
@@ -121,11 +122,10 @@ const Posts = ({user}) => {
         <Col>
         <Row>
        {posts[0]===0 && (<h3>No Posts Found!</h3>)}
-       {/* {posts.length===0 && (<LoadingAnimation />)} */}
 
-       <CardGroup>
+       <CardGroup style={{width:'100%'}}>
         {posts.length!=0 && posts[0]!=0 && posts.map(post => (
-            <Col key={post.uuid}>
+            <Col key={post.uuid} lg={4}>
 
             <PostsCard key={post.uuid} post={post}/>
             </Col>

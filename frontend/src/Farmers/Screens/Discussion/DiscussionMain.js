@@ -1,4 +1,4 @@
-import React,{useEffect} from 'react';
+import React,{useEffect,useState} from 'react';
 import { Container,Row,Col,Button } from 'react-bootstrap';
 import { Route, BrowserRouter as Router, Switch,withRouter} from 'react-router-dom'
 import DiscussionSidebar from '../../Components/Discussion/DiscussionsSidebar';
@@ -13,40 +13,51 @@ import ExpertProfile from '../../../Experts/Components/ExpertProfile';
 import DiscussionSearchForm from '../../Components/Discussion/DiscussionSearchForm';
 import AddQuestion from './AddQuestion';
 import Tags from '../../../Experts/Screens/Tags';
+import MyQuestions from './MyQuestions';
+import Page404 from '../../../components/Page404';
 
 const DiscussionMain = ({user}) => 
 {
-    console.log('DiscussionMain Reached....')
     const DiscussionContainer = () =>
     {
+        const [searchText, setSearchText] = useState('');
+        const setText = (e) => {
+            setSearchText(e);
+        }
         return (
         <Container className='w-100  p-0'>
         <Row className='m-0 py-2' style={{borderBottom:"1px solid #ced4da"}} >
             <Col lg={5} >
-                <DiscussionSearchForm />
+                <DiscussionSearchForm  setText={setText}/>
             </Col>
             <Col lg={5}></Col>
             <Col lg={2}>
             <Link to={'/discussion/add-question'}>
-
-                <Button>Add Question </Button>
+                <Button style={{borderRadius:'25px'}}>Add Question </Button>
             </Link>
             </Col>
         </Row>         
             <Switch> 
+
             <Route path='/discussion/experts/:username' component={()=>(<ExpertProfile user={user} />) }/>
 
-                 <Route path='/discussion' component={Questions} exact /> 
+                 <Route exact path='/discussion' component={()=><Questions user={user} search={searchText}/>} /> 
+                <Route exact path='/discussion/my' component={()=> (<MyQuestions search={searchText} />) }  />
+
                  <Route path='/discussion/add-question' component={AddQuestion} exact />
                 {/* <Route exact path='/questions' component={Questions } />  */}
-                <Route exact path='/questions/my' component={ Questions  }  />
-                <Route path='/discussion/tags' component={ ()=>(<Tags user={user} />) }  />
-                <Route path='/questions/:qid' component={Question }  />
-                <Route path='/discussion/farmers' component={ Farmers } exact />
+                <Route path='/discussion/tags' component={ ()=>(<Tags user={user} search={searchText}/>) }  exact/>
+                <Route path='/discussion/tags/:id' component={ ()=>(<Questions />) }  />
+                <Route path='/discussion/farmers' component={()=>(<Farmers />)} exact />
                 
-                <Route path='/discussion/experts' component={ Experts }  exact />
+                <Route path='/discussion/experts' component={()=> (<Experts search={searchText}/>) }  exact />
 
                 <Route path='/discussion/farmers/:username' component={()=>(<FarmerProfile user={user} />) }/>
+
+                <Route path='/discussion/:qid' component={()=>(<Question user={user}/> )}  />
+
+                {/* <Route path='/*' component={()=>(<Page404/> )}  /> */}
+
             </Switch>
         </Container>
         )

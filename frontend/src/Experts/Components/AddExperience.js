@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { Modal,Button,Form } from 'react-bootstrap';
 const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage}) => {
-  const [institute,setInstitute] = useState('cattle');
+  const [institute,setInstitute] = useState('');
   const [position,setPostion] = useState('');
   const [from,setFrom] = useState(0);
   const [to,setTo] = useState('');
@@ -14,7 +14,7 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
       let result = await axios(
         {
           method:"POST",
-          url:`/api/experts/experiences`,
+          url:`/api/experts/experience`,
           data:{institute,position,from,to}
         }
       );
@@ -54,7 +54,7 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
                 </Form.Group>
                 <Form.Group>
                 <Form.Label> Institute </Form.Label>
-                <Form.Control type="date" className='m-2 rounded' onChange={(e)=> setInstitute (e.target.value)}/>
+                <Form.Control type="text" className='m-2 rounded' onChange={(e)=> setInstitute (e.target.value)}/>
                 </Form.Group>
             
               </Form>

@@ -24,8 +24,8 @@ const AddQuestion = () => {
   const tagFieldRef = useRef(null);
   const [show,setShow] = useState(true);
   console.log('rendered from Add Question');
-  let [error, setError] = useState('');
-  let [title,setTitle] = useState('');
+  const [error, setError] = useState('');
+  const [title,setTitle] = useState('');
   const [editorState,setEditorState] =useState(EditorState.createEmpty()); 
   const [tagSuggestionData,setTagSuggestionData] = useState([]);
   const [questionTags,setQuestionTags] = useState([]);
@@ -36,6 +36,7 @@ const AddQuestion = () => {
       return;
     }
     let result = await axios.get(`/api/questions/tags/search?query=${e.target.value}`);
+    console.log('tag results',result)
     setTagSuggestionData(result.data);
   }; 
   
@@ -110,8 +111,6 @@ const removeTag = (id) =>{
   onEditorStateChange = {(currentState)=>setEditorState(currentState)}
   editorStyle={{minHeight:"300px"}}
   /> 
- {/* {console.log(convertToHTML(editorState.getCurrentContent()))} */}
- {/* {console.log('questionTags',...questionTags)} */}
   </div>
   </Row>
   <Row>
@@ -130,7 +129,7 @@ const removeTag = (id) =>{
  
     <Form.Group as={Col} className="p-0"  controlId="formGridWeight">
       <Form.Control ref={tagFieldRef} placeholder="Question tags" name="tags" onChange={delayedCallback} type="text"/>
-  <div style={{backgroundColor:'gainsboro',height:'130px',overflow:'auto'}}>
+  <div style={{backgroundColor:'gainsboro',height:'auto',maxHeight:'100px',overflow:'auto'}}>
     <ul style={{listStyle:"none",padding:'0',margin:'3px 5px'}}>
     {tagSuggestionData.map(data=>{return(<li onClick={()=>addTag(data)}style={{cursor:"pointer",borderBottom:'1px solid lightgray'}} >{data.tag}</li>)}
       )}

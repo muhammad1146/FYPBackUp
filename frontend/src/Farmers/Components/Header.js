@@ -1,7 +1,7 @@
 import React,{useState} from 'react'
 import {LinkContainer} from 'react-router-bootstrap'
 import { Navbar, Nav, Container,Form,Button,FormControl,Row,Col, NavDropdown  } from 'react-bootstrap';
-import { FaSignInAlt  } from "react-icons/fa";
+import { FaSignInAlt,FaShoppingCart  } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GiTalk } from "react-icons/gi";
 import { IoMdNotificationsOutline } from "react-icons/io";
@@ -15,7 +15,7 @@ if (!isLoggedIn){
     <header>
     <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Container>
-    <LinkContainer to='/'>
+    <LinkContainer to='/discussion'>
       <Navbar.Brand> <GiTalk size='1.4rem' className='pr-1'/>CATTLETALK</Navbar.Brand>
     </LinkContainer>
        

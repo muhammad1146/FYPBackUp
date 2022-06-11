@@ -32,6 +32,8 @@ router.post('/login',ExpertController.expertLogin) // Expert login
 
 router.get('/',verifyToken,ExpertController.getExperts) // get All Experts 
 
+router.get('/search',verifyToken,ExpertController.searchExperts) // get All Experts 
+
 router.get('/all',ExpertController.getAllExperts) // get All Experts 
 
 router.get('/:uuid',verifyToken,ExpertController.getExpert) // get Expert

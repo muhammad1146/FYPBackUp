@@ -13,23 +13,23 @@ const DiscussionsSidebar = () => {
         <Nav className='sidebarRight' defaultActiveKey='1' style={{padding:"0",paddingLeft:'8px'}}>
         <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
             <Nav.Link>
-              <Link to="/discussion/top" >
-              <AiFillHome className='py-0 m-0 text-right' size='1.1rem'/> Top Questions
+              <Link to="/discussion" >
+              <AiFillHome className='py-0 m-0 text-right' size='1.1rem'/> Questions
                 
               </Link>
               </Nav.Link>
         </Nav.Item>
 
-          <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
+          {/* <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
               <Nav.Link eventKey='2'>
                 <Link to="/ecommerce/my">
                   My Posts
                 </Link>
                 </Nav.Link>
-          </Nav.Item>
+          </Nav.Item> */}
           <Nav.Item className='sidebarItem' style={{margin:"5px 0"}} >
             <Nav.Link>
-                <Link to="discussion/experts">
+                <Link to="/discussion/experts">
                 <CgProfile size='1.1rem'/>  Experts
                 </Link>
             </Nav.Link>
@@ -49,13 +49,13 @@ const DiscussionsSidebar = () => {
                 </Link>
               </Nav.Link>
           </Nav.Item>
-          <Nav.Item style={{margin:"5px 0"}}>
+          {/* <Nav.Item style={{margin:"5px 0"}}>
               <Nav.Link>
                 <Link to="/discussion/my">
                     <FaTags size='1.1rem'/>My Questions
                 </Link>
               </Nav.Link>
-          </Nav.Item>
+          </Nav.Item> */}
           <Nav.Item style={{margin:"5px 0"}}>
               <Nav.Link>
                 <Link to="/discussion/unanswered">

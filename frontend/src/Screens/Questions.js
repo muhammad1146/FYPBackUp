@@ -7,10 +7,6 @@ const Questions = () => {
     const [questions,setQuestions] = useState([]);
     const [string,setString] = useState('');
     let url = window.location.pathname;
-    // let sub = url.substring(10,url.length);
-    // if(sub==='/my' || sub==='unanswered' || sub===''){
-    //     setString(sub);
-    // }
     
 useEffect (() => {
     let data;

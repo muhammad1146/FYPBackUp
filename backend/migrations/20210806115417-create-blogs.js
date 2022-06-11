@@ -12,7 +12,7 @@ module.exports = {
       uuid:{
         type:Sequelize.STRING,
         unique:true,
-        defaultValue:nanoid(8),
+        defaultValue:()=>nanoid(8),
         unique:true
       },
       expertId: 

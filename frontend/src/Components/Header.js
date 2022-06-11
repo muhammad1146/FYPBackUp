@@ -8,17 +8,10 @@ import { GiTalk } from "react-icons/gi";
 import { RiQuestionAnswerFill } from "react-icons/ri";
 import { SiBloglovin } from "react-icons/si";
 import { GiSellCard } from "react-icons/gi";
-// import { NavLink } from 'react-router-dom';
-// import jwt from 'jsonwebtoken';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-// import {UserContext} from '../Contexts/UserContext'
 const Header = ({user,resetUser}) => {
-//     console.log("from header!");
-//     let token = jwt.verify(Cookies.get("accessToken"),"secret");
-// const [user,setUser] = useState(token);
-
 const LoggedInHeader = () =>{
     let [userProfile,setUserProfile] = useState({});
         let url = user.type==='F'? `/api/farmers/${user.uuid}`:user.type==='E'?`/api/experts/${user.uuid}`:`/api/admin/${user.uuid}`;
@@ -39,7 +32,7 @@ const LoggedInHeader = () =>{
             <header>
     <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
         <Container>
-            <LinkContainer to='/'>
+            <LinkContainer to='/discussion'>
                 <Navbar.Brand> <GiTalk size='1.4rem' className='pr-1'/>CATTLETALK</Navbar.Brand>
             </LinkContainer>
            
@@ -53,13 +46,6 @@ const LoggedInHeader = () =>{
                             Discussion
                         </Nav.Link>
                     </LinkContainer>
-
-                    {/* <LinkContainer to='/blogs'>
-                        <Nav.Link>
-                            <SiBloglovin size='1.2rem' className='pr-1'/>
-                            Blogs
-                        </Nav.Link>
-                    </LinkContainer> */}
                     {
                         user.type==='F'?(
                             <LinkContainer to='/ecommerce/all'>
@@ -71,7 +57,7 @@ const LoggedInHeader = () =>{
                         ):null
                     }
                         <Nav.Item onClick={Logout} className="ml-auto">
-                        <Button className='mx-2'>
+                        <Button className='mx-2' style={{borderRadius:'25px'}}>
                         <FaSignInAlt size='1.2rem' className='pr-1'/>
                             Logout
                             </Button>

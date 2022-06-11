@@ -3,17 +3,27 @@ import axios from 'axios';
 import { Card,Button, Container,Row,Col,Image,Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import ExpertScreenCSS from './Experts.module.css';
-const Experts = () => {
+const Experts = ({search}) => {
+    console.log('rendered from experts from Expert side');
     const [experts,setExperts] = useState([]);
     const [showRankToggle,setShowRankToggle] = useState(false);
     const [rank,setRank] = useState({});
     useEffect( async()=> {
         try {
-            const result = await axios.get('/api/experts/');
-            console.log(result)
-            if(result.data.content.length>0)
-            setExperts(result.data.content);
-            else setExperts(-1)
+            if(search===''){
+                const result = await axios.get('/api/experts/');
+                console.log(result)
+                if(result.data.content.length>0)
+                setExperts(result.data.content);
+                else setExperts(-1)
+            }else {
+                const result = await axios.get(`/api/experts/search?search=${search}`);
+                if(result.data.content.length>0){
+                    setExperts(result.data.content);
+                }else {
+                    setExperts(-1);
+                }
+            }
             
         } catch (error) {
             console.log(error)
@@ -29,11 +39,11 @@ const Experts = () => {
             setShowRankToggle(true);
       }
         return(
-            <Col sm={4}>
-            <Card style={{ width: '18rem' }}>
+            <Col lg={4}>
+            <Card className="m-2">
             <div className='text-center mt-2'>
             <Link to={`experts/${expert.uuid}`}>
-            <Image variant="top" src={imageUrl} rounded width="170px" height="170px" className="text-center"/>
+            <Image variant="top" src={expert.profileImage?.length>3?`http://localhost:5000/${expert.profileImage}`:imageUrl} rounded width="170px" height="170px" className="text-center"/>
             </Link>
             </div>
             <Card.Body>

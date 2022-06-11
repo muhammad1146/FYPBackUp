@@ -1,8 +1,16 @@
 import React, { useState } from 'react'
 import {Form,Col,Row,FormControl,Button,Navbar,Container,Nav,Modal} from 'react-bootstrap'
 import { Link } from 'react-router-dom';
-const EcommerceNavbar = ({postFormToggle,setPostFormToggle}) => {
-    const [searchText,setSearchText] = useState('');
+const EcommerceNavbar = ({postFormToggle,setPostFormToggle,setText}) => {
+    let timer = null;
+      const customFunction = (value) =>{
+        if(timer) {
+            clearTimeout(timer);
+        }
+        timer = setTimeout(()=>{
+            setText(value)
+        },900)
+      }
     return (
     <Navbar bg="light" expand="lg">
     
@@ -15,15 +23,13 @@ const EcommerceNavbar = ({postFormToggle,setPostFormToggle}) => {
                 placeholder="Search"
                 className="me-2"
                 aria-label="Search"
-                onChange={(e)=>{setSearchText(e.target.value)}}
+                onChange={(e)=>{customFunction(e.target.value)}}
                 />
-                <Button variant="outline-success" type='submit'>Search</Button>
             </Form>
             <Nav
-                className="ml-auto my-2 my-lg-0 bg-warning"
+                className="ml-auto my-2 my-lg-0"
                 style={{ maxHeight: '100px' }}
                 navbarScroll>
-                {/* <Nav.Link as={Link} to="ecommerce/add-post" disabled={url==="/add-post"?(true):(false)} >add Post</Nav.Link> */}
                 <Button onClick={()=>setPostFormToggle(!postFormToggle)} >
                 Add Post
                 </Button>

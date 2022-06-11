@@ -4,11 +4,8 @@ import jwt from 'jsonwebtoken';
 import {Form,Button,Col,Row,FloatingLabel, Container,Image} from "react-bootstrap"
 import { useHistory } from 'react-router';
 import logo from '../data/LoginPNG.jpg'
-import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router-dom';
 const Login = ({setUser}) => {
   let history = useHistory();
-// const {user,setUser} = useContext(UserContext);
 const [userType,setUsertype] = useState("F");
 const [username,setUsername] = useState('');
 const [password, setPassword] = useState('');
@@ -23,7 +20,6 @@ const handleRadioChange = (event) =>{
       let url = (userType==='F')?'farmers' :'experts';
         try {
           let data =  JSON.stringify({userName:username,password});
-         
           result = await axios({
               method:'post',
               headers: { 'Content-Type': 'application/json' },
@@ -32,14 +28,17 @@ const handleRadioChange = (event) =>{
             });   
             } catch (error) {
             console.log(error.response.data);  
-               setError(error.response.data.error);
+            if(error.response.data.error){
+              setError(error.response.data.error);
+
+            }else{
+              setError(error.response.data)
+            }
               return;
           }
-         
-              const payload = jwt.verify(result.data.accessToken,'secret');
+           const payload = jwt.verify(result.data.accessToken,'secret');
            setUser(payload);
-          
-              history.push('/');
+              history.push('/discussion');
 }
   
   return (
@@ -53,7 +52,7 @@ const handleRadioChange = (event) =>{
     <Form onSubmit={onSubmitFunction} >
     <h2 className='my-2 text-center'>Login</h2>
     <h5 className="text-danger">{error}</h5>
-    <Container fluid className="my-4 border border-dark py-4">
+    <Container fluid className="my-4 border border-dark py-4" style={{borderRadius:'8px'}}>
     <fieldset className="p-2 m-3">
       <Form.Group as={Row}>
         <Col>
@@ -85,14 +84,14 @@ const handleRadioChange = (event) =>{
     label=""
     className="mb-3"
   >
-  <Form.Control type="text" placeholder="Username" onChange={(e)=>{
+  <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
     setUsername(e.target.value)
         }} />
         
   </FloatingLabel>
     
     <FloatingLabel controlId="floatingPassword" label="">
-    <Form.Control type="password" placeholder="Password"  onChange={(e)=>{
+    <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password"  onChange={(e)=>{
           setPassword(e.target.value);
         }}/>
   </FloatingLabel>
@@ -101,13 +100,13 @@ const handleRadioChange = (event) =>{
     
     <Form.Group as={Row}>
       <Col className='text-center' >
-        <Button type="submit" style={{display:"block",marginLeft:"auto"}} >Sign in</Button>
+        <Button type="submit" style={{display:"block",margin:"auto",borderRadius:'25px'}} >Sign in</Button>
       </Col>
-      <Col style={{alignSelf:"center",textAlign:"center"}}>
+      {/* <Col style={{alignSelf:"center",textAlign:"center"}}>
         <Link to={'/register'} style={{color:"blue"}}>
           Register
         </Link> 
-     </Col>
+     </Col> */}
   
     </Form.Group>
     </Container>

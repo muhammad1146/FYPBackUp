@@ -13,7 +13,7 @@ module.exports = {
       },
       uuid:{
         type:Sequelize.STRING,
-        defaultValue:nanoid(8),
+        defaultValue:()=>nanoid(8),
         allowNull:false,
         unique:true
       },

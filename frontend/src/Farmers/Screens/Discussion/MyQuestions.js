@@ -5,29 +5,15 @@ import {EditorState, Editor} from 'draft-js';
 import axios from 'axios'
 import { Link } from 'react-router-dom';
 import { convertFromHTML } from 'draft-convert';
-import {useParams} from 'react-router';
-const Questions = ({search}) => {
-    const {id} = useParams('id');
-    console.log('from Questions component')
+const MyQuestions = ({search}) => {
+    console.log('from MyQuestions component')
     const [questions,setQuestions] = useState([]);
     const [totalQuestions,setTotal] = useState(0);
     const [string,setString] = useState('');
-useEffect ( async () => {
-    if(id){
-        let result = await axios.get(`/api/questions/tags/${id}`);
-        setQuestions(()=> result.data.content.map(i=> i.Question))
-    }else{
-        if(search==='') {
-            let result = await axios.get('/api/questions');
-            console.log(result.data.content)
-            setQuestions(result.data.content);
-            setTotal(result.data.totalPages);
-        }else{ 
-            let result = await axios.get(`/api/questions/search?search=${search}`);
-            setQuestions(result.data.content);
-            setTotal(result.data.totalPages);
-        }
-    }
+useEffect ( async () => {   
+        let result = await axios.get(`/api/questions/my?search=${search===''?null:search}`);
+        setQuestions(result.data);
+        setTotal(result.data.length);
 },[])
 const QuestionCard = ({question}) => {
     const [editorState,setEditorState]= useState(EditorState.createEmpty());
@@ -76,19 +62,17 @@ const Tag = ({tag}) =>{
     return (
     <Badge className='p-2 mx-1' >{tag.tag}</Badge>
     )
-        
-    
 }
     return (
         <div className='px-2'>
-            <h4> Questions</h4>
+            <h4> MyQuestions</h4>
             <Row className='m-0'>
                 <Col lg={12}> 
-                {questions.map((question) =>( <QuestionCard question={question} />   ))}
+                {questions?.map((question) =>( <QuestionCard question={question} />   ))}
                 </Col> 
             </Row> 
         </div>
     )
 }
 
-export default Questions
+export default MyQuestions

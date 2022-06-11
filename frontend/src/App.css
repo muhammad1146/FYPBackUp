@@ -76,4 +76,24 @@ background-color: gray !important;
 }
 
 
+.btnStyling {
+}
+
+h1,h2,h3,h4,h5,h6{
+  text-transform: none !important;
+}
+.badge {
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+.btn {
+  border-radius: 25px !important;
+}
+
+.form-control {
+  border-radius:20px !important;
+}
+
+
 

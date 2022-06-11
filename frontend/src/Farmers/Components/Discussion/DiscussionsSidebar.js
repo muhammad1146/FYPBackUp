@@ -9,11 +9,11 @@ const DiscussionsSidebar = () => {
     return (
       <>
         <Nav className='sidebarRight py-4 m-1 w-100 border'> 
-                     <Nav.Item className='my-2' > 
+                     {/* <Nav.Item className='my-2' > 
                       <Nav.Link as={Link} to='/discussion/unanswered'> 
                             <RiQuestionAnswerFill size='1.1rem'/>Unanswered
                       </Nav.Link>
-                    </Nav.Item>
+                    </Nav.Item> */}
                     
                      <Nav.Item className='my-2' > 
                       <Nav.Link as={Link} to='/discussion/my'> 

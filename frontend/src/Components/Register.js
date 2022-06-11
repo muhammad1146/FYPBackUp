@@ -2,8 +2,6 @@ import React,{useEffect, useState} from 'react'
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import Logo from './../data/Register.jpg'
-
-// import FloatingLabel from "react-bootstrap-floating-label";
 import { Form,Button,FloatingLabel,Badge ,Container,Row,Col,Card,Image   } from 'react-bootstrap';
 const Register = () => {
     const [userType, setUserType] = useState('f');
@@ -22,7 +20,6 @@ const Register = () => {
       useEffect(async()=>{
         let result = await axios.get(`api/experts/all/?text=${userName}`);
         setCurrentExpertUserNames(result.data.experts);
-        
       },[userName]);
 
       const signIn = async (e) => {
@@ -30,7 +27,6 @@ const Register = () => {
         let result;
         try {
           let data = JSON.stringify({
-
             name,userName,password,address,phoneNumber:number,experties
           });
           result = await axios({
@@ -54,21 +50,21 @@ const Register = () => {
    
         <span>{error}</span>
         <Form onSubmit={signIn}>
-          <Container className='border border-dark my-3 p-4'>
+          <Container className='border border-dark my-3 p-4' style={{borderRadius:'8px'}}>
             <FloatingLabel
             controlId="floatingInputName"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Name" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
               setName(e.target.value);
             }} />
           </FloatingLabel>
-          {currentExpertUserNames.length>0?(<span>Username must be unique</span>):null} 
+          {currentExpertUserNames.length>0?(<span style={{color:'red'}}>Username must be unique</span>):null} 
           <FloatingLabel
             controlId="floatingInputUsername"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Username" min={3}  onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" min={3}  onChange={(e)=>{
               setuserName(e.target.value);
             }} />
           </FloatingLabel>
@@ -78,7 +74,7 @@ const Register = () => {
             controlId="floatingInputPassword"
             label=""
             className="mb-3">
-            <Form.Control type="password" placeholder="Password" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
               setPassword(e.target.value);
             }}  />
           </FloatingLabel>
@@ -87,7 +83,7 @@ const Register = () => {
             controlId="floatingInputAddress"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Address" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
               setAddress(e.target.value);
             }} />
           </FloatingLabel>
@@ -123,11 +119,11 @@ const Register = () => {
             controlId="floatingInputContact"
             label=""
             className="mb-3 mt-2">
-            <Form.Control type="text" placeholder="Contact Number" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Contact Number" onChange={(e)=>{
               setNumber(e.target.value);
             }} />
           </FloatingLabel>
-          <Button variant="primary" type="submit">
+          <Button variant="primary" type="submit" style={{borderRadius:'25px',display:'block',margin:'auto'}}>
               Submit
           </Button>
           </Container>
@@ -143,7 +139,7 @@ const Register = () => {
       const [userName,setuserName] = useState('');
       const [password,setPassword] = useState('');
       const [address,setAddress] = useState('');
-      const [farmingType,setFarmingType] = useState('');
+      const [farmingType,setFarmingType] = useState('cattle');
       const [number,setNumber] = useState('');
       const [error,setError] = useState(null);
       useEffect(async()=>{
@@ -166,11 +162,12 @@ const Register = () => {
               data
           })
         } catch (error) {
+          console.log(error)
           setError(error.response.data)
           return;
         }
         if(result){
-
+          alert('Signup successfull.');
           history.push('/login');
         }
       }
@@ -178,22 +175,22 @@ const Register = () => {
       <>
       <span>{error}</span>
           <Form onSubmit={Login} className='text-white'>
-            <Container className='border border-dark my-3 px-2 py-4 bg-dark' fluid="false">
-        
+            <Container className='border border-dark my-3 px-2 py-4 bg-dark' fluid="false" style={{borderRadius:'8px'}}>
+         
            <FloatingLabel
             controlId="floatingInputName"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Name" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
               setName(e.target.value);
             }} />
           </FloatingLabel>
-          {currentFarmerUserNames.length>0?(<span>Username must be unique</span>):null}       
+          {currentFarmerUserNames.length>0?(<span style={{color:'red'}}>Username must be unique</span>):null}       
           <FloatingLabel
             controlId="floatingInputUsername"
             label=""
             className="mb-3">
-            <Form.Control type="text" placeholder="Username" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
               setuserName(e.target.value);
             }} />
           </FloatingLabel>
@@ -202,7 +199,7 @@ const Register = () => {
             controlId="floatingInputPassword"
             label=""
             className="mb-3">
-            <Form.Control type="password" placeholder="Password" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
               setPassword(e.target.value);
             }}  />
           </FloatingLabel>
@@ -211,7 +208,7 @@ const Register = () => {
             controlId="floatingInputAddress"
             label=""
             className="mb-0">
-            <Form.Control type="text" placeholder="Address" onChange={(e)=>{
+            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
               setAddress(e.target.value);
             }} />
           </FloatingLabel>
@@ -221,7 +218,7 @@ const Register = () => {
               controlId="floatingInputContact"
               label=""
               className="my-3 ">
-              <Form.Control type="text" placeholder="Contact Number"  onChange={(e)=>{
+              <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Contact Number"  onChange={(e)=>{
               setNumber(e.target.value);
             }}  />
             </FloatingLabel>  
@@ -229,13 +226,13 @@ const Register = () => {
            <FloatingLabel controlId="floatingSelect" label="Farming Type" placeholder='' >
             </FloatingLabel>
            <Form.Select aria-label="Farming Type" onChange={(e)=> setFarmingType(e.target.value) } className='w-100 mb-2' >
-                <option>Cattle</option>
-                <option value="1">Poultry</option>
+                <option value='cattle'>Cattle</option>
+                <option value="poultry">Poultry</option>
             </Form.Select>
              <Row>
               <Col className='text-center'>
 
-              <Button variant="primary" type="submit" className='center'>
+              <Button variant="primary" type="submit" className='center' style={{borderRadius:'25px',display:'block',margin:'auto',marginTop:'10px'}}>
                   Submit
               </Button>
               </Col>
@@ -258,7 +255,7 @@ const Register = () => {
           </Col>
           <Col>
 
-        <Card className='mt-3'>
+        <Card className='mt-3' style={{borderRadius:'8px'}}>
         <Form>
         <h4 className='text-center mt-3'>
        {userType==='f'?('Farmer'):('Expert')} Register Form
@@ -291,7 +288,7 @@ const Register = () => {
     </fieldset>
         </Form>
         </Card>
-    {userType==='f' ? <FarmerRegisterForm /> : <ExpertRegisterForm /> }
+        {userType==='f' ? <FarmerRegisterForm /> : <ExpertRegisterForm />}
           </Col>
         </Row>
         </Container>
