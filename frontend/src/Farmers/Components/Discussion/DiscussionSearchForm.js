@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import {Button, Form,FormControl} from 'react-bootstrap'
 import { useHistory, useLocation } from 'react-router';
 const DiscussionSearchForm = ({setText}) => {
+    const validLocation = ['/discussion','/discussion/tags','/discussion/experts']
     const location = useLocation();
     console.log('location:', location);
     const history = useHistory();
@@ -19,10 +20,13 @@ const DiscussionSearchForm = ({setText}) => {
     
     return (
         <>
-    <Form >
+        {validLocation.includes(location.pathname)?
+        (
             <FormControl style={{borderRadius:'25px',display:'inline'}} type="text" placeholder="Search" className="mr-sm-2" inline onChange={(e)=>customFunction(e.target.value)}
             />
-    </Form> 
+        ): null
+        }
+    
         </>
     )
 }

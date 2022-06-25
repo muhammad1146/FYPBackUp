@@ -3,6 +3,8 @@ import React, { useState,useEffect } from 'react'
 import { Modal,Button,Form,Row,Col,Image } from 'react-bootstrap';
 import { ImCross } from "react-icons/im";
 import { useParams } from 'react-router';
+import {Toaster, toast} from 'react-hot-toast'; 
+
 const AddFarm = ({farmToggle,setFarmToggle,refreshPage}) => {
   let {username} = useParams('username')
   const [farmName,setFarmName] = useState('');
@@ -39,17 +41,17 @@ const AddFarm = ({farmToggle,setFarmToggle,refreshPage}) => {
       );
       console.log(result);
       if(result.status===200){
-        alert('Farm added successfully.')
+        toast.success('Farm added successfully.')
         setFarmToggle(false);
         refreshPage();
       
       }else{
-        alert()
+        toast.error('Failed with code: ', result.status)
       }
       
     } catch (error) {
       console.log(error)
-      alert(error.message)
+      toast.error(error.message)
     }
   }
 
@@ -68,7 +70,7 @@ const AddFarm = ({farmToggle,setFarmToggle,refreshPage}) => {
             <Modal.Body>
               <Form id='addFarmForm' onSubmit={AddNewFarm}>
                 <Form.Control type="text" placeholder="Enter Name of Farm"  className='m-2 rounded' onChange={(e)=>setFarmName(e.target.value)} />
-                <Form.Control type="text" placeholder="Enter Farm Size" className='m-2 rounded' onChange={(e)=>setFarmSize(e.target.value)}/>
+                <Form.Control type="number" placeholder="Enter Farm Size" className='m-2 rounded' onChange={(e)=>setFarmSize(e.target.value)}/>
                 <Form.Control type="number" placeholder="Enter Number of Cattle" className='m-2 rounded' onChange={(e)=>setNumberOfCattle(e.target.value)}/>
                 <Form.Control type="text" placeholder="Enter Farm Location" className='m-2 rounded' onChange={(e)=>setFarmLocation(e.target.value)} />
                 <Form.Select  style={{width:"100%"}} className="m-2 p-2 rounded" name="farmType" onChange={(e)=>setFarmType(e.target.value)}>

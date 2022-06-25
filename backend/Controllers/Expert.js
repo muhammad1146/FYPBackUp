@@ -71,7 +71,6 @@ exports.addExpert =async (req,res) => {
 
   exports.changePicture = async (req,res) => 
 {   
-    console.log("updateExpert picture")
     const schema = Joi.object({
         profileImage:Joi.string()
      });
@@ -85,18 +84,15 @@ exports.addExpert =async (req,res) => {
     }
     const expertUUID = req.params.uuid;
     const uuid = req.user.uuid;
-    console.log(uuid,expertUUID)
     if(uuid===expertUUID)
     {
         if(!req.file){
            return res.status(500).send("file missing...")
         }
         const profileImage = req.file.filename;    
-        console.log(profileImage);   
         try     
         {
             const updatedPicture = await Experts.update({profileImage},{where:{uuid}});
-            console.log(updatedPicture,"updatedPicture")
             return res.json(updatedPicture);   
     }
     catch (error)    
@@ -125,7 +121,6 @@ else {
 } 
 
 exports.addExpertRank = async (req,res) => {
-    console.log("Reached to the route controller");
     const schema = Joi.object( {
         rankname: Joi.string().required(),
         description: Joi.string().required(),
@@ -137,8 +132,6 @@ exports.addExpertRank = async (req,res) => {
        return res.status(400).send(error.details[0].message);
     } 
     const {rankname,description,adminPassword} = req.body;
-    console.log(typeof(adminPassword));
-    console.log(process.env.ADMIN_PASSWORD);
 
     if(adminPassword===process.env.ADMIN_PASSWORD)
     {
@@ -310,7 +303,6 @@ exports.searchExperts = async(req,res,next) => {
 
 exports.getAllExperts = async(req,res,next) => {
     let query = req.query.text;
-    console.log('inside getAllExperts')
     try {
         const experts = await Experts.findAll({attributes:['userName'],where:{userName: query}});
         return res.json({experts});
@@ -321,11 +313,9 @@ exports.getAllExperts = async(req,res,next) => {
 };
 
 exports.getExpert = async (req,res) => {
-    console.log('inside getExpert function')
     const uuid = req.params.uuid;
     try {
         const expert = await Experts.findOne({where: {uuid},include:[ExpertsRank,ExpertExperience,ExpertQualification]});
-        console.log(expert)
         return res.json(expert);
     } catch (error) {
        return res.status(500).json(error); 
@@ -421,7 +411,6 @@ exports.expertLogin = async (req,res) => {
     } catch (error) {
        return res.status(400).send(error.details[0].message);
     }
-    console.log('expert login reached');
     const {userName,password} = req.body;
  
      try {
@@ -470,7 +459,7 @@ exports.addExpertQualification = async (req,res) => {
     try {
         const expert = await Experts.findOne({attributes:['id'],where:{uuid}});
         if(expert.id){
-            const experience = await ExpertQualification.create({expertId:expert.id,institute,qualification,percentage,duration});
+            const experience = await ExpertQualification.create({expertId:expert.id,institution:institute,qualification,percentage,duration});
             return res.json(experience);
         }
         else {
@@ -489,7 +478,7 @@ exports.addExpertQualification = async (req,res) => {
             const expert = await Experts.findOne({attributes:['id'],where:{uuid}});
             const qualification = await ExpertQualification.findOne({attributes:['expertId'],where:{id}});
             if(expert.id===qualification.expertId){
-                const deletedQualification = await ExpertQualification.destroy({where:{uuid}});
+                const deletedQualification = await ExpertQualification.destroy({where:{id}});
                 return res.json(deletedQualification);
             }
             else{

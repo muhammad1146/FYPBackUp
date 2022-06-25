@@ -8,6 +8,7 @@ import AddFarm from './Ecommerce/AddFarm';
 import { Link } from 'react-router-dom';
 import { useHistory } from 'react-router';
 import { ImCross } from 'react-icons/im';
+import {Toaster, toast} from 'react-hot-toast'; 
 const FarmerProfile = (props) => {
     console.log('reached farmerProfile in discussion')
     const history = useHistory();
@@ -29,10 +30,10 @@ const Experience =({farmerData})=>{
         let result = await axios.delete(`/api/farmers/experiences/${id}`);
         if(result.status===200) {
             setAddExperienceToggle(false);
-            alert('The experience deleted successfully.');
             refreshPage();
+            toast.success('The experience deleted successfully.')
         }else{
-            alert(`Request Failed with status code ${result.status}`);
+            toast.error(`Request Failed with status code ${result.status}`);
         }
     }
     }
@@ -84,14 +85,14 @@ const Farms = () =>{
             let result = await axios.delete(`/api/farmers/${props.user.uuid}/farms/${uuid}`);
             console.log(result);
             if(result.status===200){
-                alert("Farm has been deleted Successfully.");
+                toast.success("Farm has been deleted Successfully.")
                 refreshPage();
 
             }else{
-            alert(`Request Failed with status code ${result.status}`);
+            toast.success("Farm has been deleted Successfully.");
             }
         } catch (error) {
-            alert(error.message);
+            toast.success(error.message);
         }
     }
     return (
@@ -161,11 +162,13 @@ const EditInfo = () =>{
       if(result.status===200) {
             setUdpateInfoToggle(false);
             refreshPage();
+            toast.success("Farm has been deleted Successfully.")
       }else{
-          alert(`Request Failed with status code ${result.status}`);
+          toast.error(`Request Failed with status code ${result.status}`);
+
       }
     } catch (error) {
-        alert(error.message);
+        toast.error(error.message);
     }    
     }
     return (
@@ -271,32 +274,39 @@ const Personal = () =>{
          
             console.log("profileImage Result: ",result);
             if(result.status===200) {
-                alert("Profile picture changed successfully");
+                toast.success("Profile picture changed successfully");
                 setPictureToggle(false);
                 refreshPage();  
             }else{
-          alert(`Request Failed with status code ${result.status}`);
+          toast.error(`Request Failed with status code ${result.status}`);
             }
         
         } catch (error) {
             console.log("error from changePicture:",error);
+            toast.error(error.message);
         }
     }
 
     useEffect( async() =>{
+    const toastId = toast.loading('Fetching Farmer Profile')
     const result = await axios.get(`/api/farmers/${username}`);
     if(result.data!=null){
         setFarmerData(result.data);
+        toast.dismiss(toastId);
     }else{
+        toast.info('Username not found!');
         setFarmerData(null);
     }
 },[]);
 
 useEffect( async() =>{
+    const toastId = toast.loading('Fetching Farmer Profile')
     const result = await axios.get(`/api/farmers/${username}`);
     if(result.data!=null){
         setFarmerData(result.data);
+        toast.dismiss(toastId);
     }else{
+        toast.info('Username not found!');
         setFarmerData(null);
     }
 },[refresh]);
@@ -394,9 +404,9 @@ useEffect( async() =>{
 <Row>
 <Farms farmerData={farmerData} />
 </Row>
-
-
+    <Toaster position='bottom-right' />
     </Container>
+
     )
 }
 

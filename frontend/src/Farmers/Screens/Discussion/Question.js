@@ -7,6 +7,8 @@ import Answers from '../../Components/Discussion/Answers';
 import BodyEditor from '../../Components/Discussion/BodyEditor';
 import { Link } from 'react-router-dom';
 import Reacts from '../../Components/Discussion/Reacts';
+import { BsTrash } from "react-icons/bs";
+import {Toaster, toast} from 'react-hot-toast';
 const Question = ({user}) => {
     let history = useHistory();
     const {qid} = useParams('qid');
@@ -22,13 +24,22 @@ const Question = ({user}) => {
         setRefreshAnswer(p=>!p);
     }
     useEffect(async()=> {
+        try {    
+        const tId =   toast.loading('Fetching Question');
         let questiondata = await axios.get(`/api/questions/${qid}`);
         let  commentsResp = await axios.get(`/api/questions/${qid}/comments`);
         let answers = await axios.get(`/api/questions/${qid}/answers`);
-        setAnswers(answers.data.content);
-        setQuestion(questiondata.data);
-        console.log('answers result: ',answers.data);
-        setQuestionComments(commentsResp.data?.content);
+        if(questiondata.status===200 && commentsResp.status===200 & answers.status===200){
+            toast.dismiss(tId);
+            setAnswers(answers.data.content);
+            setQuestion(questiondata.data);
+            setQuestionComments(commentsResp.data?.content);
+        }else{
+            toast.error('Request Failed');
+        }
+    } catch (error) {
+        toast.error(error.message);
+    }
     },[]); 
     useEffect(async()=>{
         console.log('inside commentCheck')
@@ -52,14 +63,30 @@ const Question = ({user}) => {
     console.log('questionComments',questionComments);
 const QuestionComments =({comments} ) => {
         console.log('from QuestionComments: ',comments);
+    const deleteComment = async (id) => {
+        try {
+            if(!(window.confirm('Are you sure want to delete this Comment?'))){
+                return;
+            }
+         let result = await axios.delete(`/api/questions/${qid}/comments/${id}`);
+         if(result.status===200){
+            toast.success('Comment deleted successfully.');
+            setCommentRefresh(c=>!c);
+         }else{
+            toast.error('Request failed with status code :', result.status);
+         }
+        } catch (error) {
+            toast.error('Request failed with status code :', error.message);
+        }
+    }
     return(
     <>
         {questionComments?.map(comment => {
             let date = new Date(comment.createdAt);
             let isFarmer = comment.Farmer;
             return (
-                <Card style={{border:'none',borderTop:isFarmer?'1px solid gainsboro':'1px solid blue',borderBottom:isFarmer?'1px solid gainsboro':'1px solid blue'}} className="mb-3">
-                <Card.Body className='py-2 px-1'>{comment.body} - <Link style={{color:'lightblue'}} to={`/discussion/${isFarmer!==null?(`farmers/${isFarmer.uuid}`):(`experts/${comment.Expert.uuid}`)}/`}>
+                <Card className="mb-3" style={{borderLeft:'unset', borderRight:'unset'}}>
+                <Card.Body className='py-2 px-1' >{comment.body} - <Link style={{color:'lightblue'}} to={`/discussion/${isFarmer!==null?(`farmers/${isFarmer.uuid}`):(`experts/${comment.Expert.uuid}`)}/`}>
                 {comment.Farmer!==null?(
                     comment.Farmer.userName
                 ):(
@@ -69,7 +96,11 @@ const QuestionComments =({comments} ) => {
                 <span className="ml-1">
                     {`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`}
                 </span>
+                <span style={{cursor:'pointer',float:'right',display:comment.Expert?`${comment.Expert.uuid===user.uuid?'block':'none'}`:`${comment.Farmer.uuid===user.uuid?'block':'none'}`}}>
+                    <BsTrash size={'1rem'} onClick={()=>deleteComment(comment.uuid)} />
+                </span>
                 </Card.Body>
+                
             </Card>
             )
             
@@ -86,8 +117,7 @@ const QuestionComments =({comments} ) => {
                 body
             });
             if(result.status===200){
-                alert('comment added successfully');
-                console.log(result.data);
+                toast.success('comment added successfully');
                 setCommentRefresh(p=>!p);
             }
         }
@@ -121,12 +151,14 @@ const QuestionComments =({comments} ) => {
             let result = await axios.delete(`/api/questions/${uuid}`);
             console.log('result', result);
             if(result.status===200){
-                alert('Question has been deleted successfully.');
+                toast.success('Question has been deleted successfully.');
                 history.push('/discussion/my')
+            }else{
+                toast.error('Request failed with status code:' , result.status)
             }
         } catch (error) {
             console.log(error);
-            alert(error.message);
+            toast.error(error.message);
         }
     }
     

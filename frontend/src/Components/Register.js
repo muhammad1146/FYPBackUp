@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react'
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import Logo from './../data/Register.jpg'
+import toast, { Toaster } from 'react-hot-toast';
 import { Form,Button,FloatingLabel,Badge ,Container,Row,Col,Card,Image   } from 'react-bootstrap';
 const Register = () => {
     const [userType, setUserType] = useState('f');
@@ -36,12 +37,16 @@ const Register = () => {
               data
           })
         } catch (error) {
-          setError(error.response.data)
+          setError(error.response.data);
+          toast.error(`${error.response.data}`);
           return;
         }
-        if(result){
-
+        if(result.status===200){
+          
+          toast.success("Expert Registed Successfully.");
           history.push('/login');
+        }else{
+          toast.error('Request failed with status : ',result.status)
         }
 
       }
@@ -55,7 +60,7 @@ const Register = () => {
             controlId="floatingInputName"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
               setName(e.target.value);
             }} />
           </FloatingLabel>
@@ -64,7 +69,7 @@ const Register = () => {
             controlId="floatingInputUsername"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" min={3}  onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Username" min={3}  onChange={(e)=>{
               setuserName(e.target.value);
             }} />
           </FloatingLabel>
@@ -74,7 +79,7 @@ const Register = () => {
             controlId="floatingInputPassword"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
               setPassword(e.target.value);
             }}  />
           </FloatingLabel>
@@ -83,7 +88,7 @@ const Register = () => {
             controlId="floatingInputAddress"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
               setAddress(e.target.value);
             }} />
           </FloatingLabel>
@@ -119,7 +124,7 @@ const Register = () => {
             controlId="floatingInputContact"
             label=""
             className="mb-3 mt-2">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Contact Number" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="number" placeholder="Contact Number" onChange={(e)=>{
               setNumber(e.target.value);
             }} />
           </FloatingLabel>
@@ -162,17 +167,21 @@ const Register = () => {
               data
           })
         } catch (error) {
-          console.log(error)
-          setError(error.response.data)
+          console.log(error);
+          setError(error.response.data);
+          toast.error(`${error.response.data}`);
           return;
         }
-        if(result){
-          alert('Signup successfull.');
+        if(result.status===200){
+          toast.success("Farmer Registed Successfully.");
           history.push('/login');
+        }else{
+          toast.error('Request failed with status: ',result.status);
         }
       }
     return (
       <>
+       
       <span>{error}</span>
           <Form onSubmit={Login} className='text-white'>
             <Container className='border border-dark my-3 px-2 py-4 bg-dark' fluid="false" style={{borderRadius:'8px'}}>
@@ -181,7 +190,7 @@ const Register = () => {
             controlId="floatingInputName"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Name" onChange={(e)=>{
               setName(e.target.value);
             }} />
           </FloatingLabel>
@@ -190,7 +199,7 @@ const Register = () => {
             controlId="floatingInputUsername"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
               setuserName(e.target.value);
             }} />
           </FloatingLabel>
@@ -199,7 +208,7 @@ const Register = () => {
             controlId="floatingInputPassword"
             label=""
             className="mb-3">
-            <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="password" placeholder="Password" onChange={(e)=>{
               setPassword(e.target.value);
             }}  />
           </FloatingLabel>
@@ -208,7 +217,7 @@ const Register = () => {
             controlId="floatingInputAddress"
             label=""
             className="mb-0">
-            <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
+            <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Address" onChange={(e)=>{
               setAddress(e.target.value);
             }} />
           </FloatingLabel>
@@ -218,7 +227,7 @@ const Register = () => {
               controlId="floatingInputContact"
               label=""
               className="my-3 ">
-              <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Contact Number"  onChange={(e)=>{
+              <Form.Control required style={{borderRadius:'20px'}} type="number" placeholder="Contact Number"  onChange={(e)=>{
               setNumber(e.target.value);
             }}  />
             </FloatingLabel>  
@@ -246,6 +255,7 @@ const Register = () => {
     const handleRadioChange = (e) => {
       setUserType(e.target.value)
     }
+    
     return(
         <>
         <Container fluid>
@@ -268,7 +278,6 @@ const Register = () => {
             label="Farmers"
             value= "f"
              defaultChecked={true}
-            //  checked={userType==='E'?false:true}
             name="formHorizontalRadios"
             onChange= {handleRadioChange}
             id="formHorizontalRadios1"
@@ -290,7 +299,9 @@ const Register = () => {
         </Card>
         {userType==='f' ? <FarmerRegisterForm /> : <ExpertRegisterForm />}
           </Col>
+          
         </Row>
+        <Toaster position='bottom-right'/>
         </Container>
     </>
 )

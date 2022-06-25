@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useState,useEffect } from 'react'
 import { Modal,Button,Form } from 'react-bootstrap';
+import {Toaster,toast} from 'react-hot-toast';
 
-const AddQualification = ({qualificationToggle,setQualificationToggle}) => {
+const AddQualification = ({qualificationToggle,setQualificationToggle,refreshPage}) => {
   const [qualification,setQualification] = useState('');
   const [duration,setDuration] = useState('');
   const [percentage,setPercentage] = useState('');
@@ -12,21 +13,32 @@ const AddQualification = ({qualificationToggle,setQualificationToggle}) => {
     e.preventDefault();
     let data = new FormData()
     try {
+      data.append("institute",institution);
       data.append("qualification",qualification);
       data.append("duration",+duration);
-      data.append("institution",+institution);
-      data.append("percentage",percentage);
+      data.append("percentage",+percentage);
     
       let result = await axios(
         {
           method:"POST",
           url:`/api/experts/qualification`,
-          data:data
+          data:{
+            institute:institution,
+            qualification:qualification,
+            duration: +duration,
+            percentage: +percentage
+          }
         }
       );
+      if(result.status===200) {
+        toast.success('New Qualification added successfully.');
+        setQualificationToggle(false);
+        refreshPage();
+      }
       console.log(result);
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      toast.error(error.message);
     }
   }
   return (
@@ -42,10 +54,10 @@ const AddQualification = ({qualificationToggle,setQualificationToggle}) => {
             </Modal.Header>
             <Modal.Body>
               <Form id='addFarmForm' onSubmit={addNew}>
-                <Form.Control type="text" placeholder="Enter qualification"  className='m-2 rounded' onChange={(e)=>setQualification(e.target.value)} />
-                <Form.Control type="text" placeholder="Duration period" className='m-2 rounded' onChange={(e)=>setDuration(e.target.value)}/>
-                <Form.Control type="number" placeholder="Institute" className='m-2 rounded' onChange={(e)=>setInstitution(e.target.value)}/>
-                <Form.Control type="text" placeholder="Result percentage" className='m-2 rounded' onChange={(e)=>setPercentage(e.target.value)} />                
+                <Form.Control required type="text" placeholder="Enter qualification"  className='m-2 rounded' onChange={(e)=>setQualification(e.target.value)} />
+                <Form.Control required type="number" placeholder="Duration period" className='m-2 rounded' onChange={(e)=>setDuration(e.target.value)}/>
+                <Form.Control required type="text" placeholder="Institute" className='m-2 rounded' onChange={(e)=>setInstitution(e.target.value)}/>
+                <Form.Control required type="number" placeholder="Result percentage" className='m-2 rounded' onChange={(e)=>setPercentage(e.target.value)} />                
               </Form>
            
 
@@ -57,6 +69,7 @@ const AddQualification = ({qualificationToggle,setQualificationToggle}) => {
               <Button variant="primary" type='submit' form='addFarmForm'>Submit</Button>
             </Modal.Footer>
           </Modal>
+          <Toaster position='bottom-right' />
         </>
       );
     }

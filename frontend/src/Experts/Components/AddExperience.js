@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { Modal,Button,Form } from 'react-bootstrap';
+import {Toaster, toast } from 'react-hot-toast';
 const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage}) => {
   const [institute,setInstitute] = useState('');
   const [position,setPostion] = useState('');
@@ -20,13 +21,14 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
       );
       console.log(result);
       if(result.status===200){
-        alert("Experience added successfully.")
+        toast.success("New Experience Added Successfully.");
         setAddExperienceToggle(false);
         refreshPage();
 
       }
     } catch (error) {
       console.log(error)
+      toast.error(error.message);
     }
   }
   return (
@@ -42,19 +44,19 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
             </Modal.Header>
             <Modal.Body>
               <Form id='addExeprienceForm' onSubmit={addExperiece}>
-                <Form.Control type="text" placeholder="Enter Your held Postion"  className='m-2 rounded' onChange={(e)=>setPostion(e.target.value)} />
+                <Form.Control required  type="text" placeholder="Enter Your held Postion"  className='m-2 rounded' onChange={(e)=>setPostion(e.target.value)} />
                 <Form.Group>
-                <Form.Label> Started from </Form.Label>
-                <Form.Control type="date"  className='m-2 rounded' onChange={(e)=>setFrom(e.target.value)}/>
+                <Form.Label style={{marginLeft:'12px', marginBottom:'0'}}> Started from </Form.Label>
+                <Form.Control required type="date"  className='m-2 rounded' onChange={(e)=>setFrom(e.target.value)}/>
                 </Form.Group>
 
                 <Form.Group>
-                <Form.Label> Till </Form.Label>
-                <Form.Control type="date" className='m-2 rounded' onChange={(e)=> setTo (e.target.value)}/>
+                <Form.Label style={{marginLeft:'12px', marginBottom:'0'}}> Till </Form.Label>
+                <Form.Control required type="date" className='m-2 rounded' onChange={(e)=> setTo (e.target.value)}/>
                 </Form.Group>
                 <Form.Group>
-                <Form.Label> Institute </Form.Label>
-                <Form.Control type="text" className='m-2 rounded' onChange={(e)=> setInstitute (e.target.value)}/>
+                <Form.Label style={{marginLeft:'12px', marginBottom:'0'}}> Institute </Form.Label>
+                <Form.Control required type="text" className='m-2 rounded' onChange={(e)=> setInstitute (e.target.value)}/>
                 </Form.Group>
             
               </Form>

@@ -23,9 +23,9 @@ router.put('/experience/:eeid',verifyToken,ExpertController.editExpertExperience
 
 router.delete('/experience/:eeid',verifyToken,ExpertController.deleteExpertExperience) // delete Expert experience
 
-router.post('/qualification',ExpertController.addExpertQualification) // add/register Expert
+router.post('/qualification',verifyToken,ExpertController.addExpertQualification) // add/register Expert
 
-router.delete('/qualification/:id',ExpertController.deleteExpertQualification); // get Expert Qualification
+router.delete('/qualification/:id',verifyToken,ExpertController.deleteExpertQualification); // get Expert Qualification
 
 
 router.post('/login',ExpertController.expertLogin) // Expert login

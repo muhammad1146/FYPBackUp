@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react'
 import { Modal,Button,Form } from 'react-bootstrap';
+import {Toaster, toast} from 'react-hot-toast';
 const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage}) => {
   const [farmingType,setFarmingType] = useState('cattle');
   const [position,setPostion] = useState('');
@@ -20,13 +21,14 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
       );
       console.log(result);
       if(result.status===200){
-        alert("Experience added successfully.")
+        toast.success("Experience added successfully.")
         setAddExperienceToggle(false);
         refreshPage();
 
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      toast.error(`Error in adding new Experience: ${error.message}`)
     }
   }
   return (
@@ -44,16 +46,16 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
               <Form id='addExeprienceForm' onSubmit={addExperiece}>
                 <Form.Control type="text" placeholder="Enter Your held Postion"  className='m-2 rounded' onChange={(e)=>setPostion(e.target.value)} />
                 <Form.Group>
-                <Form.Label> Started from </Form.Label>
+                <Form.Label style={{marginLeft:'12px', marginBottom:'0'}}> Started from </Form.Label>
                 <Form.Control type="date"  className='m-2 rounded' onChange={(e)=>setFrom(e.target.value)}/>
                 </Form.Group>
 
                 <Form.Group>
-                <Form.Label> Till </Form.Label>
+                <Form.Label style={{marginLeft:'12px', marginBottom:'0'}}> Till </Form.Label>
                 <Form.Control type="date" className='m-2 rounded' onChange={(e)=> setTo (e.target.value)}/>
                 </Form.Group>
 
-                <Form.Select  style={{width:"100%"}} className="m-2 p-2 rounded" onChange={(e)=>setFarmingType(e.target.value)}>
+                <Form.Select  style={{width:"100%",marginLeft:'12px', marginBottom:'0'}} className="m-2 p-2 rounded" onChange={(e)=>setFarmingType(e.target.value)}>
                   <option disabled>select Farming Type</option>
                   <option>Cattle</option>
                   <option>Polutry</option>
@@ -68,6 +70,7 @@ const AddExperience = ({addExperienceToggle,setAddExperienceToggle,refreshPage})
               </Button>
             </Modal.Footer>
           </Modal>
+          <Toaster position='bottom-right' />
         </>
       );
     }

@@ -1,9 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import { Toaster, toast } from 'react-hot-toast';
 import {Form,Button,Col,Row,FloatingLabel, Container,Image} from "react-bootstrap"
 import { useHistory } from 'react-router';
 import logo from '../data/LoginPNG.jpg'
+import Cookies from 'js-cookie';
 const Login = ({setUser}) => {
   let history = useHistory();
 const [userType,setUsertype] = useState("F");
@@ -30,23 +32,33 @@ const handleRadioChange = (event) =>{
             console.log(error.response.data);  
             if(error.response.data.error){
               setError(error.response.data.error);
+              toast.error(error.response.data.error);
 
             }else{
               setError(error.response.data)
+          toast.error(`${error.response.data}`);
+
             }
               return;
           }
+          toast.success('Login successfull.')
            const payload = jwt.verify(result.data.accessToken,'secret');
            setUser(payload);
               history.push('/discussion');
 }
+useEffect (()=>{
+  if(Cookies.get('refreshToken')){
+    toast.error('You are already logged in!');
+    history.push('discussion');
+  }
+},[])
   
   return (
     <Container >
     <Row className="my-4">
 
     <Col lg={7} sm={5} xl={6}>
-    <Image src={logo} alt="logo" fluid />
+    <Image src={logo} alt="logo" fluid width={'80%'} />
     </Col>
     <Col>
     <Form onSubmit={onSubmitFunction} >
@@ -84,14 +96,14 @@ const handleRadioChange = (event) =>{
     label=""
     className="mb-3"
   >
-  <Form.Control style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
+  <Form.Control required style={{borderRadius:'20px'}} type="text" placeholder="Username" onChange={(e)=>{
     setUsername(e.target.value)
         }} />
         
   </FloatingLabel>
     
     <FloatingLabel controlId="floatingPassword" label="">
-    <Form.Control style={{borderRadius:'20px'}} type="password" placeholder="Password"  onChange={(e)=>{
+    <Form.Control required style={{borderRadius:'20px'}} type="password" placeholder="Password"  onChange={(e)=>{
           setPassword(e.target.value);
         }}/>
   </FloatingLabel>
@@ -113,6 +125,7 @@ const handleRadioChange = (event) =>{
   </Form>
   </Col>
     </Row>
+    <Toaster position='bottom-right' />
     </Container>
   );
 }

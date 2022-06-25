@@ -6,6 +6,7 @@ import ExpertDiscussion from './Experts/Screens/DiscussionMain';
 import ExpertBlog from './Experts/Screens/BlogMain';
 import {Row,Col} from 'react-bootstrap'
 import { Switch,Route,Redirect } from 'react-router';
+import { Toaster } from 'react-hot-toast';
 
 const MainContainer = ({user,setUser}) => {
     
@@ -53,6 +54,7 @@ const MainContainer = ({user,setUser}) => {
         </Col>    
         </Row>
     </div> 
+    <Toaster position='bottom-right' />
         </>
     )
 }

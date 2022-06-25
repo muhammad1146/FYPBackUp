@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import { ImCross } from "react-icons/im";
 import {Form,Row,Col,Image,Button,Modal} from "react-bootstrap"
 import { useHistory } from 'react-router';
+import toast, { Toaster } from 'react-hot-toast';
 let validationSchema = yup.object().shape({
   name:yup.string().required(),
   price:yup.number().required(),
@@ -40,9 +41,9 @@ initialValues= {{
     name: '',
     price: 0,
     weight: 0,
-    cattleType: '',
+    cattleType: 'Cow',
     description: '',
-    city:'',
+    city:'Attock',
     cattleImages:{}
   }}
   validationSchema={validationSchema}
@@ -74,10 +75,10 @@ initialValues= {{
     catch(error){
       setError(error.response.data);
       setPostFormToggle(false);
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
-    alert("Post Submitted Successfully!");
+    toast.success("Post Submitted Successfully!");
 
    actions.resetForm();
    history.push('/ecommerce/all')
@@ -92,7 +93,7 @@ initialValues= {{
 <h5>{error}</h5>
   <Row className="mb-3">
     <Form.Group as={Col} controlId="formGridName">  
-      <Form.Control type="name" placeholder="Cattle Name"  
+      <Form.Control required type="name" placeholder="Cattle Name"  
         name="name" onChange={props.handleChange}/>
       <small className="text-danger"> {props.errors.name} </small>
     </Form.Group>
@@ -102,7 +103,7 @@ initialValues= {{
     <Form.Group as={Col} controlId="formGridPrice" className="mb-3">
 
       
-      <Form.Control type="number" 
+      <Form.Control required type="number" 
       placeholder="Price" 
       name="price" onChange={props.handleChange}
        />
@@ -112,13 +113,13 @@ initialValues= {{
   </Row>
 
   <Form.Group className="mb-3" controlId="formGriddescription">
-    <Form.Control 
+    <Form.Control required 
     placeholder="Description of Cattle" onChange={props.handleChange} name="description" />
       <small className="text-danger"> {props.errors.description} </small>
   </Form.Group>
   <Row className="mb-3">
     <Form.Group as={Col}  controlId="formGridWeight">
-      <Form.Control placeholder="Weight" name="weight" onChange={props.handleChange} type="number"/>
+      <Form.Control required placeholder="Weight" name="weight" onChange={props.handleChange} type="number"/>
       <small className="text-danger"> {props.errors.weight} </small>    
     </Form.Group>
   </Row>
@@ -145,7 +146,7 @@ initialValues= {{
     </Row>
   <Form.Group controlId="formFileSm" className="mb-3">
     
-    <Form.Control type="file" size="sm"   multiple onChange={(e) =>{
+    <Form.Control required type="file" size="sm"   multiple onChange={(e) =>{
       props.setFieldValue("cattleImages",e.target.files); onImageChange(e);
     }} name="cattleImages"/>
       <small> {props.errors.cattleImages} </small>
@@ -177,6 +178,7 @@ initialValues= {{
 )}
 </Formik>
 </Modal>
+<Toaster position='bottom-right' />
 </>
 )
 }

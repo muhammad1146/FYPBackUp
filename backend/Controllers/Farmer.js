@@ -387,7 +387,7 @@ exports.farmerLogin = async (req,res) =>
     const schema = Joi.object(
         {
             userName: Joi.string().required(),
-            password: Joi.string().min(8).required()
+            password: Joi.string().min(5).required()
         }
     );
     try {

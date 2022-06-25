@@ -6,6 +6,7 @@ import AddQualification from './AddQualification';
 import AddExperience from './AddExperience';
 import axios from 'axios';
 import { useHistory,useParams } from 'react-router';
+import {Toaster, toast} from 'react-hot-toast'; 
 const ExpertProfile = (props) => {
     console.log('reached expert profile')
     const history = useHistory();
@@ -20,18 +21,22 @@ const ExpertProfile = (props) => {
         setRefresh(prev=>!prev);
     }
     const [expertData,setExpertData] = useState();
+    console.log('expertData: ',expertData );
     const Experience =()=>{
         const deleteExperience = async (id) =>{
-            let result = await axios.delete(`/api/experts/experiences/${id}`);
+            let result = await axios.delete(`/api/experts/experience/${id}`);
             if(result.status===200) {
                 setAddExperienceToggle(false);
-                alert('The experience deleted successfully.');
+                toast.success('Expert Experience has been deleted successfully.');
                 setRefresh(prev=>!prev);
+            }else{
+              toast.error(`Request failed with status code: ${result.status}`);
+
             }
         }
         return (
             <>
-            {expertData?.ExpertExperience?.length<1?
+            {expertData?.ExpertExperiences?.length>0?
             (<Table striped bordered hover>
                 <thead>
                         <tr>
@@ -47,15 +52,15 @@ const ExpertProfile = (props) => {
                     <tbody>
                     {
                         expertData?.ExpertExperiences.map(e=>{
-                        let fromDate = new Date(e.from);       
-                        let toDate = new Date(e.to);     
+                        let fromDate = new Date(e.startDate);       
+                        let toDate = new Date(e.endDate);     
                            return( 
                             <tr>
-                                <td>{e.farmingType}</td>
+                                <td>{e.institute}</td>
                                 <td>{`${fromDate.getDate()}/${fromDate.getMonth()}/${fromDate.getFullYear()}`}</td>
                                 <td>{`${toDate.getDate()}/${toDate.getMonth()}/${toDate.getFullYear()}`}</td>
                                 <td>{e.position}</td>
-                                <td className='deleteIcon' style={{cursor:"pointer"}}><BiTrash size='2rem' onClick={()=>deleteExperience(e.id)} /> </td>
+                                <td className='deleteIcon' style={{cursor:"pointer"}}><BiTrash size='2rem' onClick={()=>deleteExperience(e.uuid)} /> </td>
                             </tr>)
                     })
                     }
@@ -94,11 +99,12 @@ const ExpertProfile = (props) => {
             }
           );
           if(result.status===200) {
-              setRefresh(true)
-              setUdpateInfoToggle(false);
+            toast.success('Profile data updated successfully.');
+            setUdpateInfoToggle(false);
+            setRefresh(true);
           }
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         }    
         }
         return (
@@ -202,13 +208,14 @@ const ExpertProfile = (props) => {
          
             console.log("profileImage Result: ",result);
             if(result.status===200) {
-                alert("Profile picture changed successfully");
+                toast.success("Profile picture changed successfully");
                 setPictureToggle(false);
                 refreshPage();    
             }
         
         } catch (error) {
             console.log("error from changePicture:",error);
+            toast.error('Error changing Profile Picture')
         }
     }
 useEffect(async() =>{
@@ -250,7 +257,7 @@ useEffect(async() =>{
             </Modal.Header>
             <Modal.Body>
               <Form id='addExeprienceForm' onSubmit={changePicture}>
-                <Form.Control type="file" placeholder="Select file as profile image"  className='m-2 rounded' onChange={(e)=>setPicture(e.target.files[0])} />
+                <Form.Control accept='.png, .jpg, .jpeg' type="file" placeholder="Select file as profile image"  className='m-2 rounded' onChange={(e)=>setPicture(e.target.files[0])} />
               </Form>
             </Modal.Body>
             <Modal.Footer>
@@ -288,27 +295,27 @@ useEffect(async() =>{
 
 
 <Row>
-    <AddQualification qualificationToggle={qualificationToggle} setQualificationToggle={setQualificationToggle} />
+    <AddQualification qualificationToggle={qualificationToggle} setQualificationToggle={setQualificationToggle} refreshPage={refreshPage} />
 
 </Row>
 
-<Row>
-    <Col lg={6}>
-    <h3>Qualifications</h3>
-    </Col>
-   {
-       (props.user.uuid===expertData?.uuid) &&(
-    <Col lg={6} style={{display:`${props.user.uuid===username?'flex':"none"}`,justifyContent:'end'}}>
-        <Button onClick={()=>setQualificationToggle(true)}>Add Farm</Button>
-    </Col>
-       )
-   }
-</Row>
-<Row>
-<ExpertQualification expertData={expertData} />
-</Row>
+    <Row>
+        <Col lg={6}>
+        <h3>Qualifications</h3>
+        </Col>
+      {
+          (props.user.uuid===expertData?.uuid) &&(
+        <Col lg={6} style={{display:`${props.user.uuid===username?'flex':"none"}`,justifyContent:'end'}}>
+            <Button onClick={()=>setQualificationToggle(true)}>Add Qualification</Button>
+        </Col>
+          )
+      }
+    </Row>
+    <Row>
+    <ExpertQualification expertData={expertData} />
+    </Row>
 
-
+    <Toaster position='bottom-right' />
     </Container>
     )
 }

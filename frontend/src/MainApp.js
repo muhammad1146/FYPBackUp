@@ -7,6 +7,7 @@ import { UserContext } from './Contexts/UserContext';
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom';
 import MainContainer from './MainContainer';
+import { Toaster, toast } from 'react-hot-toast';
 const MainApp = ({user,setUser}) => {
   let history = useHistory();                                                       
         if(Cookies.get("accessToken") || Cookies.get('refreshToken')){  // logged in 
@@ -17,6 +18,8 @@ const MainApp = ({user,setUser}) => {
             return(               
               <>
               <MainContainer user={user} setUser={setUser} />
+              <Toaster position='bottom-right'/>
+              
               </>            
             ) 
       }

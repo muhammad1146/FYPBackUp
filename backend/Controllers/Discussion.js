@@ -431,7 +431,7 @@ exports.getQuestionComments = async (req,res,next) =>{ //getAnswerOfAQuestion *F
 exports.deleteQuestionComment = async (req,res) => {
     const id = req.params.commentid;
     const uuid = req.user.uuid;
-    const userType = res.user.type
+    const userType = req.user.type
     let requesterId;
     let commentorType,commentorId;
         if(userType==='F') {
@@ -443,7 +443,7 @@ exports.deleteQuestionComment = async (req,res) => {
             requesterId = expert.id;
         }
     try {
-        const questionComment = QuestionComments.findOne({where:{id}});
+        const questionComment = QuestionComments.findOne({where:{uuid:id}});
         commentorType = questionComment.commenterType;
         commentorId = questionComment.commenterId;
     } catch (error) {
@@ -451,7 +451,7 @@ exports.deleteQuestionComment = async (req,res) => {
     }
 try {
         if(commentorId===requesterId){
-            const qComment = await QuestionComments.destroy({where:{id}});
+            const qComment = await QuestionComments.destroy({where:{uuid:id}});
             return res.json(qComment);
         }else {
             return res.status(401).send("Forbidden Access!");}
@@ -517,7 +517,7 @@ exports.getAnswers = async (req,res,next) =>{ //getAnswerOfAQuestion *For Expert
 exports.getAnswer = async (req,res,next) =>{ //getAnswerOfAQuestion *For Expert/Farmer Entity*
     const id = req.params.aid;
     try {
-        const answers = await Answers.findOne({where:{id}},{include:[Experts]});
+        const answers = await Answers.findOne({where:{id},include:[Experts]});
         return res.json(answers);
     } catch (error) {
         return res.status(500).json(error);

@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import {Row,Col,Card,ListGroup,ListGroupItem,Button,Image,Modal,Form,Alert} from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap';
 import { AiOutlineUser,AiFillPhone } from "react-icons/ai";
-import { BiDotsVerticalRounded } from "react-icons/bi";
+import { BsTrash } from "react-icons/bs";
 import axios from 'axios';
 import { useHistory } from 'react-router';
 import { CommentsArea } from '../../Components/Ecommerce/Comments';
+import {Toaster, toast } from 'react-hot-toast';
 const Post = (props) => {
     const history = useHistory();
     let [post,setPost] = useState({});
@@ -23,11 +24,14 @@ const Post = (props) => {
     });
      console.log(alertBox)
     useEffect( async () => {
+        const tId = toast.loading('Fetching Post!');
         const result = await axios.get(`/api/ecommerce/${uuid}`);
         if(result.data.animalPost!=null){
+            toast.dismiss(tId);
             setPost(result.data.animalPost); 
             setMainImage(result.data.animalPost.PostImages[0].image);   
         }else{
+            
             setPost({error:"Some error Occurred!"});
         }  
     },[])
@@ -110,6 +114,23 @@ const Post = (props) => {
             setOrderModal(true);
         }
     }
+    const deletePost = async (uuid) => {
+       if(!window.confirm("Are you sure want to delete this post?")){
+        return;
+       }
+        try {
+            let result = await axios.delete(`/api/ecommerce/${uuid}`);
+            if(result.status===200){
+                toast.success('Post deleted successfully.');
+                history.goBack();
+            }else{
+                toast.error('Request failed with status code', result.status);
+
+            }
+        } catch (error) {
+            toast.error('Request failed with status code', error.message);   
+        }
+    }
     return (
         <>
         <AlertMessage alertBox={alertBox} setAlert={setAlert}/>
@@ -120,7 +141,7 @@ const Post = (props) => {
         </Col>
         <Col lg={10}></Col>
         <Col lg={1} className='py-2'>
-        <BiDotsVerticalRounded size='2rem' />
+        <BsTrash onClick={()=>deletePost(post.uuid)} style={{cursor:'pointer',display:`${props.user.uuid===post.Farmer?.uuid?'block':'none'}`}} size='2rem' />
         </Col>
     </Row>
         <Row className='border' >
@@ -217,7 +238,7 @@ const Post = (props) => {
         </Row>
         
         <CommentsArea user={props.user} />     
-
+        <Toaster position='bottom-right' />
         </>
     )
 }

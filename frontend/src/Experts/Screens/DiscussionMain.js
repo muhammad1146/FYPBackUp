@@ -38,7 +38,7 @@ const DiscussionMain = ({user}) =>
                 <Route exact path='/discussion/unanswered' component={ Questions  } />
                 
                 <Route exact path='/discussion/farmers/:fid' component={ FarmerProfile }  />
-                <Route exact path='/discussion/experts' component={Experts} />
+                <Route exact path='/discussion/experts' component={()=>(<Experts search={searchText} />)} />
                 
                  <Route exact path='/discussion/:qid' component={()=> (<Question user={user} />)}   /> {/*Done */}
             </Switch>

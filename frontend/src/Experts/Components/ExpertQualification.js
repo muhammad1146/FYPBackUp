@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Button, Form,Row,Col,Table,Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { useParams } from 'react-router';
+import { BiTrash } from 'react-icons/bi';
+import {Toaster,toast} from 'react-hot-toast';
 const ExpertQualification = ({expertData}) => {
   const username = useParams('username');
     const [QualificationToggle,setQualificationToggle] = useState(false)
@@ -26,8 +28,14 @@ const ExpertQualification = ({expertData}) => {
                 }
               );
               console.log(result);
+              if(result.status===200){
+                toast.success('New Qualification added successfully.');
+              }else{
+                toast.error('Request failed with status code ', result.status);
+              }
             } catch (error) {
               console.log(error)
+              toast.error(error.message);
             }
           }
         return (
@@ -44,7 +52,7 @@ const ExpertQualification = ({expertData}) => {
             </Modal.Header>
             <Modal.Body>
               <Form id='addQualification' onSubmit={addQualification}>
-                <Form.Control type="text" placeholder="Qualification"  className='m-2 rounded' onChange={(e)=>setQualification(e.target.value)} />
+                <Form.Control required type="text" placeholder="Qualification"  className='m-2 rounded' onChange={(e)=>setQualification(e.target.value)} />
 
                 <Form.Select  style={{width:"100%"}} className="m-2 p-2 rounded" onChange={(e)=>setDuration(e.target.value)}>
                   <option disabled>Duration in Years</option>
@@ -56,10 +64,10 @@ const ExpertQualification = ({expertData}) => {
 
                 <Form.Group>
                 <Form.Label> Result % </Form.Label>
-                <Form.Control type="date" className='m-2 rounded' onChange={(e)=> setPercentage (e.target.value)}/>
+                <Form.Control required type="number" className='m-2 rounded' onChange={(e)=> setPercentage (e.target.value)}/>
                 </Form.Group>
 
-                <Form.Control type="text" placeholder="Institute"  className='m-2 rounded' onChange={(e)=>setInstitute(e.target.value)} />
+                <Form.Control required type="text" placeholder="Institute"  className='m-2 rounded' onChange={(e)=>setInstitute(e.target.value)} />
               </Form>
             </Modal.Body>
             <Modal.Footer>
@@ -75,8 +83,18 @@ const ExpertQualification = ({expertData}) => {
     }
    
 const handleDelete = async (id) => {
+  try {
     let result = await axios.delete(`/api/experts/qualification/${id}`);
     console.log(result);
+    if(result.status) {
+      toast.success('Qualification is deleted successfully.')
+    }else{
+      toast.error('Request is failed with status ', result.status);
+    }
+    
+  } catch (error) {
+    toast.error(error.message);
+  }
     }
     const QualificationContainer = () => {
         return (
@@ -100,13 +118,11 @@ const handleDelete = async (id) => {
                                return(
 
                             <tr>
-                                <td>{row.Qualification}</td>
-                                <td>{row.Duration}</td>
+                                <td>{row.qualification}</td>
+                                <td>{row.duration}</td>
                                 <td>{row.percentage}</td>
                                 <td>{row.institution}</td>
-                                <td>
-                                <button onClick={()=> {handleDelete(row.id)}} className="deleteRow"  >Delete</button>
-                                </td>
+                                <td className='deleteIcon' style={{cursor:"pointer"}}><BiTrash size='2rem' onClick={()=>handleDelete(row.id)} /> </td>
                             </tr>
                                )
                            }

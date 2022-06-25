@@ -9,7 +9,8 @@ import {Form,Row,Col,Button, Badge,Modal} from "react-bootstrap";
 import {EditorState} from 'draft-js';
 import {convertToHTML} from 'draft-convert';
 import { useHistory } from 'react-router';
-import {debounce} from 'lodash.debounce'
+import {debounce} from 'lodash.debounce';
+import { Toaster, toast } from 'react-hot-toast';
 import DraftDefaultConfig from "./Editor/config";
 let validationSchema = yup.object().shape({
   title:yup.string().required(),
@@ -36,8 +37,11 @@ const AddQuestion = () => {
       return;
     }
     let result = await axios.get(`/api/questions/tags/search?query=${e.target.value}`);
-    console.log('tag results',result)
+  if(result.status===200){
     setTagSuggestionData(result.data);
+  }else{
+    toast.error('Request failed with status code: ', result.status );
+  }
   }; 
   
 const addTag = (data) => {
@@ -56,7 +60,6 @@ const addTag = (data) => {
       return [...prev,data]
     }
   });
-  console.log('question tags after: ',...questionTags)
 
   tagFieldRef.current.value='';
   setTagSuggestionData([])
@@ -64,19 +67,25 @@ const addTag = (data) => {
 const handleSubmit = async(e) =>{
   e.preventDefault();
   try {
-    console.log('title',title)
-    console.log('body',convertToHTML(editorState.getCurrentContent()));
+    if(questionTags.length<3){
+      toast.error("Please select at least three tags for a question.")
+      return;
+    }
+    if(convertToHTML(editorState.getCurrentContent()).length<10) {
+      toast.error("Question body cannot be this small.");
+      return;
+    }
     let result =  await axios.post("/api/questions/",{title,body:convertToHTML(editorState.getCurrentContent()),
     tags:questionTags.map(i=>i.id)}
        );
        if(result.status===200) {
-         alert('Question added successfully.');
+         toast.success('New Question added successfully.')
          history.push('/discussion');
        }
 
   } catch (error) {
     console.log(error);
-    alert(error.message);
+    toast.error(`${error.message}`);
   }
 }
 const removeTag = (id) =>{
@@ -94,7 +103,7 @@ const removeTag = (id) =>{
 <h5>{error}</h5>
   <Row className="mb-3">
     <Form.Group as={Col} className="p-0" controlId="formGridName">  
-      <Form.Control type="text" placeholder="Question title"  
+      <Form.Control required type="text" placeholder="Question title"  
         name="title" onChange={(e)=>setTitle(e.target.value)}/>
     </Form.Group>
   </Row>
@@ -149,7 +158,7 @@ const removeTag = (id) =>{
           </Button>
         </Modal.Footer>
     </Modal>
-
+  <Toaster position='bottom-right' />
     </>
   )
 }

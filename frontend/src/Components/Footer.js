@@ -39,7 +39,14 @@ const Footer = () => {
             
         </Row> */}
             <Row>
-        <Col className= "text-center py-3">Copyright &copy; CATTLETALK</Col>
+        <Col className= "text-center py-1">Copyright &copy; CATTLETALK</Col>
+            </Row>
+            <Row>
+            <Col className= "text-center py-1" style={{fontStyle:'italic'}}>Supervised By:  
+        <span style={{color:'red'}}>
+        Mr. Shehzad Rizwan
+        </span>
+        </Col>
             </Row>
        
         </Container>

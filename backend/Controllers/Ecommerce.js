@@ -242,11 +242,6 @@ if((farmer.id && currentPost.farmerId) && (farmer.id === currentPost.farmerId) )
             }
         }
         // console.log(postImages[0].dataValues.image);
-        (postImages.length>1) && (
-            postImages.forEach((item)=>{
-                fs.unlink(`${imagePath}/${item.dataValues.image}`,deleteFileCallback);
-            }) 
-        )
         dbDebugger("deleteAnimalPostComments db process passed!!");
         const images = await PostImages.destroy({where:{postId:currentPost.id}});
 
